@@ -1,0 +1,49 @@
+{
+  "expo": {
+    "name": "LearnFitness",
+    "slug": "LearnFitness",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.LearnFitness.LearnFitness",
+      "infoPlist": {
+        "CFBundleURLTypes": [
+          {
+            "CFBundleURLSchemes": [
+              "com.googleusercontent.apps.611505217549-e4dc3rks52mml21jat2tm5mp781qtr8j"
+            ]
+          }
+        ]
+      }
+    },
+    "android": {
+      "package": "com.LearnFitness.LearnFitness",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      }
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "@react-native-google-signin/google-signin"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "9078265a-30d2-4232-b131-cb4600fce3b5"
+      }
+    }
+  }
+}
