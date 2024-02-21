@@ -7,4 +7,4 @@ Welcome to the repository of our LearnFitness mobile app, a cutting-edge solutio
 - Frontend: Built using React Native, this app offers a smooth and dynamic user experience that is consistent across iOS and Android devices.
 - Backend Server: Our backend infrastructure is powered by Node.js and Express, ensuring a robust and scalable service architecture.
 - Deployment: Deployed on Google Cloud Platform's App Engine, our app benefits from automatic scaling and high availability, handling user demands efficiently and reliably.
-- Database: Utilizing Firebase Firestore, we ensure that our app scales seamlessly with growing data needs, providing real-time updates and powerful query capabilities.
+- Database: Utilizing Supabase PótgreSQL, we ensure that our app scales seamlessly with growing data needs, providing real-time updates and powerful query capabilities.
