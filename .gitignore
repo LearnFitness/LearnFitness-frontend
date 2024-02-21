@@ -36,3 +36,7 @@ yarn-error.*
 
 # VS Code
 .vscode
+
+# ios and android build
+ios
+android
