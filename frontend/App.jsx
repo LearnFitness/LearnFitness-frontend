@@ -13,13 +13,14 @@ import { LinearGradient } from "expo-linear-gradient";
 
 export default function App() {
   GoogleSignin.configure({
+    // From Google Cloud's console
     webClientId:
       "611505217549-0d0f0gacdvkgd6i77mma9q7e46u9i0c2.apps.googleusercontent.com",
     iosClientId:
       "611505217549-e4dc3rks52mml21jat2tm5mp781qtr8j.apps.googleusercontent.com",
   });
 
-  const [session, setSession] = useState<Session | null>(null);
+  const [session, setSession] = useState(null);
   const [userName, setUserName] = useState("");
 
   useEffect(() => {
