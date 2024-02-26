@@ -1,3 +1,4 @@
+// For android and ios build settings (eas = expo app services)
 {
   "cli": {
     "version": ">= 7.3.0"

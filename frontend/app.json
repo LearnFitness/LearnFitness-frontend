@@ -1,3 +1,4 @@
+// For the expo app
 {
   "expo": {
     "name": "LearnFitness",
@@ -38,7 +39,8 @@
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
-      "@react-native-google-signin/google-signin"
+      "@react-native-google-signin/google-signin",
+      "expo-router"
     ],
     "extra": {
       "eas": {
