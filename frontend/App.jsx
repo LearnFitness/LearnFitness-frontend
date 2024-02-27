@@ -9,7 +9,6 @@ import { supabase } from "./utils/supabase";
 import Auth from "./components/Auth";
 import { useState, useEffect } from "react";
 import { Session } from "@supabase/supabase-js";
-import { LinearGradient } from "expo-linear-gradient";
 
 export default function App() {
   GoogleSignin.configure({
@@ -39,7 +38,7 @@ export default function App() {
         {session && session.user ? (
           <>
             <Text style={styles.subTitle}>Hello {userName}!</Text>
-            <Button title="Sign Out" onPress={() => supabase.auth.signOut()} />
+            <Button title="Sign Out" onPress={() => {setUserName(null); supabase.auth.signOut()}} />
           </>
         ) : (
           <SafeAreaView>
