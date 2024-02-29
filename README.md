@@ -22,9 +22,9 @@ Welcome to the repository of our LearnFitness mobile app, a cutting-edge solutio
 - ```yarn.lock```: yarn package mananger dependencies (a better alternative to npm)
 - ```.gitignore```: a list of files and folders to be ignored by Git and GitHub
 
-### ```app``` folder
+### ```screens``` folder
 
-- Contains app pages and is used by Expo Router for app navigation.
+- Contains screens
 
 ### ```assets``` folder
 
