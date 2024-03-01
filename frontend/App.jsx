@@ -32,7 +32,7 @@ export default function App() {
           <>
             <Stack.Screen name="WelcomeScreen" component={WelcomeScreen} options={{ headerShown: false }} />
             <Stack.Screen name="SignInScreen" component={SignInScreen} options={{ headerShown: false }}/>
-            <Stack.Screen name="SignUpScreen" component={SignUpScreen} options={{  }}/>
+            <Stack.Screen name="SignUpScreen" component={SignUpScreen} options={{ headerShown: false }}/>
             <Stack.Screen name="ResetPasswordScreen" component={ResetPasswordScreen} />
           </>
         }

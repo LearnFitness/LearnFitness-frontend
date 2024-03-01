@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Alert, StyleSheet, Text, TextInput, View, SafeAreaView } from "react-native"
+import { Alert, StyleSheet, Text, TextInput, View, SafeAreaView, Pressable } from "react-native"
 import { supabase } from "../utils/supabase";
 import { Button } from '@rneui/themed';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -82,6 +82,13 @@ export default function SignUpScreen({ navigation }) {
             onPress={() => signUpWithEmail()}
           />
         </View>
+
+        <View style={styles.footer}>
+          <Text style={[styles.footerText]}>Already a user?</Text>
+          <Pressable onPress={() => navigation.navigate("SignInScreen")}>
+            <Text style={{ fontSize: 17, color: "white" }}> Login</Text>
+          </Pressable>
+        </View>
       </SafeAreaView>
     </LinearGradient>
   )
@@ -98,7 +105,6 @@ const styles = StyleSheet.create({
   title: {
     fontWeight: "500",
     textAlign: "center",
-    marginTop: 200,
     marginBottom: 20,
     marginHorizontal: 40,
     fontSize: 40,
@@ -120,4 +126,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     borderRadius: 10
   },
+  footer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center"
+  },
+  footerText: {
+    color: "black",
+    fontSize: 17
+  }
 })

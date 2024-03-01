@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Image, View, Platform } from 'react-native';
+import { Button, Image, View, Platform, Pressable } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
+import { Avatar } from '@rneui/themed';
 
 export default function AvatarPicker() {
   const [image, setImage] = useState(null);
@@ -10,7 +11,6 @@ export default function AvatarPicker() {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
-      aspect: [4, 3],
       quality: 1,
     });
 
@@ -23,8 +23,11 @@ export default function AvatarPicker() {
 
   return (
     <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-      <Button title="Pick an image from camera roll" onPress={pickImage} />
-      {image && <Image source={{ uri: image }} style={{ width: 200, height: 200 }} />}
+      {image ?
+        <Avatar source={{ uri: image }} size={200} rounded onPress={pickImage} />
+        :
+        <Avatar icon={{ name: "image", type: "font-awesome" }} containerStyle={{ backgroundColor: 'grey' }} size={200} rounded onPress={pickImage} />
+      }
     </View>
   );
 }
