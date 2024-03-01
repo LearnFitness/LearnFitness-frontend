@@ -43,7 +43,7 @@ export default function SignInScreen({ navigation }) {
             onChangeText={(text) => setPassword(text)}
             value={password}
             secureTextEntry={true}
-            placeholder="password"
+            placeholder="Password"
             autoCapitalize={"none"}
           />
           <Button
