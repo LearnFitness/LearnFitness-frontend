@@ -38,7 +38,7 @@ export default function SignUpScreen({ navigation }) {
     <LinearGradient colors={['#002f51', '#00604f']} style={styles.gradient}>
       <SafeAreaView style={styles.container}>
 
-        <Text style={[styles.title]}>Sign Up</Text>
+        <Text style={[styles.title]}>Create an Account</Text>
 
         <AvatarPicker />
 
@@ -54,7 +54,7 @@ export default function SignUpScreen({ navigation }) {
             style={styles.input}
             onChangeText={(text) => setEmail(text)}
             value={email}
-            placeholder="email@address.com"
+            placeholder="Email"
             autoCapitalize={"none"}
           />
           <TextInput
@@ -86,7 +86,7 @@ export default function SignUpScreen({ navigation }) {
         <View style={styles.footer}>
           <Text style={[styles.footerText]}>Already a user?</Text>
           <Pressable onPress={() => navigation.navigate("SignInScreen")}>
-            <Text style={{ fontSize: 17, color: "white" }}> Login</Text>
+            <Text style={{ fontSize: 17, color: "lightblue" }}> Login</Text>
           </Pressable>
         </View>
       </SafeAreaView>
@@ -105,9 +105,9 @@ const styles = StyleSheet.create({
   title: {
     fontWeight: "500",
     textAlign: "center",
-    marginBottom: 20,
+    marginTop: 30,
     marginHorizontal: 40,
-    fontSize: 40,
+    fontSize: 30,
     color: "white"
   },
   flex1: {
@@ -132,7 +132,7 @@ const styles = StyleSheet.create({
     justifyContent: "center"
   },
   footerText: {
-    color: "black",
+    color: "white",
     fontSize: 17
   }
 })

@@ -56,21 +56,21 @@ export default function SignInScreen({ navigation }) {
           />
           <Pressable
             onPress={() => navigation.navigate("ResetPasswordScreen")}>
-            <Text style={{textAlign: "center", marginTop: 20, fontSize: 17, color: "darkgrey"}}>Forgot password?</Text>
+            <Text style={{textAlign: "center", marginTop: 20, fontSize: 17, color: "lightblue"}}>Forgot password?</Text>
           </Pressable>
         </View>
 
 
 
         <View style={styles.googleSignInContainer}>
-          <Text style={{ color: "white", marginVertical: 10, fontSize: 17 }}>or continue with</Text>
+          <Text style={{ paddingHorizontal: 25, paddingVertical: 5, color: "white", marginVertical: 10, fontSize: 17, position: "relative", bottom: 26, backgroundColor: "teal"}}>or continue with</Text>
           <GoogleSignIn />
         </View>
 
         <View style={styles.footer}>
           <Text style={[styles.footerText]}>Don't have an account?</Text>
           <Pressable onPress={() => navigation.navigate("SignUpScreen")}>
-            <Text style={{fontSize: 17, color: "white"}}> Sign Up</Text>
+            <Text style={{fontSize: 17, color: "lightblue"}}> Sign Up</Text>
           </Pressable>
         </View>
       </SafeAreaView>
@@ -125,7 +125,7 @@ const styles = StyleSheet.create({
     justifyContent: "center"
   },
   footerText: {
-    color: "black",
+    color: "white",
     fontSize: 17
   }
 });

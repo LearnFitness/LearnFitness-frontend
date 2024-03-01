@@ -14,19 +14,21 @@ export default function AvatarPicker() {
       quality: 1,
     });
 
-    console.log(result);
-
     if (!result.canceled) {
       setImage(result.assets[0].uri);
     }
   };
 
   return (
-    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+    <View style={{ alignItems: 'center', justifyContent: 'center' }}>
       {image ?
-        <Avatar source={{ uri: image }} size={200} rounded onPress={pickImage} />
+        <Avatar source={{ uri: image }} size={200} rounded onPress={pickImage} >
+          <Avatar.Accessory name='pencil' type='font-awesome' size={50} onPress={pickImage}/>
+        </Avatar>
         :
-        <Avatar icon={{ name: "image", type: "font-awesome" }} containerStyle={{ backgroundColor: 'grey' }} size={200} rounded onPress={pickImage} />
+        <Avatar icon={{ name: "user", type: "font-awesome" }} containerStyle={{ backgroundColor: 'grey' }} size={200} rounded onPress={pickImage} >
+          <Avatar.Accessory name='pencil' type='font-awesome' size={50} onPress={pickImage}/>
+        </Avatar>
       }
     </View>
   );
