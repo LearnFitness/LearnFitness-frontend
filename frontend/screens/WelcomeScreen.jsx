@@ -54,7 +54,7 @@ const styles = StyleSheet.create({
   signInButton: {
     width: "80%",
     height: 70,
-    backgroundColor: "white",
+    backgroundColor: "teal",
     borderRadius: 50,
     margin: 8,
     marginBottom: 60,
@@ -64,6 +64,6 @@ const styles = StyleSheet.create({
   signInButtonText: {
     fontSize: 20,
     fontWeight: "700",
-    color: "black"
+    color: "white"
   }
 })
