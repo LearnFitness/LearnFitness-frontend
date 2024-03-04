@@ -1,13 +1,14 @@
 import React, { useState } from "react";
-import { Alert, StyleSheet, View, Text, TextInput, Pressable, SafeAreaView } from "react-native";
+import { Alert, StyleSheet, View, Text, Pressable } from "react-native";
 import { supabase } from "../utils/supabase";
-import { Button } from '@rneui/themed';
+import { Button, Input } from '@rneui/themed';
 import GoogleSignIn from "../components/GoogleSignIn";
 import { LinearGradient } from 'expo-linear-gradient';
 
 export default function SignInScreen({ navigation }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [visiblePassword, setVisiblePassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
   async function signInWithEmail() {
@@ -23,26 +24,29 @@ export default function SignInScreen({ navigation }) {
 
   return (
     <LinearGradient colors={['#002f51', '#00604f']} style={styles.gradient}>
-      <SafeAreaView style={styles.container}>
+      <View style={styles.container}>
 
         <Text style={[styles.title]}>Login to your account</Text>
 
         <View style={{ paddingHorizontal: 40 }}>
-          <TextInput
-            style={styles.input}
-            leftIcon={{ type: "font-awesome", name: "envelope" }}
+          <Input
+            containerStyle={styles.input}
+            leftIcon={{ type: "font-awesome", name: "envelope", size: 20 }}
             onChangeText={(text) => setEmail(text)}
             value={email}
             placeholder="email@address.com"
             autoCapitalize={"none"}
           />
-          <TextInput
-            style={styles.input}
-
+          <Input
+            containerStyle={styles.input}
             leftIcon={{ type: "font-awesome", name: "lock" }}
+            rightIcon={visiblePassword ?
+              { type: "font-awesome", name: "eye", onPress: () => setVisiblePassword(false) } :
+              { type: "font-awesome", name: "eye-slash", onPress: () => setVisiblePassword(true) }
+            }
             onChangeText={(text) => setPassword(text)}
             value={password}
-            secureTextEntry={true}
+            secureTextEntry={visiblePassword ? false : true}
             placeholder="Password"
             autoCapitalize={"none"}
           />
@@ -56,24 +60,22 @@ export default function SignInScreen({ navigation }) {
           />
           <Pressable
             onPress={() => navigation.navigate("ResetPasswordScreen")}>
-            <Text style={{textAlign: "center", marginTop: 20, fontSize: 17, color: "lightblue"}}>Forgot password?</Text>
+            <Text style={{ textAlign: "center", marginTop: 20, fontSize: 17, color: "lightblue" }}>Forgot password?</Text>
           </Pressable>
         </View>
 
-
-
         <View style={styles.googleSignInContainer}>
-          <Text style={{ paddingHorizontal: 25, paddingVertical: 5, color: "white", marginVertical: 10, fontSize: 17, position: "relative", bottom: 26, backgroundColor: "teal"}}>or continue with</Text>
+          <Text style={{ paddingHorizontal: 25, paddingVertical: 5, color: "white", marginVertical: 10, fontSize: 17, position: "relative", bottom: 26, backgroundColor: "teal" }}>or continue with</Text>
           <GoogleSignIn />
         </View>
 
         <View style={styles.footer}>
           <Text style={[styles.footerText]}>Don't have an account?</Text>
           <Pressable onPress={() => navigation.navigate("SignUpScreen")}>
-            <Text style={{fontSize: 17, color: "lightblue"}}> Sign Up</Text>
+            <Text style={{ fontSize: 17, color: "lightblue" }}> Sign Up</Text>
           </Pressable>
         </View>
-      </SafeAreaView>
+      </View>
 
     </LinearGradient>
 
@@ -86,7 +88,8 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    justifyContent: "space-between"
+    justifyContent: "space-between",
+    paddingVertical: 35
   },
   title: {
     fontWeight: "500",
@@ -111,7 +114,7 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     marginBottom: 20,
     paddingHorizontal: 15,
-    borderRadius: 10
+    borderRadius: 10,
   },
   googleSignInContainer: {
     alignItems: "center",
