@@ -7,7 +7,7 @@ Welcome to the repository of our LearnFitness mobile app, a cutting-edge solutio
 - **Frontend**: Built using React Native, this app offers a smooth and dynamic user experience that is consistent across iOS and Android devices.
 - **Backend Server**: Our backend infrastructure is powered by Node.js and Express, ensuring a robust and scalable service architecture.
 - **Deployment**: Deployed on Google Cloud Platform's App Engine, our app benefits from automatic scaling and high availability, handling user demands efficiently and reliably.
-- **Database**: Utilizing Supabase PostgreSQL, we ensure that our app scales seamlessly with growing data needs, providing real-time updates and powerful query capabilities.
+- **Database**: Utilizing Firebase Firestore, we ensure that our app scales seamlessly with growing data needs, providing real-time updates and powerful query capabilities.
 
 ## How to compile and run the app
 
@@ -20,14 +20,27 @@ Welcome to the repository of our LearnFitness mobile app, a cutting-edge solutio
 - If you don't, run ```npm i``` (If this fails, you may not have Node.js installed. Install Node.js for you system first, which should come with npm by default)
 - Wait for the packages to be installed
 
-### 2. Start the expo server
+### 2. Run the app
+
+Try the following commands to quickly run the app:
 
 - Run the command ```npx expo start```
 - The Metro Bundler should start, and give you options to build Android or iOS apps.
-- Press ```i``` to build for iOS.
-- Press ```a``` to build for Android.
+- Press ```i``` to open iOS simulator (Mac only).
+- Press ```a``` to Android emulator.
 - Metro will automatically start the iOS simulator or the Android emulator to install and run your app, assumed that you already installed XCode (Mac only) and Android Studio + create an Android device emulator.
 - On Macs, you may need to start the Android device manually before pressing ```a``` to run the Android version of the app.
+
+If the above commands failed, you need a build of the app before running it. There are 1 options to build:
+
+1. Locally:
+
+- run ```npx expo run:ios``` or ```npx expo run:android```
+
+2. On the cloud (using eas):
+
+- run ```eas build --platform ios --profile preview``` or ```eas build --platform android --profile preview```
+- Note that a cloud build of iOS apps require a paid Apple Developer Account ($99/year).
 
 ## Frontend file structure (React Native Expo)
 
@@ -68,7 +81,7 @@ Welcome to the repository of our LearnFitness mobile app, a cutting-edge solutio
 
 ### ```utils``` folder
 
-- ```supabase.js```: establish connections to Supabase.
+- Contains config files for Firebase connections, Google Services and a troubleshoot clean-up script.
 
 ## Backend file structure (Node.js + Express)
 
