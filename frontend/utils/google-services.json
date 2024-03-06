@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "611505217549",
+    "project_id": "learnfitness",
+    "storage_bucket": "learnfitness.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:611505217549:android:ee0e45be2e28d5219a3544",
+        "android_client_info": {
+          "package_name": "com.LearnFitness.LearnFitness"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "611505217549-7fmcjlcsnij7029l54edvbmemdh0t46d.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.LearnFitness.LearnFitness",
+            "certificate_hash": "95e277a77af8fc8cb13ad634f62a1fa234b068c7"
+          }
+        },
+        {
+          "client_id": "611505217549-h5brjsuss3shvbh1rj6ih2td7vn3bl57.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBb50lSd-XRsSXKhdIJQ11Ujp0kf_3cbXw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "611505217549-0d0f0gacdvkgd6i77mma9q7e46u9i0c2.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "611505217549-e4dc3rks52mml21jat2tm5mp781qtr8j.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.LearnFitness.LearnFitness"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

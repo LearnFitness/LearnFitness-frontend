@@ -16,18 +16,11 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.LearnFitness.LearnFitness",
-      "infoPlist": {
-        "CFBundleURLTypes": [
-          {
-            "CFBundleURLSchemes": [
-              "com.googleusercontent.apps.611505217549-e4dc3rks52mml21jat2tm5mp781qtr8j"
-            ]
-          }
-        ]
-      }
+      "googleServicesFile": "./utils/GoogleService-Info.plist"
     },
     "android": {
       "package": "com.LearnFitness.LearnFitness",
+      "googleServicesFile": "./utils/google-services.json",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
@@ -39,7 +32,19 @@
     "web": {
       "favicon": "./assets/favicon.png"
     },
-    "plugins": ["@react-native-google-signin/google-signin"],
+    "plugins": [
+      "@react-native-google-signin/google-signin",
+      "@react-native-firebase/app",
+      "@react-native-firebase/auth",
+      [
+        "expo-build-properties",
+        {
+          "ios": {
+            "useFrameworks": "static"
+          }
+        }
+      ]
+    ],
     "extra": {
       "eas": {
         "projectId": "e8caa024-5e5d-4b7b-876c-8fd1261e6845"

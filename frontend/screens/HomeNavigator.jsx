@@ -9,7 +9,7 @@ import SettingScreen from "./SettingScreen";
 
 const Tab = createBottomTabNavigator();
 
-export default function HomeScreen() {
+export default function HomeNavigator() {
   return (
     <Tab.Navigator screenOptions={
       ({ route }) => ({

@@ -1,0 +1,13 @@
+Run the following commands one by one on MacOS to start fresh (if you have any trouble with building iOS app)
+
+yarn cache clean
+
+yarn
+
+watchman watch-del-all
+
+rm -fr $TMPDIR/haste-map-*
+
+rm -rf $TMPDIR/metro-cache
+
+npx expo start --clear

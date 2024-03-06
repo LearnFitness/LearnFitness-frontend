@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { Alert, StyleSheet, Text, TextInput, View, Pressable } from "react-native"
-import { supabase } from "../utils/supabase";
 import { Button } from '@rneui/themed';
 import { LinearGradient } from 'expo-linear-gradient';
-import AvatarPicker from "../components/AvatarPicker";
+import AvatarPicker from "../../components/AvatarPicker";
+import auth from "@react-native-firebase/auth";
 
 export default function SignUpScreen({ navigation }) {
   const [name, setName] = useState("");
@@ -21,16 +21,27 @@ export default function SignUpScreen({ navigation }) {
       return;
     }
 
-    const { data: { session }, error } = await supabase.auth.signUp({
-      email: email,
-      password: password,
-    });
+    auth()
+      .createUserWithEmailAndPassword(email, password)
+      .then((userCredentials) => {
+        console.log(userCredentials);
+      })
+      .catch(error => {
+        if (error.code === 'auth/email-already-in-use') {
+          Alert.alert('That email address is already in use!');
+        }
 
-    if (error) Alert.alert(error.message);
-    if (!session) {
-      Alert.alert("Please check your inbox for email verification!");
-      navigation.navigate("SignInScreen");
-    }
+        if (error.code === 'auth/invalid-email') {
+          Alert.alert('That email address is invalid!');
+        }
+
+        Alert.alert(error);
+      });
+      // TODO: may need more handling after signing up??
+    // if (!session) {
+    //   Alert.alert("Please check your inbox for email verification!");
+    //   navigation.navigate("SignInScreen");
+    // }
     setLoading(false);
   }
 

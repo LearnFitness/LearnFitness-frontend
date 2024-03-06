@@ -1,11 +1,12 @@
 import { View, Text, Button } from "react-native";
-import { supabase } from "../utils/supabase";
+import auth from "@react-native-firebase/auth";
 
 export default function DashboardScreen() {
   return (
     <View>
-      <Text>Dashboard</Text>
-      <Button title="Sign Out" onPress={() => supabase.auth.signOut()}/>
+      <Text>Hello, {auth().currentUser.email}</Text>
+      
+      <Button title="Sign Out" onPress={() => auth().signOut()} />
     </View>
   )
 }

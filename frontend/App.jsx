@@ -1,34 +1,38 @@
 import { useState, useEffect } from "react";
-import { supabase } from "./utils/supabase";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { StatusBar } from "expo-status-bar";
+import auth from '@react-native-firebase/auth';
 
 import WelcomeScreen from "./screens/WelcomeScreen";
-import SignInScreen from "./screens/SignInScreen";
-import SignUpScreen from "./screens/SignUpScreen";
-import ResetPasswordScreen from "./screens/ResetPasswordScreen";
+import SignInScreen from "./screens/auth/SignInScreen";
+import SignUpScreen from "./screens/auth/SignUpScreen";
+import ResetPasswordScreen from "./screens/auth/ResetPasswordScreen";
 import HomeNavigator from "./screens/HomeNavigator";
 
 const Stack = createNativeStackNavigator();
 
 export default function App() {
-  const [session, setSession] = useState(null);
+  // Set an initializing state whilst Firebase connects
+  const [initializing, setInitializing] = useState(true);
+  const [user, setUser] = useState(null);
+
+  // Handle user state changes
+  function onAuthStateChanged(user) {
+    setUser(user);
+    if (initializing) setInitializing(false);
+  }
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-    });
-
-    supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-    });
+    const subscriber = auth().onAuthStateChanged(onAuthStateChanged);
+    return subscriber; // unsubscribe on unmount
   }, []);
+
+  if (initializing) return null;
 
   return (
     <NavigationContainer>
       <Stack.Navigator>
-        {session && session.user ?
+        {user ?
           <Stack.Screen name="HomeNavigator" component={HomeNavigator} options={{ headerShown: false }} /> :
           <>
             <Stack.Screen name="WelcomeScreen" component={WelcomeScreen} options={{ headerShown: false }} />

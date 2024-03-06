@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { Alert, StyleSheet, View, Text, Pressable } from "react-native";
-import { supabase } from "../utils/supabase";
 import { Button, Input } from '@rneui/themed';
-import GoogleSignIn from "../components/GoogleSignIn";
+import GoogleSignIn from "../../components/GoogleSignIn";
 import { LinearGradient } from 'expo-linear-gradient';
+import auth from '@react-native-firebase/auth';
 
 export default function SignInScreen({ navigation }) {
   const [email, setEmail] = useState("");
@@ -13,12 +13,18 @@ export default function SignInScreen({ navigation }) {
 
   async function signInWithEmail() {
     setLoading(true);
-    const { error } = await supabase.auth.signInWithPassword({
-      email: email,
-      password: password,
-    });
-
-    if (error) Alert.alert(error.message);
+    auth()
+      .signInWithEmailAndPassword(email, password)
+      .then((userCredentials) => {
+        console.log(userCredentials);
+      })
+      .catch(error => {
+        // TODO: add more error handling
+        if (error.code === 'auth/invalid-email') {
+          console.log('That email address is invalid!');
+        }
+        Alert.alert(error.code);
+      });
     setLoading(false);
   }
 
@@ -76,7 +82,6 @@ export default function SignInScreen({ navigation }) {
           </Pressable>
         </View>
       </View>
-
     </LinearGradient>
 
   );
