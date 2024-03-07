@@ -82,10 +82,3 @@ If the above commands failed, you need a build of the app before running it. The
 ### ```utils``` folder
 
 - Contains config files for Firebase connections, Google Services and a troubleshoot clean-up script.
-
-## Backend file structure (Node.js + Express)
-
-### Root directory
-
-- ```package.json``` and ```package-lock.json```: npm (node package manager) dependencies.
-- ```index.js```: Node.js app entry.
