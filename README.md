@@ -4,7 +4,7 @@ Welcome to the repository of our LearnFitness mobile app, a cutting-edge solutio
 
 ## Contribution and workflow
 
-- Check out [CONTRIBUTION.md] (https://github.com/LearnFitness/LearnFitness-frontend/blob/main/CONTRIBUTION.md) for more info about how to contribute and the development workflow.
+- Check out [CONTRIBUTION.md](https://github.com/LearnFitness/LearnFitness-frontend/blob/main/CONTRIBUTION.md) for more info about how to contribute and the development workflow.
 
 ## Technology stack
 
