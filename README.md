@@ -4,11 +4,11 @@ Welcome to the repository of our LearnFitness mobile app, a cutting-edge solutio
 
 ## Contribution and workflow
 
-- Check out CONTRIBUTION.md for more info about how to contribute and the development workflow.
+- Check out [CONTRIBUTION.md] (https://github.com/LearnFitness/LearnFitness-frontend/blob/main/CONTRIBUTION.md) for more info about how to contribute and the development workflow.
 
 ## Technology stack
 
-<img width="1247" alt="image" src="https://github.com/LearnFitness/LearnFitness-frontend/assets/35861939/d39bc949-e81f-4e4e-87bf-17bb5a5c3edb">
+<img width="1150" alt="image" src="https://github.com/LearnFitness/LearnFitness-frontend/assets/35861939/9cf2088a-68c9-4c80-97e3-950cd916b362">
 
 - **Frontend**: Built using React Native, this app offers a smooth and dynamic user experience that is consistent across iOS and Android devices.
 - **Backend Server**: Our backend infrastructure is powered by Node.js and Express, ensuring a robust and scalable service architecture. We also utilize Firebase additional resources.
