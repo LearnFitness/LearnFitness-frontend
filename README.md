@@ -8,6 +8,8 @@ Welcome to the repository of our LearnFitness mobile app, a cutting-edge solutio
 
 ## Technology stack
 
+<img width="1247" alt="image" src="https://github.com/LearnFitness/LearnFitness-frontend/assets/35861939/d39bc949-e81f-4e4e-87bf-17bb5a5c3edb">
+
 - **Frontend**: Built using React Native, this app offers a smooth and dynamic user experience that is consistent across iOS and Android devices.
 - **Backend Server**: Our backend infrastructure is powered by Node.js and Express, ensuring a robust and scalable service architecture. We also utilize Firebase additional resources.
 - **Deployment**: Deployed automatically on Google Cloud Platform's App Engine using Google Cloud Build, our app benefits from automatic scaling and high availability, handling user demands efficiently and reliably.
