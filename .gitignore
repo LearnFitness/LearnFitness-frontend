@@ -41,3 +41,6 @@ yarn-error.*
 # ios and android build
 ios
 android
+
+# JetBrains
+.idea
