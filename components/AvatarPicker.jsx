@@ -3,8 +3,7 @@ import { View } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { Avatar } from '@rneui/themed';
 
-export default function AvatarPicker() {
-  const [image, setImage] = useState(null);
+export default function AvatarPicker({photoObject, setPhotoObject}) {
 
   const pickImage = async () => {
     // No permissions request is necessary for launching the image library
@@ -15,14 +14,14 @@ export default function AvatarPicker() {
     });
 
     if (!result.canceled) {
-      setImage(result.assets[0].uri);
+      setPhotoObject(result.assets[0]);
     }
   };
 
   return (
     <View style={{ alignItems: 'center', justifyContent: 'center' }}>
-      {image ?
-        <Avatar source={{ uri: image }} size={200} rounded onPress={pickImage} >
+      {photoObject ?
+        <Avatar source={{ uri: photoObject.uri }} size={200} rounded onPress={pickImage} >
           <Avatar.Accessory name='pencil' type='font-awesome' size={50} onPress={pickImage}/>
         </Avatar>
         :

@@ -26,7 +26,7 @@ export default function DashboardScreen() {
     isLoading ? <ActivityIndicator/> : <View>
       <Text>Hello, {auth().currentUser.email}</Text>
 
-      <Text>Your data: {data.name}</Text>
+      <Text>Your data: {data.email}</Text>
 
       <Button title="Sign Out" onPress={() => auth().signOut()}/>
     </View>

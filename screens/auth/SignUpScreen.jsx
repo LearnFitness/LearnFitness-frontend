@@ -4,16 +4,24 @@ import { Button } from '@rneui/themed';
 import { LinearGradient } from 'expo-linear-gradient';
 import AvatarPicker from "../../components/AvatarPicker";
 import auth from "@react-native-firebase/auth";
+import { postDataWithProfileImage } from "../../utils/backendAPI";
 
 export default function SignUpScreen({ navigation }) {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+  const [name, setName] = useState();
+  const [photoObject, setPhotoObject] = useState();
+  const [email, setEmail] = useState();
+  const [password, setPassword] = useState();
+  const [confirmPassword, setConfirmPassword] = useState();
   const [loading, setLoading] = useState(false);
 
   async function signUpWithEmail() {
     setLoading(true);
+
+    if (!(name && email && password && confirmPassword)) {
+      Alert.alert("Please fill out all required fields");
+      setLoading(false);
+      return;
+    }
 
     if (confirmPassword !== password) {
       Alert.alert("Passwords do not match. Please try again");
@@ -21,28 +29,29 @@ export default function SignUpScreen({ navigation }) {
       return;
     }
 
-    auth()
-      .createUserWithEmailAndPassword(email, password)
-      .then((userCredentials) => {
-        console.log(userCredentials);
-      })
-      .catch(error => {
-        if (error.code === 'auth/email-already-in-use') {
-          Alert.alert('That email address is already in use!');
-        }
+    try {
+      // Call Firebase Auth to create a new user
+      const userCredentials = await auth().createUserWithEmailAndPassword(email, password);
+      // Call backend to make a new user entry in Firestore "users" collection
+      // Construct a user object
+      const user = {
+        name: name,
+        email: email,
+      }
+      // Post user data to Firestore (including the image)
+      await postDataWithProfileImage("user/signup", user, photoObject);
+      setLoading(false);
 
-        if (error.code === 'auth/invalid-email') {
-          Alert.alert('That email address is invalid!');
-        }
-
-        Alert.alert(error);
-      });
-      // TODO: may need more handling after signing up??
-    // if (!session) {
-    //   Alert.alert("Please check your inbox for email verification!");
-    //   navigation.navigate("SignInScreen");
-    // }
-    setLoading(false);
+    } catch (error) {
+      if (error.code === 'auth/email-already-in-use') {
+        Alert.alert('That email address is already in use!');
+      } else if (error.code === 'auth/invalid-email') {
+        Alert.alert('That email address is invalid!');
+      } else {
+        Alert.alert("An error occured", error);
+      }
+      setLoading(false);
+    }
   }
 
   return (
@@ -51,7 +60,7 @@ export default function SignUpScreen({ navigation }) {
 
         <Text style={[styles.title]}>Create an Account</Text>
 
-        <AvatarPicker />
+        <AvatarPicker photoObject={photoObject} setPhotoObject={setPhotoObject} />
 
         <View style={{ paddingHorizontal: 40 }}>
           <TextInput

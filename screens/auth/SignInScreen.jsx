@@ -13,18 +13,18 @@ export default function SignInScreen({ navigation }) {
 
   async function signInWithEmail() {
     setLoading(true);
-    auth()
-      .signInWithEmailAndPassword(email, password)
-      .then((userCredentials) => {
-        console.log(userCredentials);
-      })
-      .catch(error => {
-        // TODO: add more error handling
-        if (error.code === 'auth/invalid-email') {
-          console.log('That email address is invalid!');
-        }
-        Alert.alert(error.code);
-      });
+
+    try {
+      await auth().signInWithEmailAndPassword(email, password);
+    } catch (error) {
+      if (error.code === 'auth/invalid-email') {
+        Alert.alert('That email address is invalid!');
+      } else if (error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
+        Alert.alert("Invalid login credentials");
+      } else {
+        Alert.alert("An error occured", error.code);
+      }
+    }
     setLoading(false);
   }
 
