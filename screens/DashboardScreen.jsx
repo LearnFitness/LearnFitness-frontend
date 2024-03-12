@@ -1,7 +1,8 @@
-import {View, Text, Button, ActivityIndicator} from "react-native";
-import {useEffect, useState} from "react";
-import {getBackendData} from "../utils/backendAPI";
+import { View, Text, Button, ActivityIndicator, SafeAreaView } from "react-native";
+import { useEffect, useState } from "react";
+import { getBackendData } from "../utils/backendAPI";
 import auth from "@react-native-firebase/auth";
+import LinearBackground from "../components/LinearBackground";
 
 export default function DashboardScreen() {
   const [data, setData] = useState(null);
@@ -23,12 +24,22 @@ export default function DashboardScreen() {
   }, []);
 
   return (
-    isLoading ? <ActivityIndicator/> : <View>
-      <Text>Hello, {auth().currentUser.email}</Text>
+    <LinearBackground>
+      <SafeAreaView>
+        {isLoading ?
+          (
+            <ActivityIndicator />
+          ) : (
+            <View>
+              <Text>Hello, {auth().currentUser.email}</Text>
 
-      <Text>Your data: {data.email}</Text>
+              <Text>Your data: {data.email}</Text>
 
-      <Button title="Sign Out" onPress={() => auth().signOut()}/>
-    </View>
+              <Button title="Sign Out" onPress={() => auth().signOut()} />
+            </View>
+          )
+        }
+      </SafeAreaView>
+    </LinearBackground>
   )
 }

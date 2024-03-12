@@ -1,8 +1,8 @@
-import { LinearGradient } from "expo-linear-gradient";
 import { useState } from "react";
-import { Alert, View, Text, TextInput, StyleSheet } from "react-native";
+import { Alert, View, Text, StyleSheet } from "react-native";
 import { Input, Button } from '@rneui/themed';
 import auth from "@react-native-firebase/auth";
+import LinearBackground from "../../components/LinearBackground";
 
 export default function ResetPasswordScreen() {
   const [email, setEmail] = useState("");
@@ -21,41 +21,42 @@ export default function ResetPasswordScreen() {
   }
 
   return (
-    <LinearGradient colors={['#002f51', '#00604f']} style={styles.gradient}>
-      {requestSent ? (
-        <View styles={styles.container}>
-          <Text style={styles.title}>Request sent</Text>
-          <Text style={styles.subTitle}>Check your inbox to continue. It might take a few minutes for the email to arrive.</Text>
-        </View>
-      ) : (
-        <View style={styles.container} >
-          <View>
-            <Text style={styles.title}>Forgot your password?</Text>
-            <Text style={styles.subTitle}>No worries, let's get you signed back in.</Text>
+    <LinearBackground>
+      {requestSent ?
+        (
+          <View styles={styles.container}>
+            <Text style={styles.title}>Request sent</Text>
+            <Text style={styles.subTitle}>Check your inbox to continue. It might take a few minutes for the email to arrive.</Text>
           </View>
+        ) : (
+          <View style={styles.container} >
+            <View>
+              <Text style={styles.title}>Forgot your password?</Text>
+              <Text style={styles.subTitle}>No worries, let's get you signed back in.</Text>
+            </View>
 
-          <View>
-            <Input
-              containerStyle={styles.input}
-              leftIcon={{ type: "font-awesome", name: "envelope", size: 20 }}
-              onChangeText={(text) => setEmail(text)}
-              value={email}
-              placeholder="Enter your email to continue"
-              autoCapitalize={"none"}
-            />
-            <Button
-              buttonStyle={styles.sendButton}
-              loading={loading}
-              disabled={loading || email === ""}
-              disabledStyle={{ backgroundColor: "gray" }}
-              title="Send"
-              onPress={() => handleResetPassword()}
-            />
-          </View>
-        </View >
-      )
+            <View>
+              <Input
+                containerStyle={styles.input}
+                leftIcon={{ type: "font-awesome", name: "envelope", size: 20 }}
+                onChangeText={(text) => setEmail(text)}
+                value={email}
+                placeholder="Enter your email to continue"
+                autoCapitalize={"none"}
+              />
+              <Button
+                buttonStyle={styles.sendButton}
+                loading={loading}
+                disabled={loading || email === ""}
+                disabledStyle={{ backgroundColor: "gray" }}
+                title="Send"
+                onPress={() => handleResetPassword()}
+              />
+            </View>
+          </View >
+        )
       }
-    </LinearGradient>
+    </LinearBackground>
   )
 }
 

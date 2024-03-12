@@ -1,10 +1,10 @@
 import React, { useState } from "react";
-import { Alert, StyleSheet, Text, TextInput, View, Pressable } from "react-native"
+import { Alert, StyleSheet, Text, TextInput, View, Pressable } from "react-native";
 import { Button } from '@rneui/themed';
-import { LinearGradient } from 'expo-linear-gradient';
 import AvatarPicker from "../../components/AvatarPicker";
 import auth from "@react-native-firebase/auth";
 import { postDataWithProfileImage } from "../../utils/backendAPI";
+import LinearBackground from "../../components/LinearBackground";
 
 export default function SignUpScreen({ navigation }) {
   const [name, setName] = useState();
@@ -55,7 +55,7 @@ export default function SignUpScreen({ navigation }) {
   }
 
   return (
-    <LinearGradient colors={['#002f51', '#00604f']} style={styles.gradient}>
+    <LinearBackground>
       <View style={styles.container}>
 
         <Text style={[styles.title]}>Create an Account</Text>
@@ -110,7 +110,7 @@ export default function SignUpScreen({ navigation }) {
           </Pressable>
         </View>
       </View>
-    </LinearGradient>
+    </LinearBackground>
   )
 }
 

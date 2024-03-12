@@ -2,8 +2,8 @@ import React, { useState } from "react";
 import { Alert, StyleSheet, View, Text, Pressable } from "react-native";
 import { Button, Input } from '@rneui/themed';
 import GoogleSignIn from "../../components/GoogleSignIn";
-import { LinearGradient } from 'expo-linear-gradient';
 import auth from '@react-native-firebase/auth';
+import LinearBackground from "../../components/LinearBackground";
 
 export default function SignInScreen({ navigation }) {
   const [email, setEmail] = useState("");
@@ -29,7 +29,7 @@ export default function SignInScreen({ navigation }) {
   }
 
   return (
-    <LinearGradient colors={['#002f51', '#00604f']} style={styles.gradient}>
+    <LinearBackground>
       <View style={styles.container}>
 
         <Text style={[styles.title]}>Login to your account</Text>
@@ -82,15 +82,12 @@ export default function SignInScreen({ navigation }) {
           </Pressable>
         </View>
       </View>
-    </LinearGradient>
+    </LinearBackground>
 
   );
 }
 
 const styles = StyleSheet.create({
-  gradient: {
-    flex: 1,
-  },
   container: {
     flex: 1,
     justifyContent: "space-between",

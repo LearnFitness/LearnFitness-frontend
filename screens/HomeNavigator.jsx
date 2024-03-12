@@ -1,4 +1,4 @@
-import {createBottomTabNavigator} from "@react-navigation/bottom-tabs";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import FontAwesome from "@expo/vector-icons/FontAwesome6";
 
 import DashboardScreen from "./DashboardScreen";
@@ -26,7 +26,9 @@ export default function HomeNavigator() {
           return <FontAwesome name={iconName} size={size} color={color} />;
         },
         tabBarActiveTintColor: 'teal',
-        tabBarInactiveTintColor: 'gray', })
+        tabBarInactiveTintColor: 'gray',
+        headerShown: false,
+      })
     }>
       <Tab.Screen name="Dashboard" component={DashboardScreen} />
       <Tab.Screen name="Workouts" component={WorkoutScreen} />
