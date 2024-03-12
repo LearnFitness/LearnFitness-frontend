@@ -52,7 +52,7 @@ export default function SignInScreen({ navigation }) {
             }
             onChangeText={(text) => setPassword(text)}
             value={password}
-            secureTextEntry={visiblePassword ? false : true}
+            secureTextEntry={!visiblePassword}
             placeholder="Password"
             autoCapitalize={"none"}
           />
