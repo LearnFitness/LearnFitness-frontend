@@ -35,12 +35,12 @@ If the above commands failed, you need a build of the app before running it. The
 
 1. Locally:
 
-- run ```npx expo run:ios``` or ```npx expo run:android```
+   - run ```npx expo run:ios``` or ```npx expo run:android```
 
 2. On the cloud (using eas):
 
-- run ```eas build --platform ios --profile preview``` or ```eas build --platform android --profile preview```
-- Note that a cloud build of iOS apps require a paid Apple Developer Account ($99/year).
+   - run ```eas build --platform ios --profile preview``` or ```eas build --platform android --profile preview```
+   - Note that a cloud build of iOS apps require a paid Apple Developer Account ($99/year).
 
 ## Frontend file structure (React Native Expo)
 
@@ -52,7 +52,7 @@ If the above commands failed, you need a build of the app before running it. The
 - ```local.properties```: contains directory of the Android SDK (used when building Android apps locally, copy and paste to ```./android``` when needed).
 - ```package.json```: npm (node package manager) dependencies.
 - ```tsconfig.json```: config file for TypeScript
-- ```yarn.lock```: (optional) yarn package mananger dependencies (a better alternative to npm). If you don't have yarn then this file will be package-lock.json
+- ```yarn.lock```: (optional) yarn package manager dependencies (a better alternative to npm). If you don't have yarn then this file will be package-lock.json
 - ```.gitignore```: a list of files and folders to be ignored by Git and GitHub
 
 ### ```screens``` folder
@@ -81,4 +81,4 @@ If the above commands failed, you need a build of the app before running it. The
 
 ### ```utils``` folder
 
-- Contains config files for Firebase connections, Google Services and a troubleshoot clean-up script.
+- Contains config files for Firebase connections, Google Services and a troubleshooting clean-up script.
