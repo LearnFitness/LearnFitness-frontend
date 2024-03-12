@@ -1,31 +1,34 @@
-import { View, Text, Button } from "react-native";
+import {View, Text, Button, ActivityIndicator} from "react-native";
+import {useEffect, useState} from "react";
+import {getBackendData} from "../utils/backendAPI";
 import auth from "@react-native-firebase/auth";
-import axios from "axios";
-
-async function testGetData() {
-  try {
-    const idToken = await auth().currentUser.getIdToken(true);
-    const response = await axios.get("http://localhost:8080/users", {
-      headers: {
-        authorization: `bearer ${idToken}`
-      }
-    })
-  
-    console.log(response.data);
-
-  } catch(error) {
-    console.log(error);
-  }
-}
 
 export default function DashboardScreen() {
-  testGetData();
-  
+  const [data, setData] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const data = await getBackendData("/user");
+        console.log(data);
+        setData(data);
+        setIsLoading(false);
+      } catch (error) {
+        console.log(error);
+      }
+    }
+
+    fetchData();
+  }, []);
+
   return (
-    <View>
+    isLoading ? <ActivityIndicator/> : <View>
       <Text>Hello, {auth().currentUser.email}</Text>
 
-      <Button title="Sign Out" onPress={() => auth().signOut()} />
+      <Text>Your data: {data.name}</Text>
+
+      <Button title="Sign Out" onPress={() => auth().signOut()}/>
     </View>
   )
 }
