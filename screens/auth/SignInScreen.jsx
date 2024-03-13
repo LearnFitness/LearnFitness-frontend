@@ -29,58 +29,56 @@ export default function SignInScreen({ navigation }) {
   }
 
   return (
-    <LinearBackground>
-      <View style={styles.container}>
+    <LinearBackground style={styles.container}>
 
-        <Text style={[styles.title]}>Login to your account</Text>
+      <Text style={[styles.title]}>Login to your account</Text>
 
-        <View style={{ paddingHorizontal: 40 }}>
-          <Input
-            containerStyle={styles.input}
-            leftIcon={{ type: "font-awesome", name: "envelope", size: 20 }}
-            onChangeText={(text) => setEmail(text)}
-            value={email}
-            placeholder="email@address.com"
-            autoCapitalize={"none"}
-          />
-          <Input
-            containerStyle={styles.input}
-            leftIcon={{ type: "font-awesome", name: "lock" }}
-            rightIcon={visiblePassword ?
-              { type: "font-awesome", name: "eye", onPress: () => setVisiblePassword(false) } :
-              { type: "font-awesome", name: "eye-slash", onPress: () => setVisiblePassword(true) }
-            }
-            onChangeText={(text) => setPassword(text)}
-            value={password}
-            secureTextEntry={!visiblePassword}
-            placeholder="Password"
-            autoCapitalize={"none"}
-          />
-          <Button
-            buttonStyle={styles.signInButton}
-            loading={loading}
-            disabled={loading}
-            disabledStyle={{ backgroundColor: "gray" }}
-            title="Sign In"
-            onPress={() => signInWithEmail()}
-          />
-          <Pressable
-            onPress={() => navigation.navigate("ResetPasswordScreen")}>
-            <Text style={{ textAlign: "center", marginTop: 20, fontSize: 17, color: "lightblue" }}>Forgot password?</Text>
-          </Pressable>
-        </View>
+      <View style={{ paddingHorizontal: 40 }}>
+        <Input
+          containerStyle={styles.input}
+          leftIcon={{ type: "font-awesome", name: "envelope", size: 20 }}
+          onChangeText={(text) => setEmail(text)}
+          value={email}
+          placeholder="email@address.com"
+          autoCapitalize={"none"}
+        />
+        <Input
+          containerStyle={styles.input}
+          leftIcon={{ type: "font-awesome", name: "lock" }}
+          rightIcon={visiblePassword ?
+            { type: "font-awesome", name: "eye", onPress: () => setVisiblePassword(false) } :
+            { type: "font-awesome", name: "eye-slash", onPress: () => setVisiblePassword(true) }
+          }
+          onChangeText={(text) => setPassword(text)}
+          value={password}
+          secureTextEntry={!visiblePassword}
+          placeholder="Password"
+          autoCapitalize={"none"}
+        />
+        <Button
+          buttonStyle={styles.signInButton}
+          loading={loading}
+          disabled={loading}
+          disabledStyle={{ backgroundColor: "gray" }}
+          title="Sign In"
+          onPress={() => signInWithEmail()}
+        />
+        <Pressable
+          onPress={() => navigation.navigate("ResetPassword")}>
+          <Text style={{ textAlign: "center", marginTop: 20, fontSize: 17, color: "lightblue" }}>Forgot password?</Text>
+        </Pressable>
+      </View>
 
-        <View style={styles.googleSignInContainer}>
-          <Text style={{ paddingHorizontal: 25, paddingVertical: 5, color: "white", marginVertical: 10, fontSize: 17, position: "relative", bottom: 26, backgroundColor: "teal" }}>or continue with</Text>
-          <GoogleSignIn />
-        </View>
+      <View style={styles.googleSignInContainer}>
+        <Text style={{ paddingHorizontal: 25, paddingVertical: 5, color: "white", marginVertical: 10, fontSize: 17, position: "relative", bottom: 26, backgroundColor: "teal" }}>or continue with</Text>
+        <GoogleSignIn />
+      </View>
 
-        <View style={styles.footer}>
-          <Text style={[styles.footerText]}>Don't have an account?</Text>
-          <Pressable onPress={() => navigation.navigate("SignUpScreen")}>
-            <Text style={{ fontSize: 17, color: "lightblue" }}> Sign Up</Text>
-          </Pressable>
-        </View>
+      <View style={styles.footer}>
+        <Text style={[styles.footerText]}>Don't have an account?</Text>
+        <Pressable onPress={() => navigation.navigate("SignUpNavigator")}>
+          <Text style={{ fontSize: 17, color: "lightblue" }}> Sign Up</Text>
+        </Pressable>
       </View>
     </LinearBackground>
 
@@ -89,14 +87,12 @@ export default function SignInScreen({ navigation }) {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     justifyContent: "space-between",
-    paddingVertical: 35
   },
   title: {
     fontWeight: "500",
     textAlign: "center",
-    marginTop: 200,
+    marginTop: 150,
     marginBottom: 20,
     marginHorizontal: 40,
     fontSize: 40,

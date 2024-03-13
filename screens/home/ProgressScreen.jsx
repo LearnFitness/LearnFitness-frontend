@@ -1,8 +1,8 @@
 import { View, Text, SafeAreaView, ActivityIndicator } from "react-native";
 import { useState } from "react";
-import LinearBackground from "../components/LinearBackground";
+import LinearBackground from "../../components/LinearBackground";
 
-export default function ExerciseScreen() {
+export default function ProgressScreen() {
   const [isLoading, setIsLoading] = useState(true);
 
   return (
