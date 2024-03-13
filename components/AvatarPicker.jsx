@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { View } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
-import { Avatar } from '@rneui/themed';
+import AvatarDisplay from './AvatarDisplay';
 
 export default function AvatarPicker({photoObject, setPhotoObject}) {
 
@@ -14,20 +14,16 @@ export default function AvatarPicker({photoObject, setPhotoObject}) {
     });
 
     if (!result.canceled) {
-      setPhotoObject(result.assets[0]);
+      setPhotoObject("photoObject", result.assets[0]);
     }
   };
 
   return (
     <View style={{ alignItems: 'center', justifyContent: 'center' }}>
       {photoObject ?
-        <Avatar source={{ uri: photoObject.uri }} size={200} rounded onPress={pickImage} >
-          <Avatar.Accessory name='pencil' type='font-awesome' size={50} onPress={pickImage}/>
-        </Avatar>
+        <AvatarDisplay source={{ uri: photoObject.uri }} size={200} handleOnPress={pickImage} />
         :
-        <Avatar icon={{ name: "user", type: "font-awesome" }} containerStyle={{ backgroundColor: 'grey' }} size={200} rounded onPress={pickImage} >
-          <Avatar.Accessory name='pencil' type='font-awesome' size={50} onPress={pickImage}/>
-        </Avatar>
+        <AvatarDisplay source={null} size={200} handleOnPress={pickImage} />
       }
     </View>
   );

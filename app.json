@@ -14,11 +14,13 @@
     },
     "assetBundlePatterns": ["**/*"],
     "ios": {
+      "buildNumber": "1.0.0",
       "supportsTablet": true,
       "bundleIdentifier": "com.LearnFitness.LearnFitness",
       "googleServicesFile": "./utils/GoogleService-Info.plist"
     },
     "android": {
+      "versionCode": 1,
       "package": "com.LearnFitness.LearnFitness",
       "googleServicesFile": "./utils/google-services.json",
       "adaptiveIcon": {
