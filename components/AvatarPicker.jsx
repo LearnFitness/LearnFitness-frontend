@@ -3,7 +3,7 @@ import { View } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import AvatarDisplay from './AvatarDisplay';
 
-export default function AvatarPicker({photoObject, setPhotoObject}) {
+export default function AvatarPicker({ size=200, photoObject, setPhotoObject }) {
 
   const pickImage = async () => {
     // No permissions request is necessary for launching the image library
@@ -21,9 +21,9 @@ export default function AvatarPicker({photoObject, setPhotoObject}) {
   return (
     <View style={{ alignItems: 'center', justifyContent: 'center' }}>
       {photoObject ?
-        <AvatarDisplay source={{ uri: photoObject.uri }} size={200} handleOnPress={pickImage} />
+        <AvatarDisplay source={{ uri: photoObject.uri }} size={size} handleOnPress={pickImage} />
         :
-        <AvatarDisplay source={null} size={200} handleOnPress={pickImage} />
+        <AvatarDisplay source={null} size={size} handleOnPress={pickImage} />
       }
     </View>
   );

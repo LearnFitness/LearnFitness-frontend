@@ -1,9 +1,11 @@
 import React, { useState } from "react";
 import { Alert, StyleSheet, View, Text, Pressable } from "react-native";
-import { Button, Input } from '@rneui/themed';
+import { Input } from "@rneui/themed";
 import GoogleSignIn from "../../components/GoogleSignIn";
 import auth from '@react-native-firebase/auth';
 import LinearBackground from "../../components/LinearBackground";
+import PrimaryButton from "../../components/PrimaryButton";
+import { appStyles } from "../../utils/styles";
 
 export default function SignInScreen({ navigation }) {
   const [email, setEmail] = useState("");
@@ -29,13 +31,13 @@ export default function SignInScreen({ navigation }) {
   }
 
   return (
-    <LinearBackground style={styles.container}>
+    <LinearBackground containerStyle={styles.container}>
 
       <Text style={[styles.title]}>Login to your account</Text>
 
-      <View style={{ paddingHorizontal: 40 }}>
+      <View>
         <Input
-          containerStyle={styles.input}
+          containerStyle={appStyles.input}
           leftIcon={{ type: "font-awesome", name: "envelope", size: 20 }}
           onChangeText={(text) => setEmail(text)}
           value={email}
@@ -43,7 +45,7 @@ export default function SignInScreen({ navigation }) {
           autoCapitalize={"none"}
         />
         <Input
-          containerStyle={styles.input}
+          containerStyle={appStyles.input}
           leftIcon={{ type: "font-awesome", name: "lock" }}
           rightIcon={visiblePassword ?
             { type: "font-awesome", name: "eye", onPress: () => setVisiblePassword(false) } :
@@ -55,13 +57,11 @@ export default function SignInScreen({ navigation }) {
           placeholder="Password"
           autoCapitalize={"none"}
         />
-        <Button
-          buttonStyle={styles.signInButton}
+        <PrimaryButton
           loading={loading}
           disabled={loading}
-          disabledStyle={{ backgroundColor: "gray" }}
           title="Sign In"
-          onPress={() => signInWithEmail()}
+          handleOnPress={signInWithEmail}
         />
         <Pressable
           onPress={() => navigation.navigate("ResetPassword")}>
@@ -70,13 +70,13 @@ export default function SignInScreen({ navigation }) {
       </View>
 
       <View style={styles.googleSignInContainer}>
-        <Text style={{ paddingHorizontal: 25, paddingVertical: 5, color: "white", marginVertical: 10, fontSize: 17, position: "relative", bottom: 26, backgroundColor: "teal" }}>or continue with</Text>
-        <GoogleSignIn />
+        <Text style={styles.googleSignInText}>or continue with</Text>
+        <GoogleSignIn navigation={navigation} />
       </View>
 
       <View style={styles.footer}>
         <Text style={[styles.footerText]}>Don't have an account?</Text>
-        <Pressable onPress={() => navigation.navigate("SignUpNavigator")}>
+        <Pressable onPress={() => navigation.navigate("SignUp")}>
           <Text style={{ fontSize: 17, color: "lightblue" }}> Sign Up</Text>
         </Pressable>
       </View>
@@ -88,37 +88,29 @@ export default function SignInScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     justifyContent: "space-between",
+    marginHorizontal: "10%"
   },
   title: {
     fontWeight: "500",
     textAlign: "center",
-    marginTop: 150,
-    marginBottom: 20,
-    marginHorizontal: 40,
+    marginTop: "50%",
     fontSize: 40,
     color: "white"
-  },
-  flex1: {
-    flex: 1
-  },
-  signInButton: {
-    backgroundColor: "#0494e8",
-    height: 50,
-    borderRadius: 30
-  },
-  input: {
-    fontSize: 17,
-    height: 50,
-    backgroundColor: "white",
-    marginBottom: 20,
-    paddingHorizontal: 15,
-    borderRadius: 10,
   },
   googleSignInContainer: {
     alignItems: "center",
     borderTopWidth: 1,
     borderTopColor: "grey",
-    marginHorizontal: 40
+  },
+  googleSignInText: {
+    paddingHorizontal: 25,
+    paddingVertical: 5,
+    color: "white",
+    marginVertical: 10,
+    fontSize: 17,
+    position: "relative",
+    bottom: 26,
+    backgroundColor: "teal"
   },
   footer: {
     flexDirection: "row",

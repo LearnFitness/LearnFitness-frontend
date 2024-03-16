@@ -1,50 +1,57 @@
-import { View, Text, Button, ActivityIndicator, SafeAreaView, Alert, StyleSheet } from "react-native";
+import { View, Text, ActivityIndicator, Alert, StyleSheet } from "react-native";
 import { useEffect, useState } from "react";
-import { getBackendData } from "../../utils/backendAPI";
+import { getBackendDataWithRetry } from "../../utils/backendAPI";
 import auth from "@react-native-firebase/auth";
 import LinearBackground from "../../components/LinearBackground";
 import AvatarDisplay from "../../components/AvatarDisplay";
+import PrimaryButton from "../../components/PrimaryButton";
 
 export default function DashboardScreen() {
   const [userData, setUserData] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    console.log("Dashboard mounted");
     async function fetchData() {
       try {
-        const userData = await getBackendData("/user");
+        const userData = await getBackendDataWithRetry("/user");
         setUserData(userData);
+        console.log(userData);
       } catch (error) {
         Alert.alert("An error occured", error);
       } finally {
-        setIsLoading(false);
+        setLoading(false);
       }
     }
     fetchData();
   }, []);
 
+  useEffect(() => {
+    async function updateUser() {
+      await auth().currentUser.updateProfile({
+        displayName: "",
+        photoURL: ""
+      })
+    }
+  }, [])
+
   return (
     <LinearBackground>
-      <SafeAreaView>
-        {isLoading || !userData ?
-          (
-            <ActivityIndicator />
-          ) : (
-            <View>
-              <View style={styles.greetingContainer}>
-                <View>
-                  <Text style={styles.greetingText} >Good Morning,</Text>
-                  <Text style={styles.greetingName} >{userData.name}</Text>
-                </View>
-                <AvatarDisplay source={{ uri: userData.photoURL }} size={120} editable={false} />
+      {loading || !userData ?
+        (
+          <ActivityIndicator style={{flex: 1}}/>
+        ) : (
+          <View>
+            <View style={styles.greetingContainer}>
+              <View>
+                <Text style={styles.greetingText} >Good Morning,</Text>
+                <Text style={styles.greetingName} >{userData.name}</Text>
               </View>
-
-              <Button title="Sign Out" onPress={() => auth().signOut()} />
+              <AvatarDisplay source={{ uri: userData.photoURL }} size={120} editable={false} />
             </View>
-          )
-        }
-      </SafeAreaView>
+            <PrimaryButton title="Sign Out" handleOnPress={() => auth().signOut()} />
+          </View>
+        )
+      }
     </LinearBackground>
   )
 }

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import auth from '@react-native-firebase/auth';
@@ -7,7 +7,8 @@ import WelcomeScreen from "./screens/WelcomeScreen";
 import SignInScreen from "./screens/auth/SignInScreen";
 import ResetPasswordScreen from "./screens/auth/ResetPasswordScreen";
 import HomeNavigator from "./navigators/HomeNavigator";
-import SignUpNavigator from "./navigators/SignUpNavigator";
+import OnboardNavigator from "./navigators/OnboardNavigator";
+import SignUpScreen from "./screens/auth/SignUpScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -31,15 +32,18 @@ export default function App() {
 
   return (
     <NavigationContainer>
-      <Stack.Navigator screenOptions={{"headerShown": false}}>
+      <Stack.Navigator screenOptions={{ "headerShown": false }}>
         {user ?
-          <Stack.Screen name="HomeNavigator" component={HomeNavigator}/>
+          <>
+            <Stack.Screen name="OnboardNavigator" component={OnboardNavigator} />
+            <Stack.Screen name="HomeNavigator" component={HomeNavigator} />
+          </>
           :
           <>
             <Stack.Screen name="Welcome" component={WelcomeScreen} />
             <Stack.Screen name="SignIn" component={SignInScreen} />
-            <Stack.Screen name="ResetPassword" component={ResetPasswordScreen} />            
-            <Stack.Screen name="SignUpNavigator" component={SignUpNavigator} />
+            <Stack.Screen name="SignUp" component={SignUpScreen} />
+            <Stack.Screen name="ResetPassword" component={ResetPasswordScreen} />
           </>
         }
       </Stack.Navigator>

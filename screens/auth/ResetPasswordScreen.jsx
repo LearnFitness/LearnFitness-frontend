@@ -3,8 +3,10 @@ import { Alert, View, Text, StyleSheet } from "react-native";
 import { Input, Button } from '@rneui/themed';
 import auth from "@react-native-firebase/auth";
 import LinearBackground from "../../components/LinearBackground";
+import PrimaryButton from "../../components/PrimaryButton";
+import BackButton from "../../components/BackButton";
 
-export default function ResetPasswordScreen() {
+export default function ResetPasswordScreen({ navigation }) {
   const [email, setEmail] = useState("");
   const [requestSent, setRequestSent] = useState(false)
   const [loading, setLoading] = useState(false);
@@ -22,14 +24,15 @@ export default function ResetPasswordScreen() {
 
   return (
     <LinearBackground>
+      <BackButton handleOnPress={() => navigation.goBack()}/>
       {requestSent ?
         (
-          <View styles={styles.container}>
+          <View style={styles.container}>
             <Text style={styles.title}>Request sent</Text>
             <Text style={styles.subTitle}>Check your inbox to continue. It might take a few minutes for the email to arrive.</Text>
           </View>
         ) : (
-          <View style={styles.container} >
+          <View style={styles.container}>
             <View>
               <Text style={styles.title}>Forgot your password?</Text>
               <Text style={styles.subTitle}>No worries, let's get you signed back in.</Text>
@@ -44,13 +47,11 @@ export default function ResetPasswordScreen() {
                 placeholder="Enter your email to continue"
                 autoCapitalize={"none"}
               />
-              <Button
-                buttonStyle={styles.sendButton}
-                loading={loading}
-                disabled={loading || email === ""}
-                disabledStyle={{ backgroundColor: "gray" }}
+              <PrimaryButton
                 title="Send"
-                onPress={() => handleResetPassword()}
+                loading={loading}
+                disabled={loading || !email}
+                handleOnPress={handleResetPassword}
               />
             </View>
           </View >
@@ -61,14 +62,9 @@ export default function ResetPasswordScreen() {
 }
 
 const styles = StyleSheet.create({
-  gradient: {
-    flex: 1,
-  },
   container: {
-    flex: 1,
     justifyContent: "center",
-    paddingVertical: 35,
-    paddingHorizontal: 40
+    marginHorizontal: "10%",
   },
   title: {
     fontWeight: "500",
@@ -91,10 +87,5 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     paddingHorizontal: 15,
     borderRadius: 10,
-  },
-  sendButton: {
-    backgroundColor: "#0494e8",
-    height: 50,
-    borderRadius: 30
   },
 })
