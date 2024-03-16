@@ -46,16 +46,19 @@ export default function Onboard1Screen({ navigation }) {
     navigation.navigate("Onboard2");
   }
 
-  if (loading) return <ActivityIndicator style={{ flex: 1 }} />;
-  else {
+  if (loading) {
+    return (
+      <LinearBackground>
+        <ActivityIndicator style={{ flex: 1 }} />
+      </LinearBackground>
+    )
+  } else {
     if (userData) {
       return (
         <LinearBackground>
           <ActivityIndicator style={{ flex: 1 }} />
           {navigation.navigate("HomeNavigator")}
         </LinearBackground>)
-      
-      return <></>;
     } else {
       return (
         <SafeAreaView style={{ flex: 1 }}>
