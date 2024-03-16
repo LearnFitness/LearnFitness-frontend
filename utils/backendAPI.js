@@ -3,8 +3,8 @@ import auth from "@react-native-firebase/auth";
 
 // Create an Axios instance configured with base settings
 const apiClient = axios.create({
-  // baseURL: "https://learnfitness.wl.r.appspot.com/", // Express backend base URL
-  baseURL: "http://localhost:8080/", // localhost test
+  baseURL: "https://learnfitness.wl.r.appspot.com/", // Express backend base URL
+  // baseURL: "http://localhost:8080/", // localhost test
   timeout: 10000, // Set all requests to timeout after 10 seconds
 });
 

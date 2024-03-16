@@ -10,6 +10,7 @@ import KeyboardAvoidView from "../components/KeyboardAvoidView";
 import { getBackendData } from "../utils/backendAPI";
 import AvatarPicker from "../components/AvatarPicker";
 import auth from "@react-native-firebase/auth"
+import LinearBackground from "../components/LinearBackground";
 
 export default function Onboard1Screen({ navigation }) {
   const [loading, setLoading] = useState(true);
@@ -48,7 +49,13 @@ export default function Onboard1Screen({ navigation }) {
   if (loading) return <ActivityIndicator style={{ flex: 1 }} />;
   else {
     if (userData) {
-      navigation.navigate("HomeNavigator");
+      return (
+        <LinearBackground>
+          <ActivityIndicator style={{ flex: 1 }} />
+          {navigation.navigate("HomeNavigator")}
+        </LinearBackground>)
+      
+      return <></>;
     } else {
       return (
         <SafeAreaView style={{ flex: 1 }}>
@@ -63,14 +70,14 @@ export default function Onboard1Screen({ navigation }) {
             <AvatarPicker photoObject={onboardData.photoObject} setPhotoObject={updateOnboardData} size={150} />
 
             <View>
-              <SignUpInput 
+              <SignUpInput
                 title="Name"
                 InputComponent={TextInput}
                 onChangeText={(text) => updateOnboardData("name", text)}
                 value={onboardData.name}
                 placeholder="Your Name"
                 autoCapitalize={"none"}
-                style={{fontSize: 17}}
+                style={{ fontSize: 17 }}
               />
               <Divider />
               <SignUpInput

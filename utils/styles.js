@@ -1,9 +1,6 @@
 import { StyleSheet } from "react-native";
 
 export const appStyles = StyleSheet.create({
-  screen: {
-    flex: 1,
-  },
   heading1: {
     fontWeight: "500",
     textAlign: "center",

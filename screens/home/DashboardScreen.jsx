@@ -15,7 +15,6 @@ export default function DashboardScreen() {
       try {
         const userData = await getBackendDataWithRetry("/user");
         setUserData(userData);
-        console.log(userData);
       } catch (error) {
         Alert.alert("An error occured", error);
       } finally {
@@ -24,15 +23,6 @@ export default function DashboardScreen() {
     }
     fetchData();
   }, []);
-
-  useEffect(() => {
-    async function updateUser() {
-      await auth().currentUser.updateProfile({
-        displayName: "",
-        photoURL: ""
-      })
-    }
-  }, [])
 
   return (
     <LinearBackground>
@@ -44,7 +34,7 @@ export default function DashboardScreen() {
             <View style={styles.greetingContainer}>
               <View>
                 <Text style={styles.greetingText} >Good Morning,</Text>
-                <Text style={styles.greetingName} >{userData.name}</Text>
+                <Text style={styles.greetingName} >{userData.name.split(" ")[0]}</Text>
               </View>
               <AvatarDisplay source={{ uri: userData.photoURL }} size={120} editable={false} />
             </View>

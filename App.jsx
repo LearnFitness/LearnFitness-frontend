@@ -36,7 +36,7 @@ export default function App() {
         {user ?
           <>
             <Stack.Screen name="OnboardNavigator" component={OnboardNavigator} />
-            <Stack.Screen name="HomeNavigator" component={HomeNavigator} />
+            <Stack.Screen name="HomeNavigator" component={HomeNavigator} options={{ animation: "none" }}/>
           </>
           :
           <>
