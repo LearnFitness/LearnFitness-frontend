@@ -9,7 +9,7 @@ import PrimaryButton from "../../components/PrimaryButton";
 export default function DashboardScreen() {
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(false);
-
+  
   useEffect(() => {
     async function fetchData() {
       try {
@@ -38,6 +38,47 @@ export default function DashboardScreen() {
               </View>
               <AvatarDisplay source={{ uri: userData.photoURL }} size={120} editable={false} />
             </View>
+            <View style={styles.finishedWorkoutsContainer}>
+              <Text style={styles.finishedWorkoutsText}>Finished Workouts</Text>
+              <PrimaryButton
+                title="View All >"
+                buttonStyle={styles.viewAllButton}
+                textStyle={styles.viewAllButtonText}/>
+            </View>
+            <View style={styles.completedWorkoutsContainer}>
+              <Text style={styles.completedWorkoutsText}>
+                No completed workouts yet. 
+                {'\n'}
+                Start a new workout!
+              </Text>
+            </View>
+            <View style={styles.statsContainer}>
+              <Text style={styles.statText}>
+                <Text style={styles.statNumber}>--</Text>{'\n'}
+                <Text style={styles.subText}>WORKOUTS COMPLETED</Text>
+              </Text>
+              <Text style={styles.statText}>
+                <Text style={styles.statNumber}>--</Text>{'\n'}
+                <Text style={styles.subText}>DAYS SINCE LAST WORKOUT</Text>
+              </Text>
+              <Text style={styles.statText}>
+                <Text style={styles.statNumber}>--</Text>{'\n'}
+                <Text style={styles.subText}>PR ACHIEVED THIS WEEK</Text>
+              </Text>
+            </View>
+            <View style={styles.lineContainer}>
+              <View style={styles.horizontalLine} />
+            </View>
+            <Text style={styles.dayText}>It's {currentDayOfWeek}!</Text>
+            <Text style={styles.motivationalText}>{getRandomSentence()}</Text>
+            <View style={styles.buttonContainer}>
+              <PrimaryButton 
+                title="View Workouts >"
+                buttonColor="blue" 
+                textColor="white" 
+                width="50%" 
+              />
+            </View>
             <PrimaryButton title="Sign Out" handleOnPress={() => auth().signOut()} />
           </View>
         )
@@ -64,5 +105,105 @@ const styles = StyleSheet.create({
     color: "white",
     fontSize: 40,
     fontWeight: "900"
-  }
+  },
+  finishedWorkoutsContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginHorizontal: 20,
+    marginTop: 20,
+  },
+  finishedWorkoutsText: {
+    color: "white",
+    fontSize: 20,
+  },
+  viewAllButton: {
+    backgroundColor: "transparent", 
+    opacity: 0.7, 
+  },
+  viewAllButtonText: {
+    fontWeight: "normal", 
+    color: "white", 
+  },
+  completedWorkoutsContainer: {
+    backgroundColor: "rgba(255, 255, 255, 0.3)", 
+    borderRadius: 10, 
+    padding: 20,
+    marginHorizontal: 20, 
+    marginBottom: 30, 
+    marginTop: 30, 
+    alignItems: "center",
+    justifyContent: "center", 
+    minHeight: 150, 
+  },
+  completedWorkoutsText: {
+    color: "white",
+    fontSize: 18,
+    textAlign: "center",
+  },
+  statText: {
+    flex: 1,
+    alignItems: "center",
+    textAlign: "center",
+    fontWeight: "bold",
+  },
+  statNumber: {
+    color: "white",
+    fontSize: 30, 
+    fontWeight: "bold",
+  },
+  subText: {
+    color: "white",
+    fontSize: 12,
+    opacity: 0.7,
+  },
+  statsContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingHorizontal: 20,
+  },
+  lineContainer: {
+    alignItems: "center",
+    marginTop: 20,
+    marginBottom: 20,
+  },
+  horizontalLine: {
+    width: "40%",
+    height: 1, 
+    backgroundColor: "rgba(255, 255, 255, 0.5)", 
+  },
+  dayText: {
+    color: "white",
+    fontSize: 18,
+    textAlign: "center",
+    fontStyle: "italic",
+  },
+  motivationalText: {
+    color: "white",
+    fontSize: 16,
+    textAlign: "center",
+    fontStyle: "italic",
+    marginHorizontal: 20,
+  },
+  buttonContainer: {
+    marginTop: 15,
+    marginBottom: 15,
+    alignItems: "center"
+  },
 })
+
+const motivationalSentences = [
+  "Lighten up your day by completing a workout!",
+  "Start your day right with a workout!",
+  "Push yourself to new limits today!",
+  "Make today count with a great workout!",
+  // Add more motivational sentences as needed
+];
+
+function getRandomSentence() {
+  const randomIndex = Math.floor(Math.random() * motivationalSentences.length);
+  return motivationalSentences[randomIndex];
+}
+
+const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+const currentDayOfWeek = daysOfWeek[new Date().getDay()];
