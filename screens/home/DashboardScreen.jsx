@@ -1,4 +1,4 @@
-import { View, Text, ActivityIndicator, Alert, StyleSheet } from "react-native";
+import { View, Text, ActivityIndicator, Alert, StyleSheet, StatusBar } from "react-native";
 import { useEffect, useState } from "react";
 import { getBackendDataWithRetry } from "../../utils/backendAPI";
 import auth from "@react-native-firebase/auth";
@@ -26,6 +26,7 @@ export default function DashboardScreen() {
 
   return (
     <LinearBackground>
+      <StatusBar translucent backgroundColor="transparent" barStyle={"light-content"}/>
       {loading || !userData ?
         (
           <ActivityIndicator style={{flex: 1}}/>
