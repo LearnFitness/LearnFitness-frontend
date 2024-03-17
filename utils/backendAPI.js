@@ -18,7 +18,6 @@ export async function getBackendData(endpoint) {
         Authorization: `Bearer ${idToken}`,
       },
     });
-    console.log("Getting backend data:", response.data);
     return response.data;
   } catch (error) {
     console.error("There was an error fetching the data.", error.message);
@@ -47,7 +46,6 @@ export async function getBackendDataWithRetry(endpoint, maxRetries = 3,retryDela
       if (attempts >= maxRetries) {
         throw error;
       }
-
       // Wait before retrying
       await new Promise((resolve) => setTimeout(resolve, retryDelay));
     }
