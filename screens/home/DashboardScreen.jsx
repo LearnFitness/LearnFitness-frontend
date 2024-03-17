@@ -1,4 +1,3 @@
-import { View, Text, ActivityIndicator, Alert, StyleSheet } from "react-native";
 import { View, Text, ActivityIndicator, Alert, StyleSheet, StatusBar } from "react-native";
 import { useEffect, useState } from "react";
 import { getBackendDataWithRetry } from "../../utils/backendAPI";
@@ -208,5 +207,4 @@ function getRandomSentence() {
 }
 
 const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-const currentDayOfWeek = daysOfWeek[new Date().getDay()];
 const currentDayOfWeek = daysOfWeek[new Date().getDay()];
