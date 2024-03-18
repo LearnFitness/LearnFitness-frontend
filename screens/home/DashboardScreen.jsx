@@ -6,10 +6,10 @@ import LinearBackground from "../../components/LinearBackground";
 import AvatarDisplay from "../../components/AvatarDisplay";
 import PrimaryButton from "../../components/PrimaryButton";
 
-export default function DashboardScreen() {
+export default function DashboardScreen({navigation}) {
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(false);
-  
+
   useEffect(() => {
     async function fetchData() {
       try {
@@ -44,11 +44,12 @@ export default function DashboardScreen() {
               <PrimaryButton
                 title="View All >"
                 buttonStyle={styles.viewAllButton}
-                textStyle={styles.viewAllButtonText}/>
+                textStyle={styles.viewAllButtonText}
+                handleOnPress={() => navigation.navigate("Progress")}/>
             </View>
             <View style={styles.completedWorkoutsContainer}>
               <Text style={styles.completedWorkoutsText}>
-                No completed workouts yet. 
+                No completed workouts yet.
                 {'\n'}
                 Start a new workout!
               </Text>
@@ -73,11 +74,12 @@ export default function DashboardScreen() {
             <Text style={styles.dayText}>It's {currentDayOfWeek}!</Text>
             <Text style={styles.motivationalText}>{getRandomSentence()}</Text>
             <View style={styles.buttonContainer}>
-              <PrimaryButton 
+              <PrimaryButton
                 title="View Workouts >"
-                buttonColor="blue" 
-                textColor="white" 
-                width="50%" 
+                buttonColor="blue"
+                textColor="white"
+                width="50%"
+                handleOnPress={() => navigation.navigate("Workouts")}
               />
             </View>
             <PrimaryButton title="Sign Out" handleOnPress={() => auth().signOut()} />
@@ -95,7 +97,8 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     gap: 20,
     flexWrap: "wrap",
-    margin: 20
+    margin: 20,
+    paddingTop: 20
   },
   greetingText: {
     color: "white",
@@ -111,31 +114,29 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    marginHorizontal: 20,
-    marginTop: 20,
+    marginHorizontal: 35
   },
   finishedWorkoutsText: {
     color: "white",
     fontSize: 20,
   },
   viewAllButton: {
-    backgroundColor: "transparent", 
-    opacity: 0.7, 
+    backgroundColor: "transparent",
+    opacity: 0.7,
   },
   viewAllButtonText: {
-    fontWeight: "normal", 
-    color: "white", 
+    fontWeight: "normal",
+    color: "white",
   },
   completedWorkoutsContainer: {
-    backgroundColor: "rgba(255, 255, 255, 0.3)", 
-    borderRadius: 10, 
-    padding: 20,
-    marginHorizontal: 20, 
-    marginBottom: 30, 
-    marginTop: 30, 
+    backgroundColor: "rgba(255, 255, 255, 0.3)",
+    borderRadius: 10,
+    marginHorizontal: 20,
+    marginBottom: 20,
+    marginTop: 20,
     alignItems: "center",
-    justifyContent: "center", 
-    minHeight: 150, 
+    justifyContent: "center",
+    minHeight: 150,
   },
   completedWorkoutsText: {
     color: "white",
@@ -147,10 +148,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
     textAlign: "center",
     fontWeight: "bold",
+    marginBottom: 10
   },
   statNumber: {
     color: "white",
-    fontSize: 30, 
+    fontSize: 30,
     fontWeight: "bold",
   },
   subText: {
@@ -170,8 +172,8 @@ const styles = StyleSheet.create({
   },
   horizontalLine: {
     width: "40%",
-    height: 1, 
-    backgroundColor: "rgba(255, 255, 255, 0.5)", 
+    height: 1,
+    backgroundColor: "rgba(255, 255, 255, 0.5)",
   },
   dayText: {
     color: "white",
