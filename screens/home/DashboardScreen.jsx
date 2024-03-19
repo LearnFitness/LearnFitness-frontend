@@ -1,4 +1,4 @@
-import { View, Text, ActivityIndicator, Alert, StyleSheet, StatusBar } from "react-native";
+import { View, Text, ActivityIndicator, Alert, StyleSheet, StatusBar, Pressable, TouchableOpacity } from "react-native";
 import { useEffect, useState } from "react";
 import { getBackendDataWithRetry } from "../../utils/backendAPI";
 import auth from "@react-native-firebase/auth";
@@ -41,11 +41,10 @@ export default function DashboardScreen({navigation}) {
             </View>
             <View style={styles.finishedWorkoutsContainer}>
               <Text style={styles.finishedWorkoutsText}>Finished Workouts</Text>
-              <PrimaryButton
-                title="View All >"
-                buttonStyle={styles.viewAllButton}
-                textStyle={styles.viewAllButtonText}
-                handleOnPress={() => navigation.navigate("Progress")}/>
+              <Pressable
+                onPress={() => navigation.navigate("Progress")}>
+                <Text style={{ textAlign: "center", marginTop: 0, fontSize: 17, color: "#9E9E9E" }}>View All {">"}</Text>
+              </Pressable>
             </View>
             <View style={styles.completedWorkoutsContainer}>
               <Text style={styles.completedWorkoutsText}>
@@ -74,13 +73,9 @@ export default function DashboardScreen({navigation}) {
             <Text style={styles.dayText}>It's {currentDayOfWeek}!</Text>
             <Text style={styles.motivationalText}>{getRandomSentence()}</Text>
             <View style={styles.buttonContainer}>
-              <PrimaryButton
-                title="View Workouts >"
-                buttonColor="blue"
-                textColor="white"
-                width="50%"
-                handleOnPress={() => navigation.navigate("Workouts")}
-              />
+              <TouchableOpacity onPress={() => navigation.navigate("Workouts")} style={{ height: 55, width: 250, backgroundColor: "#FFFFFF", padding: 10, borderRadius: 30 }}>
+                <Text style={{ color: "#0044AA", fontWeight: "bold", fontSize: 25, textAlign: "center" }}>View Workouts →</Text>
+              </TouchableOpacity>
             </View>
             <PrimaryButton title="Sign Out" handleOnPress={() => auth().signOut()} />
           </View>
@@ -103,7 +98,8 @@ const styles = StyleSheet.create({
   greetingText: {
     color: "white",
     fontSize: 25,
-    fontStyle: "italic"
+    fontStyle: "italic",
+    paddingRight: 5
   },
   greetingName: {
     color: "white",
@@ -119,6 +115,7 @@ const styles = StyleSheet.create({
   finishedWorkoutsText: {
     color: "white",
     fontSize: 20,
+    paddingTop: 5
   },
   viewAllButton: {
     backgroundColor: "transparent",
