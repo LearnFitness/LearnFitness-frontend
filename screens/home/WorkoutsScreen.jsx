@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { View, Text, SafeAreaView, TouchableOpacity, StyleSheet, ScrollView, Image } from "react-native";
 import LinearBackground from "../../components/LinearBackground";
 
-const WorkoutPlanItem = ({ workouts, onWorkoutPress, onAddWorkoutPlan }) => {
+const WorkoutPlanItem = ({ workouts, onWorkoutPress }) => {
   return (
     <View style={styles.workoutPlanContainer}>
       {workouts.map((workout, index) => (
@@ -19,27 +19,30 @@ const WorkoutPlanItem = ({ workouts, onWorkoutPress, onAddWorkoutPlan }) => {
           </View>
         </TouchableOpacity>
       ))}
-      <TouchableOpacity style={styles.addButtonContainer} onPress={onAddWorkoutPlan}>
-        <View style={styles.addButton}>
-          <Text style={styles.addButtonText}>+</Text>
-        </View>
+    </View>
+  );
+};
+
+const RecommendPlans = ({ onRecommendPress }) => {
+  return (
+    <View style={styles.recommendContainer}>
+      <Text style={styles.recommendTitle}>Recommend For You</Text>
+      <TouchableOpacity style={styles.recommendImageContainer} onPress={() => onRecommendPress({ id: 2, image: require("./../../assets/recommend1.jpg") })}>
+        <Image
+          source={require("./../../assets/recommend1.jpg")}
+          style={styles.recommendImage}
+        />
       </TouchableOpacity>
+      {/* Add more recommended plans as needed */}
     </View>
   );
 };
 
 export default function WorkoutsScreen() {
-  const [selectedDay, setSelectedDay] = useState(null);
-  const [workouts, setWorkouts] = useState({
-    Monday: [{ id: 1, image: require("../../assets/workout1.jpg") }],
-    // Define workouts for other days as needed
-  });
-
-  const daysOfWeek = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
-
-  const handleDaySelect = (day) => {
-    setSelectedDay(day);
-  };
+  const [workouts, setWorkouts] = useState([
+    { id: 1, image: require("../../assets/workout1.jpg") },
+    // Add more workout objects as needed
+  ]);
 
   const handleWorkoutPress = (workout) => {
     console.log("Accessing workout:", workout);
@@ -47,10 +50,13 @@ export default function WorkoutsScreen() {
   };
 
   const handleAddWorkoutPlan = () => {
-    if (selectedDay) {
-      console.log("Adding a workout plan for:", selectedDay);
-      // Handle adding a workout plan for the selected day
-    }
+    console.log("Making your own workout plan");
+    // Handle adding a workout plan
+  };
+
+  const handleRecommendPress = (workout) => {
+    console.log("Accessing workout:", workout);
+    // Handle accessing the workout here
   };
 
   return (
@@ -58,36 +64,16 @@ export default function WorkoutsScreen() {
       <SafeAreaView style={styles.container}>
         <View style={styles.content}>
           <Text style={styles.title}>My Workouts</Text>
-          <View style={styles.buttonSection}>
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.buttonContainer}
-            >
-              {daysOfWeek.map((day, index) => (
-                <TouchableOpacity
-                  key={index}
-                  style={[styles.dayButton, selectedDay === day && styles.selectedDayButton]}
-                  onPress={() => handleDaySelect(day)}
-                >
-                  <Text style={[styles.dayButtonText, selectedDay === day && styles.selectedDayButtonText]}>{day}</Text>
-                </TouchableOpacity>
-              ))}
-            </ScrollView>
-          </View>
-          {selectedDay && workouts[selectedDay] && workouts[selectedDay].length > 0 ? (
+          <ScrollView contentContainerStyle={styles.workoutScrollView}>
             <WorkoutPlanItem 
-              workouts={workouts[selectedDay]} 
+              workouts={workouts} 
               onWorkoutPress={handleWorkoutPress} 
-              onAddWorkoutPlan={handleAddWorkoutPlan} 
             />
-          ) : (
-            <TouchableOpacity style={styles.addButtonContainer} onPress={handleAddWorkoutPlan}>
-              <View style={styles.addButton}>
-                <Text style={styles.addButtonText}>+</Text>
-              </View>
-            </TouchableOpacity>
-          )}
+          </ScrollView>
+          <TouchableOpacity style={styles.addButton} onPress={handleAddWorkoutPlan}>
+            <Text style={styles.addButtonText}>+</Text>
+          </TouchableOpacity>
+          <RecommendPlans onRecommendPress={handleRecommendPress} />
         </View>
       </SafeAreaView>
     </LinearBackground>
@@ -100,7 +86,8 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    padding: 20,
+    paddingBottom: 70, // To accommodate the add button
+    paddingHorizontal: 20,
   },
   title: {
     fontSize: 24,
@@ -109,33 +96,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     marginTop: 20,
   },
-  buttonSection: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 20,
-  },
-  buttonContainer: {
-    flexDirection: "row",
-  },
-  dayButton: {
-    backgroundColor: "rgba(255, 255, 255, 0.3)",
-    borderRadius: 20,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    marginRight: 10,
-  },
-  selectedDayButton: {
-    backgroundColor: "blue",
-  },
-  dayButtonText: {
-    fontSize: 16,
-    color: "white",
-  },
-  selectedDayButtonText: {
-    fontWeight: "bold",
-  },
-  workoutPlanContainer: {
-    marginTop: 10,
+  workoutScrollView: {
     flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "space-between",
@@ -157,27 +118,42 @@ const styles = StyleSheet.create({
     height: 130,
     borderRadius: 10,
   },
-  addButtonContainer: {
-    width: 150,
-    height: 150,
-    padding: 10,
-    borderRadius: 10,
-    marginTop: 10,
-    backgroundColor: "rgba(255, 255, 255, 0.3)",
-    justifyContent: "center",
-    alignItems: "center",
-  },
   addButton: {
+    position: "absolute",
+    bottom: 20,
+    right: 20,
     width: 50,
     height: 50,
-    borderRadius: 10,
-    backgroundColor: "transparent",
+    borderRadius: 25,
+    backgroundColor: "rgba(255, 255, 255, 0.3)",
     justifyContent: "center",
     alignItems: "center",
   },
   addButtonText: {
     color: "white",
-    fontSize: 50,
+    fontSize: 30,
     fontWeight: "bold",
+  },
+  recommendContainer: {
+    marginTop: 20,
+  },
+  recommendTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "white",
+    marginBottom: 10,
+  },
+  recommendImageContainer: {
+    width: 150,
+    height: 150,
+    borderRadius: 10,
+    backgroundColor: "rgba(255, 255, 255, 0.3)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  recommendImage: {
+    width: 130,
+    height: 130,
+    borderRadius: 10,
   },
 });
