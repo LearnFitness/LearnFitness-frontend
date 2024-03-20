@@ -1,5 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
-import { Alert, StyleSheet, Text, TextInput, View, Pressable } from "react-native";
+import { Alert, StyleSheet, Text, View, Pressable } from "react-native";
+import { Input } from "@rneui/themed";
 import AvatarPicker from "../../components/AvatarPicker";
 import auth from "@react-native-firebase/auth";
 import LinearBackground from "../../components/LinearBackground";
@@ -70,28 +71,34 @@ export default function SignUpScreen({ navigation, route }) {
       <KeyboardAvoidView containerStyle={styles.container}>
         <View style={{ marginTop: "50%" }}>
           <Text style={[appStyles.heading1, { color: "white", marginBottom: "20%"}]}>Create a LearnFitness account</Text>
-          <TextInput
-            style={appStyles.input}
+          <Input
+            inputContainerStyle={appStyles.input}
             onChangeText={(text) => setEmail(text)}
             value={email}
             placeholder="Email"
             autoCapitalize={"none"}
+            autoCorrect={false}
+            spellCheck={false}
           />
-          <TextInput
-            style={appStyles.input}
+          <Input
+            inputContainerStyle={appStyles.input}
             onChangeText={(text) => setPassword(text)}
             value={password}
             secureTextEntry={true}
             placeholder="Password"
             autoCapitalize={"none"}
+            autoCorrect={false}
+            spellCheck={false}
           />
-          <TextInput
-            style={appStyles.input}
+          <Input
+            inputContainerStyle={appStyles.input}
             onChangeText={(text) => setConfirmPassword(text)}
             value={confirmPassword}
             secureTextEntry={true}
             placeholder="Confirm Password"
             autoCapitalize={"none"}
+            autoCorrect={false}
+            spellCheck={false}
           />
           <PrimaryButton
             loading={loading}

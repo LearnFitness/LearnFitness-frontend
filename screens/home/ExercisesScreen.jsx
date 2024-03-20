@@ -1,27 +1,39 @@
-import { View, Text, SafeAreaView, ActivityIndicator } from "react-native";
-import { useState } from "react";
+import { View, Text, StyleSheet, Pressable, Image } from "react-native";
+import { useState, useRef } from "react";
 import LinearBackground from "../../components/LinearBackground";
+import algoliasearch from 'algoliasearch/lite';
+import { InstantSearch } from 'react-instantsearch-core';
+import SearchBox from "../../components/SearchBox";
+import InfiniteHits from "../../components/InfiniteHits";
+import Filters from "../../components/Filters";
+
+const searchClient = algoliasearch('ZZ7KAXIP59', '115ba3dafb56044172a3f15bfaf3b329');
 
 export default function ExercisesScreen() {
-  const [isLoading, setIsLoading] = useState(true);
+  const [isFilterModalOpen, setFilterModalOpen] = useState(false);
+  const listRef = useRef(null);
+
+  function scrollToTop() {
+    listRef.current?.scrollToOffset({ animated: false, offset: 0 });
+  }
 
   return (
-    <LinearBackground>
-      <SafeAreaView>
-        {isLoading ?
-          (
-            <ActivityIndicator />
-          ) : (
-            <View>
-              <Text>Hello, {auth().currentUser.email}</Text>
-
-              <Text>Your data: {data.email}</Text>
-
-              <Button title="Sign Out" onPress={() => auth().signOut()} />
-            </View>
-          )
-        }
-      </SafeAreaView>
+    <LinearBackground containerStyle={styles.container}>
+      <InstantSearch searchClient={searchClient} indexName="exercises_search">
+        <SearchBox onChange={scrollToTop} />
+        <Filters
+          isModalOpen={isFilterModalOpen}
+          onToggleModal={() => setFilterModalOpen((isOpen) => !isOpen)}
+          onChange={scrollToTop}
+        />
+        <InfiniteHits ref={listRef} />
+      </InstantSearch>
     </LinearBackground>
   )
 }
+
+const styles = StyleSheet.create({
+  container: {
+    marginHorizontal: "4%"
+  }
+})

@@ -1,12 +1,8 @@
 import { GoogleSignin, GoogleSigninButton, statusCodes } from "@react-native-google-signin/google-signin";
 import auth from "@react-native-firebase/auth";
-import { useContext } from "react";
-import { OnboardContext } from "../context/OnboardContext";
 import { Alert } from "react-native";
 
-export default function GoogleSignIn({ navigation }) {
-  // const { signUpData, updateMultipleSignUpData } = useContext(SignUpContext);
-
+export default function GoogleSignIn() {
   GoogleSignin.configure({
     // From Google Cloud's console
     webClientId:
@@ -21,20 +17,7 @@ export default function GoogleSignIn({ navigation }) {
       const user = await GoogleSignin.signIn();
       // Create a Google credential with the token
       const googleCredential = auth.GoogleAuthProvider.credential(user.idToken);
-
-      // Get user info from Google
-      // updateMultipleSignUpData({
-      //   externalCredential: googleCredential,
-      //   name: user.user.displayName,
-      //   email: user.user.email,
-      //   photoURL: user.user.photo
-      // })
-
-      const userCredential = await auth().signInWithCredential(googleCredential);
-      // if (userCredential.additionalUserInfo.isNewUser)
-      //   // Navigate to additional Sign Up screens
-      //   navigation.navigate("SignUp2");
-
+      await auth().signInWithCredential(googleCredential);
     } catch (error) {
       Alert.alert(error.message);
     }
