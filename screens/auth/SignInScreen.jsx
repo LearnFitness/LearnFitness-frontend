@@ -37,15 +37,17 @@ export default function SignInScreen({ navigation }) {
 
       <View>
         <Input
-          containerStyle={appStyles.input}
+          inputContainerStyle={appStyles.input}
           leftIcon={{ type: "font-awesome", name: "envelope", size: 20 }}
           onChangeText={(text) => setEmail(text)}
           value={email}
           placeholder="email@address.com"
           autoCapitalize={"none"}
+          autoCorrect={false}
+          spellCheck={false}
         />
         <Input
-          containerStyle={appStyles.input}
+          inputContainerStyle={appStyles.input}
           leftIcon={{ type: "font-awesome", name: "lock" }}
           rightIcon={visiblePassword ?
             { type: "font-awesome", name: "eye", onPress: () => setVisiblePassword(false) } :
@@ -56,6 +58,8 @@ export default function SignInScreen({ navigation }) {
           secureTextEntry={!visiblePassword}
           placeholder="Password"
           autoCapitalize={"none"}
+          autoCorrect={false}
+          spellCheck={false}
         />
         <PrimaryButton
           loading={loading}

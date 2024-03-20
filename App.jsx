@@ -27,7 +27,7 @@ export default function App() {
     const unsubscriber = auth().onAuthStateChanged(onAuthStateChanged);
     return unsubscriber; // unsubscribe on unmount
   }, []);
-
+  
   if (initializing) return null;
 
   return (
