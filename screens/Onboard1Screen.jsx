@@ -64,8 +64,8 @@ export default function Onboard1Screen({ navigation }) {
         <SafeAreaView style={{ flex: 1 }}>
           <KeyboardAvoidView containerStyle={styles.container}>
             <View>
-              <Text style={[appStyles.heading1, { marginBottom: 20 }]}>Personal Details</Text>
-              <Text style={appStyles.heading3}>Let us know more about you to get your personal workout plans</Text>
+              <Text style={[appStyles.heading1, { marginBottom: 20 }]}>Complete your signup</Text>
+              <Text style={appStyles.heading4}>Let us know more about you to get your personal workout plans</Text>
             </View>
 
             <Text style={appStyles.heading2}>Step 1 of 2</Text>

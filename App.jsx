@@ -27,9 +27,9 @@ export default function App() {
     const unsubscriber = auth().onAuthStateChanged(onAuthStateChanged);
     return unsubscriber; // unsubscribe on unmount
   }, []);
-  
-  if (initializing) return null;
 
+  if (initializing) return null;
+// auth().signOut()
   return (
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ "headerShown": false }}>
