@@ -1,59 +1,17 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Alert, StyleSheet, Text, View, Pressable } from "react-native";
 import { Input } from "@rneui/themed";
-import AvatarPicker from "../../components/AvatarPicker";
 import auth from "@react-native-firebase/auth";
 import LinearBackground from "../../components/LinearBackground";
 import KeyboardAvoidView from "../../components/KeyboardAvoidView";
 import PrimaryButton from "../../components/PrimaryButton"
-import { OnboardContext } from "../../context/OnboardContext";
 import { appStyles } from "../../utils/styles";
 
-export default function SignUpScreen({ navigation, route }) {
-  // const { signUpData, updateSignUpData } = useContext(SignUpContext);
-  const [confirmPassword, setConfirmPassword] = useState();
-  const [loading, setLoading] = useState(false);
-
-  // Create a new Date object for the next SignUp screen
-  // useEffect(() => {
-  //   updateSignUpData("birthday", new Date());
-  // }, [])
-
-  // async function handleNext() {
-  //   setLoading(true);
-
-  //   if (!(signUpData.name && signUpData.email && signUpData.password)) {
-  //     Alert.alert("Please fill out all required fields");
-  //     setLoading(false);
-  //     return;
-  //   }
-
-  //   // Check for valid password
-  //   if (confirmPassword !== signUpData.password) {
-  //     Alert.alert("Passwords do not match. Please try again");
-  //     setLoading(false);
-  //     return;
-  //   }
-
-  //   // Check for valid emails
-  //   try {
-  //     const signInMethods = await auth().fetchSignInMethodsForEmail(signUpData.email);
-  //     if (signInMethods.length === 0) { // If this email is not registered yet
-  //       updateSignUpData("externalCredential", null);
-  //       navigation.navigate("SignUp2");
-  //     } else {
-  //       Alert.alert("This email is already registered. Please try signing in.");
-  //       return;
-  //     }
-  //   } catch (error) {
-  //     Alert.alert(error.message);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // }
-  const [name, setName] = useState(null);
+export default function SignUpScreen({ navigation }) {
   const [email, setEmail] = useState(null);
   const [password, setPassword] = useState(null);
+  const [confirmPassword, setConfirmPassword] = useState();
+  const [loading, setLoading] = useState(false);
 
   async function handleSignUp() {
     setLoading(true);
@@ -104,7 +62,7 @@ export default function SignUpScreen({ navigation, route }) {
             loading={loading}
             disabled={loading}
             title="Next"
-            handleOnPress={handleSignUp}
+            handleOnPress={() => handleSignUp()}
           />
         </View>
 

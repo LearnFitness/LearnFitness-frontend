@@ -17,7 +17,7 @@ export default function HomeNavigator() {
           let iconName;
 
           if (route.name === 'Dashboard') iconName = "house"
-          else if (route.name === 'Workouts') iconName = "rectangle-list"
+          else if (route.name === 'Workouts') iconName = "list"
           else if (route.name === 'Exercises') iconName = "dumbbell"
           else if (route.name === 'Progress') iconName = "chart-simple"
           else if (route.name === 'Settings') iconName = "gear"

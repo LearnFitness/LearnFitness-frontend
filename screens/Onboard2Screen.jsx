@@ -56,7 +56,7 @@ export default function Onboard2Screen({ navigation }) {
         })}
       </View>
 
-      <PrimaryButton title="Create Account" handleOnPress={handleSubmitOnboardData} />
+      <PrimaryButton title="Create Account" handleOnPress={handleSubmitOnboardData} loading={loading} disabled={loading} />
 
     </SafeAreaView>
   )

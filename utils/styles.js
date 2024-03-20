@@ -16,6 +16,11 @@ export const appStyles = StyleSheet.create({
     textAlign: "center",
     fontSize: 25,
   },
+  heading4: {
+    fontWeight: "300",
+    textAlign: "center",
+    fontSize: 22,
+  },
   input: {
     fontSize: 17,
     height: 50,
