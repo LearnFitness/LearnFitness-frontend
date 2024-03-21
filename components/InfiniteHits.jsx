@@ -2,9 +2,8 @@ import React, { forwardRef, useState } from 'react';
 import { StyleSheet, View, FlatList, Text, Pressable } from 'react-native';
 import { useInfiniteHits } from 'react-instantsearch-core';
 import firestore from "@react-native-firebase/firestore";
-import { capitalize } from '../utils/utilities';
-import { Image } from '@rneui/themed';
 import ExerciseModal from './ExerciseModal';
+import FastImage from "react-native-fast-image";
 
 export default InfiniteHits = forwardRef(
   ({ ...props }, ref) => {
@@ -27,17 +26,17 @@ export default InfiniteHits = forwardRef(
         renderItem={({ item }) => (<SearchResult item={item} />)}
       />
 
-      <ExerciseModal exercise={exercise} isModalVisible={isModalVisible} setModalVisible={setModalVisible}/>
+      <ExerciseModal exercise={exercise} isModalVisible={isModalVisible} setModalVisible={setModalVisible} />
     </>
     );
 
     function SearchResult({ item }) {
       return (
         <Pressable onPress={() => handleViewItem(item)} style={styles.exerciseContainer}>
-          {/* <Image source={{ uri: item.gifUrl }} style={styles.exerciseGif} /> */}
-          <View>
-            <Text style={styles.exerciseName}>{capitalize(item.name)}</Text>
-            <Text style={styles.exerciseBodyPart}>{capitalize(item.bodyPart)}</Text>
+          <FastImage source={{ uri: item.gifUrl }} style={styles.exerciseGif} />
+          <View style={{ paddingRight: 50 }}>
+            <Text style={styles.exerciseName}>{item.name}</Text>
+            <Text style={styles.exerciseBodyPart}>{item.bodyPart}</Text>
           </View>
         </Pressable>
       )
@@ -47,10 +46,9 @@ export default InfiniteHits = forwardRef(
 const styles = StyleSheet.create({
   exerciseContainer: {
     flexDirection: "row",
-    flexWrap: "wrap",
     padding: 10,
     margin: 5,
-    backgroundColor: "rgba(255, 255, 255, 0.15)",
+    backgroundColor: "rgba(255, 255, 255, 0.2)",
     borderRadius: 5,
   },
   exerciseGif: {
@@ -64,9 +62,11 @@ const styles = StyleSheet.create({
     fontSize: 18,
     paddingBottom: 5,
     fontWeight: "600",
+    textTransform: "capitalize",
   },
   exerciseBodyPart: {
     color: "darkgrey",
-    fontSize: 15
+    fontSize: 15,
+    textTransform: "capitalize"
   }
 });

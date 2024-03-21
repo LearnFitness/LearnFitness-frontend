@@ -54,11 +54,12 @@ export default function Onboard1Screen({ navigation }) {
     )
   } else {
     if (userData) {
-      return (
-        <LinearBackground>
-          <ActivityIndicator style={{ flex: 1 }} />
-          {navigation.navigate("HomeNavigator")}
-        </LinearBackground>)
+      // return (
+      //   <LinearBackground>
+      //     <ActivityIndicator style={{ flex: 1 }} />
+      //     {navigation.navigate("HomeNavigator")}
+      //   </LinearBackground>)
+      navigation.navigate("HomeNavigator");
     } else {
       return (
         <SafeAreaView style={{ flex: 1 }}>

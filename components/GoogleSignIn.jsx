@@ -1,6 +1,6 @@
 import { GoogleSignin, GoogleSigninButton, statusCodes } from "@react-native-google-signin/google-signin";
 import auth from "@react-native-firebase/auth";
-import { Alert } from "react-native";
+import { Alert, View } from "react-native";
 
 export default function GoogleSignIn() {
   GoogleSignin.configure({
@@ -19,15 +19,22 @@ export default function GoogleSignIn() {
       const googleCredential = auth.GoogleAuthProvider.credential(user.idToken);
       await auth().signInWithCredential(googleCredential);
     } catch (error) {
-      Alert.alert(error.message);
+      if (error.code === statusCodes.SIGN_IN_CANCELLED) {
+        // Bypass this error for better UX
+      } else {
+        Alert.alert(error.message);
+
+      }
     }
   }
 
   return (
-    <GoogleSigninButton
-      size={GoogleSigninButton.Size.Icon}
-      color={GoogleSigninButton.Color.Light}
-      onPress={() => signInWithGoogle()}
-    />
+    <View style={{ margin: 10 }}>
+      <GoogleSigninButton
+        size={GoogleSigninButton.Size.Wide}
+        color={GoogleSigninButton.Color.Light}
+        onPress={() => signInWithGoogle()}
+      />
+    </View>
   )
 }

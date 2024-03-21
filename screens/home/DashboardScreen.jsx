@@ -77,7 +77,6 @@ export default function DashboardScreen({navigation}) {
                 <Text style={{ color: "#0044AA", fontWeight: "bold", fontSize: 25, textAlign: "center" }}>View Workouts →</Text>
               </TouchableOpacity>
             </View>
-            <PrimaryButton title="Sign Out" handleOnPress={() => auth().signOut()} />
           </View>
         )
       }

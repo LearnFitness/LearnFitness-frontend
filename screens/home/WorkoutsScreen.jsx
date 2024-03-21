@@ -1,24 +1,23 @@
-import React, { useState } from "react";
-import { View, Text, SafeAreaView, TouchableOpacity, StyleSheet, ScrollView, Image, Platform, StatusBar} from "react-native";
+import firestore from "@react-native-firebase/firestore";
+import React, { useEffect, useState } from "react";
+import { View, Text, StyleSheet, ScrollView, Image, Pressable, Alert, ActivityIndicator } from "react-native";
 import LinearBackground from "../../components/LinearBackground";
+import { getBackendData } from "./../../utils/backendAPI";
 
-const WorkoutPlanItem = ({ workouts, onWorkoutPress }) => {
+function WorkoutPlan({ workout, onWorkoutPress }) {
   return (
     <View style={styles.workoutPlanContainer}>
-      {workouts.map((workout, index) => (
-        <TouchableOpacity
-          key={index}
-          style={styles.workoutPlansContainer}
-          onPress={() => onWorkoutPress(workout)}
-        >
-          <View style={styles.imageContainer}>
-            <Image
-              source={workout.image}
-              style={styles.workoutImage}
-            />
-          </View>
-        </TouchableOpacity>
-      ))}
+      <Pressable onPress={() => onWorkoutPress(workout)}>
+        <Image source={require("./../../assets/workout_plans_images/leg1.jpg")} style={styles.workoutImage} />
+        <View style={{ padding: 10 }}>
+          <Text style={styles.workoutName}>{workout.name}</Text>
+          <Text style={styles.workoutDescription}>{workout.description}</Text>
+          {workout.exercises.map(exercise => (
+            <Text key={exercise.id} style={styles.exerciseName}>{exercise.sets + " x " + exercise.name}</Text>
+          ))
+          }
+        </View>
+      </Pressable>
     </View>
   );
 };
@@ -27,22 +26,36 @@ const RecommendPlans = ({ onRecommendPress }) => {
   return (
     <View style={styles.recommendContainer}>
       <Text style={styles.recommendTitle}>Recommend For You</Text>
-      <TouchableOpacity style={styles.recommendImageContainer} onPress={() => onRecommendPress({ id: 2, image: require("./../../assets/recommend1.jpg") })}>
+      <Pressable style={styles.recommendImageContainer} onPress={() => onRecommendPress({ id: 2, image: require("./../../assets/recommend1.jpg") })}>
         <Image
           source={require("./../../assets/recommend1.jpg")}
           style={styles.recommendImage}
         />
-      </TouchableOpacity>
+      </Pressable>
       {/* Add more recommended plans as needed */}
     </View>
   );
 };
 
 export default function WorkoutsScreen() {
-  const [workouts, setWorkouts] = useState([
-    { id: 1, image: require("../../assets/workout1.jpg") },
-    // Add more workout objects as needed
-  ]);
+  const [loading, setLoading] = useState(false);
+  const [workouts, setWorkouts] = useState([]);
+
+  useEffect(() => {
+    async function getWorkouts() {
+      setLoading(true);
+      try {
+        const workouts = await getBackendData("/user/workouts");
+        const premadeWorkoutsSnapshot = await firestore().collection("premade_workouts").get();
+        setWorkouts(workouts);
+      } catch (error) {
+        Alert.alert(error.message);
+      } finally {
+        setLoading(false);
+      }
+    }
+    getWorkouts();
+  }, []);
 
   const handleWorkoutPress = (workout) => {
     console.log("Accessing workout:", workout);
@@ -54,108 +67,106 @@ export default function WorkoutsScreen() {
     // Handle adding a workout plan
   };
 
-  const handleRecommendPress = (workout) => {
-    console.log("Accessing workout:", workout);
-    // Handle accessing the workout here
-  };
+  if (loading) return (
+    <LinearBackground>
+      <ActivityIndicator style={{ flex: 1 }} />
+    </LinearBackground>
+  )
 
   const statusBarHeight = Platform.OS === 'android' ? StatusBar.currentHeight : 0;
 
   return (
-    <LinearBackground>
-      <SafeAreaView style={[styles.container, { paddingTop: statusBarHeight }]}>
-        <View style={styles.content}>
-          <Text style={styles.title}>My Workouts</Text>
-          <ScrollView contentContainerStyle={styles.workoutScrollView}>
-            <WorkoutPlanItem 
-              workouts={workouts} 
-              onWorkoutPress={handleWorkoutPress} 
+    <LinearBackground containerStyle={styles.container}>
+      <ScrollView>
+        <Text style={styles.title}>Your Workouts</Text>
+        <View style={styles.workoutsContainer}>
+          {workouts.map((workout, index) => (
+            <WorkoutPlan
+              key={index}
+              workout={workout}
+              onWorkoutPress={handleWorkoutPress}
             />
-          </ScrollView>
-          <TouchableOpacity style={styles.addButton} onPress={handleAddWorkoutPlan}>
-            <Text style={styles.addButtonText}>+</Text>
-          </TouchableOpacity>
-          <RecommendPlans onRecommendPress={handleRecommendPress} />
+          )
+          )}
         </View>
-      </SafeAreaView>
+
+        <Text style={styles.title}>Recommended for you</Text>
+        <View style={styles.workoutsContainer}>
+          {workouts.map((workout, index) => (
+            <WorkoutPlan
+              key={index}
+              workout={workout}
+              onWorkoutPress={handleWorkoutPress}
+            />
+          )
+          )}
+        </View>
+
+      </ScrollView>
+
+
+      <Pressable style={styles.addButton} onPress={handleAddWorkoutPlan}>
+        <Text style={styles.addButtonText}>+</Text>
+      </Pressable>
+
     </LinearBackground>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-  },
-  content: {
-    flex: 1,
-    paddingBottom: 70, // To accommodate the add button
-    paddingHorizontal: 20,
+    marginHorizontal: "6%"
   },
   title: {
     fontSize: 24,
     fontWeight: "bold",
     color: "white",
-    marginBottom: 20,
-    marginTop: 20,
+    marginVertical: 20
   },
-  workoutScrollView: {
+  workoutsContainer: {
     flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "space-between",
   },
-  workoutPlansContainer: {
-    width: 150,
-    height: 150,
-    padding: 10,
+  workoutPlanContainer: {
+    width: "47%",
     borderRadius: 10,
-    marginTop: 10,
-    backgroundColor: "rgba(255, 255, 255, 0.3)",
-  },
-  imageContainer: {
-    flex: 1,
-    alignItems: "center",
+    backgroundColor: "rgba(255, 255, 255, 1)",
   },
   workoutImage: {
-    width: 130,
-    height: 130,
-    borderRadius: 10,
+    width: '100%',
+    height: 170,
+    alignSelf: "center",
+    borderTopLeftRadius: 10,
+    borderTopRightRadius: 10
   },
-  addButton: {
-    position: "absolute",
-    bottom: 20,
-    right: 20,
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    backgroundColor: "rgba(255, 255, 255, 0.3)",
-    justifyContent: "center",
-    alignItems: "center",
+  workoutDescription: {
+    color: "darkgrey",
+    fontStyle: "italic",
+    marginBottom: 10
   },
   addButtonText: {
     color: "white",
     fontSize: 30,
     fontWeight: "bold",
   },
-  recommendContainer: {
-    marginTop: 20,
+  workoutName: {
+    fontSize: 18,
+    fontWeight: "700"
   },
-  recommendTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: "white",
-    marginBottom: 10,
+  exerciseName: {
+    fontSize: 15
   },
-  recommendImageContainer: {
-    width: 150,
-    height: 150,
-    borderRadius: 10,
-    backgroundColor: "rgba(255, 255, 255, 0.3)",
+  addButton: {
+    position: "absolute",
+    bottom: 20,
+    right: 0,
+    width: 60,
+    height: 60,
+    borderRadius: 50,
+    backgroundColor: "teal",
     justifyContent: "center",
     alignItems: "center",
   },
-  recommendImage: {
-    width: 130,
-    height: 130,
-    borderRadius: 10,
-  },
+
 });

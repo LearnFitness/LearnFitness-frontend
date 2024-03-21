@@ -1,6 +1,6 @@
+import { Button, Modal, View, Text, StyleSheet, ScrollView } from "react-native";
+import FastImage from "react-native-fast-image";
 import { Divider } from "@rneui/themed";
-import { Button, Image, Modal, View, Text, StyleSheet, ScrollView } from "react-native";
-import { capitalize } from "../utils/utilities";
 
 export default function ExerciseModal({ exercise, isModalVisible, setModalVisible }) {
   return (
@@ -9,9 +9,10 @@ export default function ExerciseModal({ exercise, isModalVisible, setModalVisibl
         <Button title="Add to Workout" />
         <Button title="Close" onPress={() => setModalVisible(false)} />
       </View>
+      <Divider />
       <ScrollView contentContainerStyle={styles.container}>
-        <Text style={styles.exerciseName}>{capitalize(exercise?.name)}</Text>
-        <Image style={styles.exerciseGif} source={{ uri: exercise?.gifUrl }} />
+        <Text style={styles.exerciseName}>{exercise?.name}</Text>
+        <FastImage style={styles.exerciseGif} source={{ uri: exercise?.gifUrl }} />
 
         <View style={styles.keyValueRow}>
           <View style={{ flex: 1 }}>
@@ -37,8 +38,8 @@ export default function ExerciseModal({ exercise, isModalVisible, setModalVisibl
             </View>
           </View>
         </View>
-
         <View>
+          <Divider style={{padding: 10}}/>
           <Text style={styles.instructions}>Instructions</Text>
           {exercise?.instructions.map((instruction, index) => {
             return <Text style={styles.instructionStep} key={index}>{(index + 1) + ". " + instruction}</Text>
@@ -58,6 +59,7 @@ const styles = StyleSheet.create({
     fontSize: 25,
     fontWeight: "600",
     textAlign: "center",
+    textTransform: "capitalize"
   },
   exerciseGif: {
     width: 250,
@@ -92,6 +94,6 @@ const styles = StyleSheet.create({
   buttonsContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
-    margin: 10
+    margin: 15
   }
 })
