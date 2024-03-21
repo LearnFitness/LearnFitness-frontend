@@ -7,6 +7,8 @@ import {
   Text,
   TouchableOpacity,
   View,
+  TouchableWithoutFeedback,
+  Pressable
 } from 'react-native';
 import {
   useClearRefinements,
@@ -14,8 +16,8 @@ import {
   useRefinementList,
 } from 'react-instantsearch-core';
 
-export default function Filters({ isModalOpen, onToggleModal, onChange }) {
-  const { items, refine } = useRefinementList({ attribute: "bodyPart" });
+export default function Filters({ isOpen, onClose, onChange }) {
+  const { items, refine } = useRefinementList({ attribute: 'bodyPart' });
   const { canRefine: canClear, refine: clear } = useClearRefinements();
   const { items: currentRefinements } = useCurrentRefinements();
   const totalRefinements = currentRefinements.reduce(
@@ -24,49 +26,46 @@ export default function Filters({ isModalOpen, onToggleModal, onChange }) {
   );
 
   return (
-    <>
-      <TouchableOpacity style={styles.filtersButton} onPress={onToggleModal}>
-        <Text style={styles.filtersButtonText}>Filters</Text>
-        {totalRefinements > 0 && (
-          <View style={styles.itemCount}>
-            <Text style={styles.itemCountText}>{totalRefinements}</Text>
-          </View>
-        )}
-      </TouchableOpacity>
-
-      <Modal animationType="slide" visible={isModalOpen} presentationStyle="pageSheet">
-        <SafeAreaView>
-          <View style={styles.container}>
-            <View style={styles.title}>
-              <Text style={styles.titleText}>Filters</Text>
-            </View>
-            <View style={styles.list}>
-              {items.map((item) => {
-                return (
-                  <TouchableOpacity
-                    key={item.value}
-                    style={styles.item}
-                    onPress={() => {
-                      refine(item.value);
-                      onChange();
-                    }}
-                  >
-                    <Text
-                      style={{
-                        ...styles.labelText,
-                        fontWeight: item.isRefined ? '800' : '400',
+    <Modal animationType="slide" visible={isOpen} presentationStyle="pageSheet">
+      <TouchableWithoutFeedback onPress={onClose}>
+        <SafeAreaView style={styles.modalOverlay}>
+          <TouchableWithoutFeedback>
+            <View style={styles.container}>
+              <View style={styles.title}>
+                <Text style={styles.titleText}>Filters</Text>
+              </View>
+              <View style={styles.list}>
+                {items.map((item) => {
+                  const capitalizeFirstLetter = (string) => {
+                    return string.replace(/\b\w/g, (char) => char.toUpperCase());
+                  };
+                  const capitalizedCategory = capitalizeFirstLetter(item.label); // Capitalize first letter of each word
+                  return (
+                    <TouchableOpacity
+                      key={item.value}
+                      style={{...styles.item, backgroundColor: item.isRefined ? '#e6e6e6' : 'transparent',}}
+                      onPress={() => {
+                        refine(item.value);
+                        onChange();
                       }}
                     >
-                      {item.label}
-                    </Text>
-                    <View style={styles.itemCount}>
-                      <Text style={styles.itemCountText}>{item.count}</Text>
-                    </View>
-                  </TouchableOpacity>
-                );
-              })}
+                      <Text
+                        style={{
+                          ...styles.labelText,
+                          fontWeight: item.isRefined ? '800' : '400',
+                        }}
+                      >
+                        {capitalizedCategory}
+                      </Text>
+                      <View style={styles.itemCount}>
+                        <Text style={styles.itemCountText}>{item.count}</Text>
+                      </View>
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
             </View>
-          </View>
+          </TouchableWithoutFeedback>
           <View style={styles.filterListButtonContainer}>
             <View style={styles.filterListButton}>
               <Button
@@ -76,21 +75,19 @@ export default function Filters({ isModalOpen, onToggleModal, onChange }) {
                 onPress={() => {
                   clear();
                   onChange();
-                  onToggleModal();
                 }}
               />
             </View>
             <View style={styles.filterListButton}>
-              <Button
-                onPress={onToggleModal}
-                title="See results"
-                color="#252b33"
-              />
+              <Button onPress={onClose} title="Apply" color="#252b33" />
             </View>
           </View>
+          <Pressable style={styles.closeButton} onPress={onClose}>
+            <Text style={styles.closeButtonText}>Exit</Text>
+          </Pressable>
         </SafeAreaView>
-      </Modal>
-    </>
+      </TouchableWithoutFeedback>
+    </Modal>
   );
 }
 
@@ -138,16 +135,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 18,
   },
-  filtersButton: {
-    paddingVertical: 18,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
+  modalOverlay: {
+    flex: 1,
   },
-  filtersButtonText: {
-    fontSize: 20,
-    textAlign: 'center',
-    color: "white",
-    fontWeight: "500"
+  closeButton: {
+    position: 'absolute',
+    top: 10,
+    left: 10,
+    zIndex: 1, // Ensure it appears above other content
+    padding: 10,
+  },
+  closeButtonText: {
+    fontSize: 16,
+    color: '#df2420',
+    fontWeight: 'bold',
   },
 });

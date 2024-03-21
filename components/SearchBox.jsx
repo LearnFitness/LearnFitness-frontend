@@ -44,7 +44,8 @@ export default function SearchBox({ onChange, ...props }) {
 const styles = StyleSheet.create({
   container: {
     height: 50,
-    marginTop: 10
+    marginTop: 10,
+    width: '90%',
   },
   input: {
     height: 50,

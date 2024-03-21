@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Text, SafeAreaView, TouchableOpacity, StyleSheet, ScrollView, Image } from "react-native";
+import { View, Text, SafeAreaView, TouchableOpacity, StyleSheet, ScrollView, Image, Platform, StatusBar} from "react-native";
 import LinearBackground from "../../components/LinearBackground";
 
 const WorkoutPlanItem = ({ workouts, onWorkoutPress }) => {
@@ -59,9 +59,11 @@ export default function WorkoutsScreen() {
     // Handle accessing the workout here
   };
 
+  const statusBarHeight = Platform.OS === 'android' ? StatusBar.currentHeight : 0;
+
   return (
     <LinearBackground>
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView style={[styles.container, { paddingTop: statusBarHeight }]}>
         <View style={styles.content}>
           <Text style={styles.title}>My Workouts</Text>
           <ScrollView contentContainerStyle={styles.workoutScrollView}>
