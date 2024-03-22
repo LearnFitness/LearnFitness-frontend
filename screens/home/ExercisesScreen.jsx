@@ -1,4 +1,4 @@
-import { StyleSheet, Platform, StatusBar, View, Pressable, FontAwesome } from "react-native";
+import { StyleSheet, Platform, StatusBar, View, Pressable } from "react-native";
 import { useState, useRef } from "react";
 import LinearBackground from "../../components/LinearBackground";
 import { InstantSearch } from 'react-instantsearch-core';
@@ -6,6 +6,7 @@ import SearchBox from "../../components/SearchBox";
 import InfiniteHits from "../../components/InfiniteHits";
 import Filters from "../../components/Filters";
 import { searchClient } from "../../utils/AlgoliaSearchClient";
+import FontAwesome from "react-native-vector-icons/FontAwesome";
 
 export default function ExercisesScreen() {
   const [isFilterModalOpen, setFilterModalOpen] = useState(false);
