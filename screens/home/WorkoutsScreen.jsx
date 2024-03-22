@@ -1,6 +1,6 @@
 import firestore from "@react-native-firebase/firestore";
 import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet, ScrollView, Image, Pressable, Alert, ActivityIndicator } from "react-native";
+import { View, Text, StyleSheet, ScrollView, Image, Pressable, Alert, ActivityIndicator, Platform, StatusBar } from "react-native";
 import LinearBackground from "../../components/LinearBackground";
 import { getBackendData } from "./../../utils/backendAPI";
 
@@ -121,7 +121,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: "bold",
     color: "white",
-    marginVertical: 20
+    marginTop: 50,
   },
   workoutsContainer: {
     flexDirection: "row",
@@ -146,7 +146,7 @@ const styles = StyleSheet.create({
     marginBottom: 10
   },
   addButtonText: {
-    color: "white",
+    color: "rgba(0, 0, 0, 0.25)",
     fontSize: 30,
     fontWeight: "bold",
   },
@@ -163,10 +163,9 @@ const styles = StyleSheet.create({
     right: 0,
     width: 60,
     height: 60,
-    borderRadius: 50,
-    backgroundColor: "teal",
+    borderRadius: 10,
+    backgroundColor: "rgba(255, 255, 255, 0.25)",
     justifyContent: "center",
     alignItems: "center",
   },
-
 });

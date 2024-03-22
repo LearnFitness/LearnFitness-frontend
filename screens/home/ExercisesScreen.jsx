@@ -1,4 +1,4 @@
-import { StyleSheet } from "react-native";
+import { StyleSheet, Platform, StatusBar, View, Pressable, FontAwesome } from "react-native";
 import { useState, useRef } from "react";
 import LinearBackground from "../../components/LinearBackground";
 import { InstantSearch } from 'react-instantsearch-core';
@@ -18,7 +18,7 @@ export default function ExercisesScreen() {
   const statusBarHeight = Platform.OS === 'android' ? StatusBar.currentHeight : 0;
 
   return (
-    <LinearBackground containerStyle={[styles.container, { paddingTop: statusBarHeight }]}> 
+    <LinearBackground containerStyle={[styles.container, { paddingTop: statusBarHeight }]}>
       <InstantSearch searchClient={searchClient} indexName="exercises_search">
         <View style={styles.searchContainer}>
           <SearchBox onChange={scrollToTop} style={{width: '90%'}} />

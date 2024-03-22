@@ -1,10 +1,8 @@
 import { View, Text, ActivityIndicator, Alert, StyleSheet, StatusBar, Pressable, TouchableOpacity } from "react-native";
 import { useEffect, useState } from "react";
 import { getBackendDataWithRetry } from "../../utils/backendAPI";
-import auth from "@react-native-firebase/auth";
 import LinearBackground from "../../components/LinearBackground";
 import AvatarDisplay from "../../components/AvatarDisplay";
-import PrimaryButton from "../../components/PrimaryButton";
 
 export default function DashboardScreen({navigation}) {
   const [userData, setUserData] = useState(null);
@@ -26,6 +24,8 @@ export default function DashboardScreen({navigation}) {
 
   return (
     <LinearBackground>
+      {/* Changes status bar icon color for ALL pages to white
+      (use FocusAwareStatusBar as seen in SettingsScreen.jsx for individual screens) */}
       <StatusBar translucent backgroundColor="transparent" barStyle={"light-content"}/>
       {loading || !userData ?
         (
@@ -43,7 +43,7 @@ export default function DashboardScreen({navigation}) {
               <Text style={styles.finishedWorkoutsText}>Finished Workouts</Text>
               <Pressable
                 onPress={() => navigation.navigate("Progress")}>
-                <Text style={{ textAlign: "center", marginTop: 0, fontSize: 17, color: "#9E9E9E" }}>View All {">"}</Text>
+                <Text style={{ textAlign: "center", marginTop: 4, fontSize: 17, color: "#9E9E9E" }}>View All {">"}</Text>
               </Pressable>
             </View>
             <View style={styles.completedWorkoutsContainer}>
@@ -92,7 +92,7 @@ const styles = StyleSheet.create({
     gap: 20,
     flexWrap: "wrap",
     margin: 20,
-    paddingTop: 20
+    paddingTop: 30
   },
   greetingText: {
     color: "white",
@@ -103,7 +103,8 @@ const styles = StyleSheet.create({
   greetingName: {
     color: "white",
     fontSize: 40,
-    fontWeight: "900"
+    fontWeight: "900",
+    fontStyle: "italic",
   },
   finishedWorkoutsContainer: {
     flexDirection: "row",
@@ -127,12 +128,12 @@ const styles = StyleSheet.create({
   completedWorkoutsContainer: {
     backgroundColor: "rgba(255, 255, 255, 0.3)",
     borderRadius: 10,
-    marginHorizontal: 20,
+    marginHorizontal: 30,
     marginBottom: 20,
     marginTop: 20,
     alignItems: "center",
     justifyContent: "center",
-    minHeight: 150,
+    minHeight: 175,
   },
   completedWorkoutsText: {
     color: "white",
@@ -163,8 +164,8 @@ const styles = StyleSheet.create({
   },
   lineContainer: {
     alignItems: "center",
-    marginTop: 20,
-    marginBottom: 20,
+    marginTop: 30,
+    marginBottom: 40,
   },
   horizontalLine: {
     width: "40%",
