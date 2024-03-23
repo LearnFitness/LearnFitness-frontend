@@ -6,8 +6,7 @@ import { InstantSearch } from 'react-instantsearch-core';
 import SearchBox from "../../components/SearchBox";
 import InfiniteHits from "../../components/InfiniteHits";
 import Filters from "../../components/Filters";
-import { searchClient } from "../../utils/algoliaSearchClient";
-import FontAwesome from "react-native-vector-icons/FontAwesome";
+import { searchClient } from "../../utils/AlgoliaSearchClient";
 
 export default function ExercisesScreen() {
   const [isFilterModalOpen, setFilterModalOpen] = useState(false);
