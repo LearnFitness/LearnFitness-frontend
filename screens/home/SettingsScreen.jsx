@@ -30,6 +30,7 @@ export default function SettingsScreen() {
   }, []);
 
   // Logout confirmation dialog
+  // Note: styles only affect iOS
   const handleLogout = () => {
     Alert.alert(
       "Logout",
@@ -60,7 +61,7 @@ export default function SettingsScreen() {
         <ActivityIndicator />
       ) : (
         <View style={styles.contentContainer}>
-          {/* Profile picture, name, and email (email has not been implemented yet) */}
+          {/* Profile picture, name, and email */}
           <View style={styles.profileContainer}>
             {/* To be implemented */}
             <TouchableOpacity onPress={() => console.log("Change profile picture")}>
@@ -72,6 +73,7 @@ export default function SettingsScreen() {
               </View>
             </TouchableOpacity>
             <Text style={styles.profileName} >{userData.name.split(" ")[0]}</Text>
+            <Text style={styles.profileEmail}>{userData.email}</Text>
           </View>
           {/* Horizontal line */}
           <View style={styles.horizontalLine} />
@@ -172,5 +174,10 @@ const styles = StyleSheet.create({
   icon: {
     marginRight: 20,
     top: 17,
+  },
+  profileEmail: {
+    marginTop: 5,
+    fontSize: 17,
+    color: "gray",
   },
 });

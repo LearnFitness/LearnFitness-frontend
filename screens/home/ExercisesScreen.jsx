@@ -1,4 +1,5 @@
-import { StyleSheet, Platform, StatusBar, View, Pressable, FontAwesome } from "react-native";
+import { StyleSheet, Platform, StatusBar, View, Pressable } from "react-native";
+import { FontAwesome } from "@expo/vector-icons";
 import { useState, useRef } from "react";
 import LinearBackground from "../../components/LinearBackground";
 import { InstantSearch } from 'react-instantsearch-core';
@@ -45,8 +46,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     marginBottom: 10,
+    marginTop: 10,
   },
   filterButton: {
     padding: 10,
+    top: 3,
   }
 })

@@ -141,7 +141,7 @@ const styles = StyleSheet.create({
   closeButton: {
     position: 'absolute',
     top: 10,
-    left: 10,
+    right: 10,
     zIndex: 1, // Ensure it appears above other content
     padding: 10,
   },
