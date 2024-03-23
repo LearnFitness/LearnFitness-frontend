@@ -29,36 +29,48 @@ export default function Filters({ isOpen, onClose, onChange }) {
     <Modal animationType="slide" visible={isOpen} presentationStyle="pageSheet">
       <TouchableWithoutFeedback onPress={onClose}>
         <SafeAreaView style={styles.modalOverlay}>
-          <View style={styles.container}>
-            <View style={styles.title}>
-              <Text style={styles.titleText}>Filters</Text>
+          <TouchableWithoutFeedback>
+            <View style={styles.container}>
+              <View style={styles.title}>
+                <Text style={styles.titleText}>Filters</Text>
+              </View>
+              <View style={styles.list}>
+                {items.map((item) => {
+                  const capitalizeFirstLetter = (string) => {
+                    return string.replace(/\b\w/g, (char) => char.toUpperCase());
+                  };
+                  const capitalizedCategory = capitalizeFirstLetter(item.label); // Capitalize first letter of each word
+                  return (
+                    <TouchableOpacity
+                      key={item.value}
+                      style={{...styles.item, backgroundColor: item.isRefined ? '#e6e6e6' : 'transparent',}}
+                      onPress={() => {
+                        refine(item.value);
+                        onChange();
+                      }}
+                    >
+                      <Text
+                        style={{
+                          ...styles.labelText,
+                          fontWeight: item.isRefined ? '800' : '400',
+                        }}
+                      >
+                        {capitalizedCategory}
+                      </Text>
+                      <View style={styles.itemCount}>
+                        <Text style={styles.itemCountText}>{item.count}</Text>
+                      </View>
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
             </View>
-            <View style={styles.list}>
-              {items.map(item => {
-                return (
-                  <TouchableOpacity
-                    key={item.value}
-                    style={{ ...styles.item, backgroundColor: item.isRefined ? '#cee7ff' : 'transparent', }}
-                    onPress={() => {
-                      refine(item.value);
-                      onChange();
-                    }}
-                  >
-                    <Text style={{ ...styles.labelText, fontWeight: item.isRefined ? '700' : '400', }}>
-                      {item.label}
-                    </Text>
-                    <View style={styles.itemCount}>
-                      <Text style={styles.itemCountText}>{item.count}</Text>
-                    </View>
-                  </TouchableOpacity>
-                );
-              })}
-            </View>
-          </View>
+          </TouchableWithoutFeedback>
           <View style={styles.filterListButtonContainer}>
             <View style={styles.filterListButton}>
               <Button
                 title="Clear all"
+                color="#252b33"
                 disabled={!canClear}
                 onPress={() => {
                   clear();
@@ -67,11 +79,11 @@ export default function Filters({ isOpen, onClose, onChange }) {
               />
             </View>
             <View style={styles.filterListButton}>
-              <Button onPress={onClose} title="Apply" />
+              <Button onPress={onClose} title="Apply" color="#252b33" />
             </View>
           </View>
           <Pressable style={styles.closeButton} onPress={onClose}>
-            <Text style={styles.closeButtonText}>Close</Text>
+            <Text style={styles.closeButtonText}>Exit</Text>
           </Pressable>
         </SafeAreaView>
       </TouchableWithoutFeedback>
@@ -88,7 +100,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   titleText: {
-    fontSize: 25,
+    fontSize: 32,
   },
   list: {
     marginTop: 32,
@@ -100,14 +112,13 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderColor: '#ddd',
     alignItems: 'center',
-    borderRadius: 5
   },
   itemCount: {
     backgroundColor: '#252b33',
     borderRadius: 24,
     paddingVertical: 4,
     paddingHorizontal: 8,
-    marginHorizontal: 10,
+    marginLeft: 4,
   },
   itemCountText: {
     color: '#ffffff',
@@ -115,8 +126,6 @@ const styles = StyleSheet.create({
   },
   labelText: {
     fontSize: 16,
-    textTransform: "capitalize",
-    marginHorizontal: 10
   },
   filterListButtonContainer: {
     flexDirection: 'row',
@@ -137,7 +146,8 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   closeButtonText: {
-    fontSize: 18,
+    fontSize: 16,
     color: '#df2420',
+    fontWeight: 'bold',
   },
 });

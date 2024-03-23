@@ -6,8 +6,7 @@ import { InstantSearch } from 'react-instantsearch-core';
 import SearchBox from "../../components/SearchBox";
 import InfiniteHits from "../../components/InfiniteHits";
 import Filters from "../../components/Filters";
-import { searchClient } from "../../utils/algoliaSearchClient";
-import FontAwesome from "react-native-vector-icons/FontAwesome";
+import { searchClient } from "../../utils/AlgoliaSearchClient";
 
 export default function ExercisesScreen() {
   const [isFilterModalOpen, setFilterModalOpen] = useState(false);
@@ -21,9 +20,9 @@ export default function ExercisesScreen() {
 
   return (
     <LinearBackground containerStyle={[styles.container, { paddingTop: statusBarHeight }]}>
-      <InstantSearch searchClient={searchClient} indexName="exercises_search" future={{ preserveSharedStateOnUnmount: true }}>
+      <InstantSearch searchClient={searchClient} indexName="exercises_search">
         <View style={styles.searchContainer}>
-          <SearchBox onChange={scrollToTop} style={{ width: '90%' }} />
+          <SearchBox onChange={scrollToTop} style={{width: '90%'}} />
           <Pressable
             style={styles.filterButton}
             onPress={() => setFilterModalOpen(!isFilterModalOpen)}

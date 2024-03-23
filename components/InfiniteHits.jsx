@@ -10,19 +10,11 @@ export default InfiniteHits = forwardRef(
     const { hits, isLastPage, showMore } = useInfiniteHits({ ...props, escapeHTML: false, });
     const [exercise, setExercise] = useState(null);
     const [isModalVisible, setModalVisible] = useState(false);
-    const [loading, setLoading] = useState(false);
 
     async function handleViewItem(item) {
+      const exercise = await firestore().collection("exercises").doc(item.objectID).get();
+      setExercise(exercise.data());
       setModalVisible(true);
-      setLoading(true);
-      try {
-        const exercise = await firestore().collection("exercises").doc(item.objectID).get();
-        setExercise(exercise.data());
-      } catch (error) {
-        Alert.alert(error.message);
-      } finally {
-        setLoading(false);
-      }
     }
 
     return (<>
@@ -34,7 +26,7 @@ export default InfiniteHits = forwardRef(
         renderItem={({ item }) => (<SearchResult item={item} />)}
       />
 
-      <ExerciseModal loading={loading} exercise={exercise} isModalVisible={isModalVisible} setModalVisible={setModalVisible} />
+      <ExerciseModal exercise={exercise} isModalVisible={isModalVisible} setModalVisible={setModalVisible} />
     </>
     );
 
