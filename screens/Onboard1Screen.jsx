@@ -70,7 +70,7 @@ export default function Onboard1Screen({ navigation }) {
 
             <Text style={appStyles.heading2}>Step 1 of 2</Text>
 
-            <AvatarPicker photoObject={onboardData.photoObject} setPhotoObject={updateOnboardData} size={150} />
+            <AvatarPicker photoObject={onboardData.photoObject} setPhotoObject={(photoObject) => updateOnboardData("photoObject", photoObject)} size={150} />
 
             <View>
               <SignUpInput

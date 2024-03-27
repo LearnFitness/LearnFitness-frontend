@@ -14,7 +14,7 @@ export default function AvatarPicker({ size=200, photoObject, setPhotoObject }) 
     });
 
     if (!result.canceled) {
-      setPhotoObject("photoObject", result.assets[0]);
+      setPhotoObject(result.assets[0]);
     }
   };
 

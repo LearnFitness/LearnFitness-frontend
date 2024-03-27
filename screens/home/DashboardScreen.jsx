@@ -1,4 +1,4 @@
-import { View, Text, ActivityIndicator, Alert, StyleSheet, StatusBar, Pressable, TouchableOpacity } from "react-native";
+import { View, Text, ActivityIndicator, Alert, StyleSheet, StatusBar, Pressable } from "react-native";
 import { useEffect, useState } from "react";
 import { getBackendDataWithRetry } from "../../utils/backendAPI";
 import LinearBackground from "../../components/LinearBackground";
