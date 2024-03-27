@@ -1,13 +1,12 @@
-import { View, Text, StyleSheet, Pressable, Image } from "react-native";
+import { StyleSheet, Platform, StatusBar, View, Pressable } from "react-native";
+import { FontAwesome } from "@expo/vector-icons";
 import { useState, useRef } from "react";
 import LinearBackground from "../../components/LinearBackground";
-import algoliasearch from 'algoliasearch/lite';
 import { InstantSearch } from 'react-instantsearch-core';
 import SearchBox from "../../components/SearchBox";
 import InfiniteHits from "../../components/InfiniteHits";
 import Filters from "../../components/Filters";
-
-const searchClient = algoliasearch('ZZ7KAXIP59', '115ba3dafb56044172a3f15bfaf3b329');
+import { searchClient } from "../../utils/AlgoliaSearchClient";
 
 export default function ExercisesScreen() {
   const [isFilterModalOpen, setFilterModalOpen] = useState(false);
@@ -17,15 +16,21 @@ export default function ExercisesScreen() {
     listRef.current?.scrollToOffset({ animated: false, offset: 0 });
   }
 
+  const statusBarHeight = Platform.OS === 'android' ? StatusBar.currentHeight : 0;
+
   return (
-    <LinearBackground containerStyle={styles.container}>
-      <InstantSearch searchClient={searchClient} indexName="exercises_search">
-        <SearchBox onChange={scrollToTop} />
-        <Filters
-          isModalOpen={isFilterModalOpen}
-          onToggleModal={() => setFilterModalOpen((isOpen) => !isOpen)}
-          onChange={scrollToTop}
-        />
+    <LinearBackground containerStyle={[styles.container, { paddingTop: statusBarHeight }]}>
+      <InstantSearch searchClient={searchClient} indexName="exercises_search" future={{ preserveSharedStateOnUnmount: true }}>
+        <View style={styles.searchContainer}>
+          <SearchBox onChange={scrollToTop} style={{ width: '90%' }} />
+          <Pressable
+            style={styles.filterButton}
+            onPress={() => setFilterModalOpen(!isFilterModalOpen)}
+          >
+            <FontAwesome name="filter" size={22} color="white" />
+          </Pressable>
+        </View>
+        <Filters isOpen={isFilterModalOpen} onClose={() => setFilterModalOpen(false)} onChange={scrollToTop} />
         <InfiniteHits ref={listRef} />
       </InstantSearch>
     </LinearBackground>
@@ -35,5 +40,16 @@ export default function ExercisesScreen() {
 const styles = StyleSheet.create({
   container: {
     marginHorizontal: "4%"
+  },
+  searchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 10,
+    marginTop: 10,
+  },
+  filterButton: {
+    padding: 10,
+    top: 3,
   }
 })

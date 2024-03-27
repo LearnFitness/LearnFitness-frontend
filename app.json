@@ -14,6 +14,7 @@
     },
     "assetBundlePatterns": ["**/*"],
     "ios": {
+      "usesAppleSignIn": true,
       "buildNumber": "1.0.0",
       "supportsTablet": true,
       "bundleIdentifier": "com.LearnFitness.LearnFitness",
@@ -35,6 +36,7 @@
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
+      "expo-apple-authentication",
       "@react-native-google-signin/google-signin",
       "@react-native-firebase/app",
       "@react-native-firebase/auth",

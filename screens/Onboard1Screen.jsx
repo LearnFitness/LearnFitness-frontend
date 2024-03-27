@@ -2,7 +2,6 @@ import React, { useState, useContext, useEffect } from "react";
 import { Alert, StyleSheet, Text, TextInput, View, SafeAreaView, ActivityIndicator } from "react-native";
 import { ButtonGroup, Divider } from "@rneui/themed";
 import { OnboardContext } from "../context/OnboardContext";
-import DateTimePicker from '@react-native-community/datetimepicker';
 import SignUpInput from "../components/SignUpInput";
 import PrimaryButton from "../components/PrimaryButton";
 import { appStyles } from "../utils/styles";
@@ -19,7 +18,7 @@ export default function Onboard1Screen({ navigation }) {
   const genders = ["Male", "Female", "Other"];
 
   useEffect(() => {
-    updateMultipleOnboardData({ email: auth().currentUser.email, birthday: new Date(), height: "5.6", weight: "150", gender: "Male" });
+    updateMultipleOnboardData({ email: auth().currentUser.email, age: "25", height: "5.6", weight: "150", gender: "Male" });
   }, []);
 
   useEffect(() => {
@@ -54,11 +53,12 @@ export default function Onboard1Screen({ navigation }) {
     )
   } else {
     if (userData) {
-      return (
-        <LinearBackground>
-          <ActivityIndicator style={{ flex: 1 }} />
-          {navigation.navigate("HomeNavigator")}
-        </LinearBackground>)
+      // return (
+      //   <LinearBackground>
+      //     <ActivityIndicator style={{ flex: 1 }} />
+      //     {navigation.navigate("HomeNavigator")}
+      //   </LinearBackground>)
+      navigation.navigate("HomeNavigator");
     } else {
       return (
         <SafeAreaView style={{ flex: 1 }}>
@@ -84,10 +84,12 @@ export default function Onboard1Screen({ navigation }) {
               />
               <Divider />
               <SignUpInput
-                title="Birthday"
-                InputComponent={DateTimePicker}
-                value={onboardData.birthday}
-                onChange={(event, date) => updateOnboardData("birthday", date)}
+                title="Age"
+                InputComponent={TextInput}
+                value={onboardData.age}
+                onChange={(text) => updateOnboardData("age", text)}
+                keyboardType="numeric"
+                style={{ fontSize: 17 }}
               />
               <Divider />
               <SignUpInput

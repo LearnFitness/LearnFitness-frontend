@@ -6,6 +6,8 @@ import auth from '@react-native-firebase/auth';
 import LinearBackground from "../../components/LinearBackground";
 import PrimaryButton from "../../components/PrimaryButton";
 import { appStyles } from "../../utils/styles";
+import AppleSignIn from "../../components/AppleSignIn";
+import { Platform } from "react-native";
 
 export default function SignInScreen({ navigation }) {
   const [email, setEmail] = useState("");
@@ -73,9 +75,10 @@ export default function SignInScreen({ navigation }) {
         </Pressable>
       </View>
 
-      <View style={styles.googleSignInContainer}>
-        <Text style={styles.googleSignInText}>or continue with</Text>
-        <GoogleSignIn navigation={navigation} />
+      <View style={styles.thirdPartySignInContainer}>
+        <Text style={styles.thirdPartySignInText}>or</Text>
+        <GoogleSignIn />
+        {Platform.OS === "ios" ? <AppleSignIn /> : null}
       </View>
 
       <View style={styles.footer}>
@@ -97,16 +100,16 @@ const styles = StyleSheet.create({
   title: {
     fontWeight: "500",
     textAlign: "center",
-    marginTop: "50%",
+    marginTop: "30%",
     fontSize: 40,
     color: "white"
   },
-  googleSignInContainer: {
+  thirdPartySignInContainer: {
     alignItems: "center",
     borderTopWidth: 1,
     borderTopColor: "grey",
   },
-  googleSignInText: {
+  thirdPartySignInText: {
     paddingHorizontal: 25,
     paddingVertical: 5,
     color: "white",

@@ -7,6 +7,8 @@ import {
   Text,
   TouchableOpacity,
   View,
+  TouchableWithoutFeedback,
+  Pressable
 } from 'react-native';
 import {
   useClearRefinements,
@@ -14,8 +16,8 @@ import {
   useRefinementList,
 } from 'react-instantsearch-core';
 
-export default function Filters({ isModalOpen, onToggleModal, onChange }) {
-  const { items, refine } = useRefinementList({ attribute: "bodyPart" });
+export default function Filters({ isOpen, onClose, onChange }) {
+  const { items, refine } = useRefinementList({ attribute: 'bodyPart' });
   const { canRefine: canClear, refine: clear } = useClearRefinements();
   const { items: currentRefinements } = useCurrentRefinements();
   const totalRefinements = currentRefinements.reduce(
@@ -24,39 +26,25 @@ export default function Filters({ isModalOpen, onToggleModal, onChange }) {
   );
 
   return (
-    <>
-      <TouchableOpacity style={styles.filtersButton} onPress={onToggleModal}>
-        <Text style={styles.filtersButtonText}>Filters</Text>
-        {totalRefinements > 0 && (
-          <View style={styles.itemCount}>
-            <Text style={styles.itemCountText}>{totalRefinements}</Text>
-          </View>
-        )}
-      </TouchableOpacity>
-
-      <Modal animationType="slide" visible={isModalOpen} presentationStyle="pageSheet">
-        <SafeAreaView>
+    <Modal animationType="slide" visible={isOpen} presentationStyle="pageSheet">
+      <TouchableWithoutFeedback onPress={onClose}>
+        <SafeAreaView style={styles.modalOverlay}>
           <View style={styles.container}>
             <View style={styles.title}>
               <Text style={styles.titleText}>Filters</Text>
             </View>
             <View style={styles.list}>
-              {items.map((item) => {
+              {items.map(item => {
                 return (
                   <TouchableOpacity
                     key={item.value}
-                    style={styles.item}
+                    style={{ ...styles.item, backgroundColor: item.isRefined ? '#cee7ff' : 'transparent', }}
                     onPress={() => {
                       refine(item.value);
                       onChange();
                     }}
                   >
-                    <Text
-                      style={{
-                        ...styles.labelText,
-                        fontWeight: item.isRefined ? '800' : '400',
-                      }}
-                    >
+                    <Text style={{ ...styles.labelText, fontWeight: item.isRefined ? '700' : '400', }}>
                       {item.label}
                     </Text>
                     <View style={styles.itemCount}>
@@ -71,26 +59,23 @@ export default function Filters({ isModalOpen, onToggleModal, onChange }) {
             <View style={styles.filterListButton}>
               <Button
                 title="Clear all"
-                color="#252b33"
                 disabled={!canClear}
                 onPress={() => {
                   clear();
                   onChange();
-                  onToggleModal();
                 }}
               />
             </View>
             <View style={styles.filterListButton}>
-              <Button
-                onPress={onToggleModal}
-                title="See results"
-                color="#252b33"
-              />
+              <Button onPress={onClose} title="Apply" />
             </View>
           </View>
+          <Pressable style={styles.closeButton} onPress={onClose}>
+            <Text style={styles.closeButtonText}>Close</Text>
+          </Pressable>
         </SafeAreaView>
-      </Modal>
-    </>
+      </TouchableWithoutFeedback>
+    </Modal>
   );
 }
 
@@ -103,7 +88,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   titleText: {
-    fontSize: 32,
+    fontSize: 25,
   },
   list: {
     marginTop: 32,
@@ -115,13 +100,14 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderColor: '#ddd',
     alignItems: 'center',
+    borderRadius: 5
   },
   itemCount: {
     backgroundColor: '#252b33',
     borderRadius: 24,
     paddingVertical: 4,
     paddingHorizontal: 8,
-    marginLeft: 4,
+    marginHorizontal: 10,
   },
   itemCountText: {
     color: '#ffffff',
@@ -129,6 +115,8 @@ const styles = StyleSheet.create({
   },
   labelText: {
     fontSize: 16,
+    textTransform: "capitalize",
+    marginHorizontal: 10
   },
   filterListButtonContainer: {
     flexDirection: 'row',
@@ -138,16 +126,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 18,
   },
-  filtersButton: {
-    paddingVertical: 18,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
+  modalOverlay: {
+    flex: 1,
   },
-  filtersButtonText: {
-    fontSize: 20,
-    textAlign: 'center',
-    color: "white",
-    fontWeight: "500"
+  closeButton: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+    zIndex: 1, // Ensure it appears above other content
+    padding: 10,
+  },
+  closeButtonText: {
+    fontSize: 18,
+    color: '#df2420',
   },
 });
