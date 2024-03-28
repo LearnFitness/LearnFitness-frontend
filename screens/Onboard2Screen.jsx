@@ -1,6 +1,5 @@
 import React, { useContext, useState } from "react";
 import { Alert, StyleSheet, Text, TextInput, View, Pressable, SafeAreaView } from "react-native";
-import auth from "@react-native-firebase/auth";
 import { postBackendDataWithPhoto, postBackendData } from "../utils/backendAPI";
 import { OnboardContext } from "../context/OnboardContext";
 import { appStyles } from "../utils/styles";
@@ -22,7 +21,6 @@ export default function Onboard2Screen({ navigation }) {
   }
 
   async function handleSubmitOnboardData() {
-    console.log("onboardData on submit: ", onboardData);
     setLoading(true);
     try {
       // Check if the user has submitted a photo

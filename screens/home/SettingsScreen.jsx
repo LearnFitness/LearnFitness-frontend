@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { View, Text, ActivityIndicator, StyleSheet, Alert, StatusBar, Pressable } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import auth from "@react-native-firebase/auth";
-import { getBackendDataWithRetry, postBackendData, postBackendDataWithPhoto } from "../../utils/backendAPI";
+import { getBackendDataWithRetry, postBackendDataWithPhoto } from "../../utils/backendAPI";
 import { useIsFocused } from '@react-navigation/native';
 import AvatarPicker from "../../components/AvatarPicker";
 
@@ -33,10 +33,10 @@ export default function SettingsScreen() {
     fetchData();
   }, []);
 
-  async function handleEditPhoto(object) {
-    setPhotoObject(object);
+  async function handleEditPhoto(photoObject) {
+    setPhotoObject(photoObject);
     try {
-      await postBackendDataWithPhoto("user/photo", { photoObject: object });
+      await postBackendDataWithPhoto("user/photo", { photoObject });
     } catch (error) {
       Alert.alert(error.message);
     }
@@ -155,7 +155,6 @@ const styles = StyleSheet.create({
     height: 1,
     backgroundColor: "rgba(0, 0, 0, 0.25)",
     marginTop: 20,
-    bottom: 60,
   },
   buttonsContainer: {
     alignSelf: "flex-start",
