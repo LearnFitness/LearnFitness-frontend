@@ -133,18 +133,7 @@ const styles = StyleSheet.create({
   profileContainer: {
     alignItems: "center",
     marginBottom: 20,
-    bottom: 60,
-  },
-  profileImageContainer: {
-    position: "relative",
-  },
-  cameraIconContainer: {
-    position: "absolute",
-    bottom: 10,
-    right: 20,
-    backgroundColor: "#004A85",
-    padding: 5,
-    borderRadius: 20,
+    bottom: 40,
   },
   profileName: {
     marginTop: 10,

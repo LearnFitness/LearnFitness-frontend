@@ -115,7 +115,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: "bold",
     color: "white",
-    marginTop: 30,
+    marginTop: 45,
     marginBottom: 10
   },
   workoutsContainer: {

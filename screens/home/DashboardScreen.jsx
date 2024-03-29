@@ -5,6 +5,8 @@ import LinearBackground from "../../components/LinearBackground";
 import AvatarDisplay from "../../components/AvatarDisplay";
 import FontAwesome from "react-native-vector-icons/FontAwesome6";
 
+const rightArrowIcon = "arrow-right";
+
 const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 const currentDayOfWeek = daysOfWeek[new Date().getDay()];
 const motivationalSentences = [
@@ -92,14 +94,14 @@ export default function DashboardScreen({ navigation }) {
               <Text style={styles.motivationalText}>{getRandomSentence()}</Text>
               <View style={styles.buttonContainer}>
                 <Pressable onPress={() => navigation.navigate("Workouts")} style={{ height: 55, width: 250, backgroundColor: "#FFFFFF", borderRadius: 30, justifyContent: "center", alignItems: "center" }}>
-                  <Text style={{ color: "#0044AA", fontWeight: "700", fontSize: 20, textAlign: "center" }}>View Workouts →</Text>
+                  <Text style={{ color: "#0044AA", fontWeight: "700", fontSize: 23, textAlign: "center" }}>View Workouts  <FontAwesome name={rightArrowIcon} size={23} color="#0044AA"/> </Text>
                 </Pressable>
               </View>
             </View>
           )
         }
       </ScrollView>
-      
+
     </LinearBackground>
   )
 }
@@ -186,7 +188,7 @@ const styles = StyleSheet.create({
   lineContainer: {
     alignItems: "center",
     marginTop: 30,
-    marginBottom: 40,
+    marginBottom: 30,
   },
   horizontalLine: {
     width: "40%",
@@ -208,7 +210,7 @@ const styles = StyleSheet.create({
     marginVertical: 10,
   },
   buttonContainer: {
-    marginTop: 15,
+    marginTop: 10,
     marginBottom: 15,
     alignItems: "center"
   },
