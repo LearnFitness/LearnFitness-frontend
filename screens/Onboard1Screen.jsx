@@ -12,7 +12,7 @@ import auth from "@react-native-firebase/auth"
 import LinearBackground from "../components/LinearBackground";
 
 export default function Onboard1Screen({ navigation }) {
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [userData, setUserData] = useState(null);
   const { onboardData, updateOnboardData, updateMultipleOnboardData } = useContext(OnboardContext);
   const genders = ["Male", "Female", "Other"];
@@ -24,6 +24,7 @@ export default function Onboard1Screen({ navigation }) {
   useEffect(() => {
     async function fetchData() {
       try {
+        setLoading(true);
         const userData = await getBackendData("/user");
         setUserData(userData);
       } catch (error) {
@@ -51,83 +52,79 @@ export default function Onboard1Screen({ navigation }) {
         <ActivityIndicator style={{ flex: 1 }} />
       </LinearBackground>
     )
+  }
+
+  if (userData) {
+    setTimeout(() => navigation.navigate("HomeNavigator"), 1);
   } else {
-    if (userData) {
-      // return (
-      //   <LinearBackground>
-      //     <ActivityIndicator style={{ flex: 1 }} />
-      //     {navigation.navigate("HomeNavigator")}
-      //   </LinearBackground>)
-      navigation.navigate("HomeNavigator");
-    } else {
-      return (
-        <SafeAreaView style={{ flex: 1 }}>
-          <KeyboardAvoidView containerStyle={styles.container}>
-            <View>
-              <Text style={[appStyles.heading1, { marginBottom: 20 }]}>Complete your signup</Text>
-              <Text style={appStyles.heading4}>Let us know more about you to get your personal workout plans</Text>
-            </View>
+    return (
+      <SafeAreaView style={{ flex: 1 }}>
+        <KeyboardAvoidView containerStyle={styles.container}>
+          <View>
+            <Text style={[appStyles.heading1, { marginBottom: 20 }]}>Complete your signup</Text>
+            <Text style={appStyles.heading4}>Let us know more about you to get your personal workout plans</Text>
+          </View>
 
-            <Text style={appStyles.heading2}>Step 1 of 2</Text>
+          <Text style={appStyles.heading2}>Step 1 of 2</Text>
 
-            <AvatarPicker photoObject={onboardData.photoObject} setPhotoObject={updateOnboardData} size={150} />
+          <AvatarPicker photoObject={onboardData.photoObject} setPhotoObject={(photoObject) => updateOnboardData("photoObject", photoObject)} size={150} />
 
-            <View>
-              <SignUpInput
-                title="Name"
-                InputComponent={TextInput}
-                onChangeText={(text) => updateOnboardData("name", text)}
-                value={onboardData.name}
-                placeholder="Your Name"
-                autoCapitalize={"none"}
-                style={{ fontSize: 17 }}
-              />
-              <Divider />
-              <SignUpInput
-                title="Age"
-                InputComponent={TextInput}
-                value={onboardData.age}
-                onChange={(text) => updateOnboardData("age", text)}
-                keyboardType="numeric"
-                style={{ fontSize: 17 }}
-              />
-              <Divider />
-              <SignUpInput
-                title="Height"
-                InputComponent={TextInput}
-                value={onboardData.height}
-                onChangeText={(text) => updateOnboardData("height", text)}
-                keyboardType="numeric"
-                style={{ fontSize: 17 }}
-              />
-              <Divider />
-              <SignUpInput
-                title="Weight"
-                InputComponent={TextInput}
-                value={onboardData.weight}
-                onChangeText={(text) => updateOnboardData("weight", text)}
-                keyboardType="numeric"
-                style={{ fontSize: 17 }}
-              />
-              <Divider />
-              <SignUpInput
-                title="Gender"
-                InputComponent={ButtonGroup}
-                flexDirection="column"
-                buttons={genders}
-                selectedIndex={genders.indexOf(onboardData.gender)}
-                onPress={(index) => updateOnboardData("gender", genders[index])}
-                containerStyle={{ borderRadius: 10 }}
-                textStyle={{ fontSize: 17 }}
-              />
-            </View>
-            <PrimaryButton title="Next" handleOnPress={handleNext} />
-          </KeyboardAvoidView>
-        </SafeAreaView>
-      )
-    }
+          <View>
+            <SignUpInput
+              title="Name"
+              InputComponent={TextInput}
+              onChangeText={(text) => updateOnboardData("name", text)}
+              value={onboardData.name}
+              placeholder="Your Name"
+              autoCapitalize={"none"}
+              style={{ fontSize: 17 }}
+            />
+            <Divider />
+            <SignUpInput
+              title="Age"
+              InputComponent={TextInput}
+              value={onboardData.age}
+              onChange={(text) => updateOnboardData("age", text)}
+              keyboardType="numeric"
+              style={{ fontSize: 17 }}
+            />
+            <Divider />
+            <SignUpInput
+              title="Height"
+              InputComponent={TextInput}
+              value={onboardData.height}
+              onChangeText={(text) => updateOnboardData("height", text)}
+              keyboardType="numeric"
+              style={{ fontSize: 17 }}
+            />
+            <Divider />
+            <SignUpInput
+              title="Weight"
+              InputComponent={TextInput}
+              value={onboardData.weight}
+              onChangeText={(text) => updateOnboardData("weight", text)}
+              keyboardType="numeric"
+              style={{ fontSize: 17 }}
+            />
+            <Divider />
+            <SignUpInput
+              title="Gender"
+              InputComponent={ButtonGroup}
+              flexDirection="column"
+              buttons={genders}
+              selectedIndex={genders.indexOf(onboardData.gender)}
+              onPress={(index) => updateOnboardData("gender", genders[index])}
+              containerStyle={{ borderRadius: 10 }}
+              textStyle={{ fontSize: 17 }}
+            />
+          </View>
+          <PrimaryButton title="Next" handleOnPress={handleNext} />
+        </KeyboardAvoidView>
+      </SafeAreaView>
+    )
   }
 }
+
 
 const styles = StyleSheet.create({
   container: {

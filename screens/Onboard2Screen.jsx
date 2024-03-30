@@ -1,7 +1,6 @@
 import React, { useContext, useState } from "react";
 import { Alert, StyleSheet, Text, TextInput, View, Pressable, SafeAreaView } from "react-native";
-import auth from "@react-native-firebase/auth";
-import { createUserWithProfilePhoto, postBackendData } from "../utils/backendAPI";
+import { postBackendDataWithPhoto, postBackendData } from "../utils/backendAPI";
 import { OnboardContext } from "../context/OnboardContext";
 import { appStyles } from "../utils/styles";
 import { Divider } from "@rneui/base";
@@ -24,10 +23,15 @@ export default function Onboard2Screen({ navigation }) {
   async function handleSubmitOnboardData() {
     setLoading(true);
     try {
-      const data = await createUserWithProfilePhoto("user/signup", onboardData);
+      // Check if the user has submitted a photo
+      if (onboardData.hasOwnProperty("photoObject")) {
+        await postBackendDataWithPhoto("user/signup/photo", onboardData);
+      } else {
+        await postBackendData("user/signup", onboardData);
+      }
       navigation.navigate("HomeNavigator");
     } catch (error) {
-      Alert.alert(error.message)
+      Alert.alert(error.message);
     } finally {
       setLoading(false);
     }

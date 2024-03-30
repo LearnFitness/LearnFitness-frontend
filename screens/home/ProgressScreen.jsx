@@ -3,21 +3,15 @@ import { useState } from "react";
 import LinearBackground from "../../components/LinearBackground";
 
 export default function ProgressScreen() {
-  const [isLoading, setIsLoading] = useState(true);
-
+  const [loading, setLoading] = useState(true);
   return (
     <LinearBackground>
       <SafeAreaView>
-        {isLoading ?
+        {loading ?
           (
-            <ActivityIndicator />
+            <ActivityIndicator style={{ flex: 1 }} />
           ) : (
             <View>
-              <Text>Hello, {auth().currentUser.email}</Text>
-
-              <Text>Your data: {data.email}</Text>
-
-              <Button title="Sign Out" onPress={() => auth().signOut()} />
             </View>
           )
         }

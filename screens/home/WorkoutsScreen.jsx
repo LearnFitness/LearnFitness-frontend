@@ -1,10 +1,10 @@
 import firestore from "@react-native-firebase/firestore";
 import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet, ScrollView, Image, Pressable, Alert, ActivityIndicator, Platform, StatusBar } from "react-native";
+import { View, Text, StyleSheet, ScrollView, Image, Pressable, Alert, ActivityIndicator } from "react-native";
 import LinearBackground from "../../components/LinearBackground";
 import { getBackendData } from "./../../utils/backendAPI";
 
-function WorkoutPlan({ workout, onWorkoutPress }) {
+function Workout({ workout, onWorkoutPress }) {
   return (
     <View style={styles.workoutPlanContainer}>
       <Pressable onPress={() => onWorkoutPress(workout)}>
@@ -22,32 +22,26 @@ function WorkoutPlan({ workout, onWorkoutPress }) {
   );
 };
 
-const RecommendPlans = ({ onRecommendPress }) => {
-  return (
-    <View style={styles.recommendContainer}>
-      <Text style={styles.recommendTitle}>Recommend For You</Text>
-      <Pressable style={styles.recommendImageContainer} onPress={() => onRecommendPress({ id: 2, image: require("./../../assets/recommend1.jpg") })}>
-        <Image
-          source={require("./../../assets/recommend1.jpg")}
-          style={styles.recommendImage}
-        />
-      </Pressable>
-      {/* Add more recommended plans as needed */}
-    </View>
-  );
-};
-
 export default function WorkoutsScreen() {
   const [loading, setLoading] = useState(false);
   const [workouts, setWorkouts] = useState([]);
+  const [recommendedWorkouts, setRecommendedWorkouts] = useState([]);
 
   useEffect(() => {
     async function getWorkouts() {
       setLoading(true);
       try {
-        const workouts = await getBackendData("/user/workouts");
-        const premadeWorkoutsSnapshot = await firestore().collection("premade_workouts").get();
+        const userData = await getBackendData("user");
+        const workouts = await getBackendData("user/workouts");
+        const premadeWorkoutsSnapshot = await firestore().collection("premade_workouts").where("expLevel", "==", userData.expLevel.toLowerCase()).get();
+
+        let recommendedWorkoutsArray = [];
+        premadeWorkoutsSnapshot.forEach((workout) => {
+          recommendedWorkoutsArray.push(workout.data());
+        })
+
         setWorkouts(workouts);
+        setRecommendedWorkouts(recommendedWorkoutsArray);
       } catch (error) {
         Alert.alert(error.message);
       } finally {
@@ -73,33 +67,33 @@ export default function WorkoutsScreen() {
     </LinearBackground>
   )
 
-  const statusBarHeight = Platform.OS === 'android' ? StatusBar.currentHeight : 0;
-
   return (
     <LinearBackground containerStyle={styles.container}>
       <ScrollView>
         <Text style={styles.title}>Your Workouts</Text>
         <View style={styles.workoutsContainer}>
-          {workouts.map((workout, index) => (
-            <WorkoutPlan
-              key={index}
-              workout={workout}
-              onWorkoutPress={handleWorkoutPress}
-            />
-          )
-          )}
+          {workouts.length === 0 ? <Text style={{ color: "darkgrey", fontSize: 17 }}>You have no workouts yet</Text> :
+            workouts.map((workout, index) => (
+              <Workout
+                key={index}
+                workout={workout}
+                onWorkoutPress={handleWorkoutPress}
+              />
+            )
+            )}
         </View>
 
         <Text style={styles.title}>Recommended for you</Text>
         <View style={styles.workoutsContainer}>
-          {workouts.map((workout, index) => (
-            <WorkoutPlan
-              key={index}
-              workout={workout}
-              onWorkoutPress={handleWorkoutPress}
-            />
-          )
-          )}
+          {recommendedWorkouts.length === 0 ? <Text style={{ color: "darkgrey", fontSize: 17 }}>No recommendations available</Text> :
+            recommendedWorkouts.map((workout, index) => (
+              <Workout
+                key={index}
+                workout={workout}
+                onWorkoutPress={handleWorkoutPress}
+              />
+            )
+            )}
         </View>
 
       </ScrollView>
@@ -121,7 +115,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: "bold",
     color: "white",
-    marginTop: 30,
+    marginTop: 45,
     marginBottom: 10
   },
   workoutsContainer: {

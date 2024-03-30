@@ -29,14 +29,14 @@ export default function App() {
   }, []);
 
   if (initializing) return null;
-// auth().signOut()
+
   return (
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ "headerShown": false }}>
         {user ?
           <>
             <Stack.Screen name="OnboardNavigator" component={OnboardNavigator} />
-            <Stack.Screen name="HomeNavigator" component={HomeNavigator} options={{ animation: "none" }}/>
+            <Stack.Screen name="HomeNavigator" component={HomeNavigator} options={{ animation: "none" }} />
           </>
           :
           <>

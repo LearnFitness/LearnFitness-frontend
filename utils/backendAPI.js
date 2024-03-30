@@ -26,7 +26,11 @@ export async function getBackendData(endpoint) {
 }
 
 // GET request with retries
-export async function getBackendDataWithRetry(endpoint, maxRetries = 3,retryDelay = 2000) {
+export async function getBackendDataWithRetry(
+  endpoint,
+  maxRetries = 3,
+  retryDelay = 2000
+) {
   let attempts = 0;
   while (attempts < maxRetries) {
     try {
@@ -68,29 +72,29 @@ export async function postBackendData(endpoint, data) {
   }
 }
 
-// POST data and a profile image, expects a response of the image URL
-export async function createUserWithProfilePhoto(endpoint, onBoardData) {
+// POST data and a profile image
+export async function postBackendDataWithPhoto(endpoint, data) {
   const idToken = await auth().currentUser.getIdToken(true);
   const formData = new FormData();
 
-  // Append image file
-  // 'image' is the field name we're looking for on the server side at multer.upload.single
+  // Append user info JSON data
+  formData.append("data", JSON.stringify(data));
+
+  // Append photo file
+  // 'photo' is the field name we're looking for on the server side at multer.upload.single
   formData.append("photo", {
-    uri: onBoardData.photoObject.uri,
-    type: onBoardData.photoObject.mimeType,
+    uri: data.photoObject.uri,
+    type: data.photoObject.mimeType,
     name: `${auth().currentUser.uid}.${
-      onBoardData.photoObject.mimeType.split("/")[1]
+      data.photoObject.mimeType.split("/")[1]
     }`, // Profile photo name is uid + image type
   });
 
   // Delete local photo URL
-  delete onBoardData.photoObject;
-
-  // Append user info JSON data
-  formData.append("data", JSON.stringify(onBoardData));
+  delete data.photoObject;
 
   try {
-    console.log(formData);
+    console.log("Form Data:", formData);
     const response = await apiClient.post(endpoint, formData, {
       headers: {
         "Content-Type": "multipart/form-data",

@@ -20,7 +20,6 @@ export default function AppleSignIn() {
                 ],
               });
               const appleCredential = auth.AppleAuthProvider.credential(credential.identityToken);
-              console.log(appleCredential);
               await auth().signInWithCredential(appleCredential);
             } catch (error) {
               if (error.code === 'ERR_REQUEST_CANCELED') {

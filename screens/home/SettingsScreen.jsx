@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, ActivityIndicator, StyleSheet, Image, TouchableOpacity, Alert, StatusBar } from "react-native";
+import { View, Text, ActivityIndicator, StyleSheet, Alert, StatusBar, Pressable } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import auth from "@react-native-firebase/auth";
-import { getBackendDataWithRetry } from "../../utils/backendAPI";
+import { getBackendDataWithRetry, postBackendDataWithPhoto } from "../../utils/backendAPI";
 import { useIsFocused } from '@react-navigation/native';
+import AvatarPicker from "../../components/AvatarPicker";
 
 export default function SettingsScreen() {
   const [userData, setUserData] = useState(null);
+  const [photoObject, setPhotoObject] = useState({ uri: userData ? userData.photoURL : null });
   const [loading, setLoading] = useState(false);
 
   // Modifies status bar color ONLY on Settings screen
@@ -18,8 +20,10 @@ export default function SettingsScreen() {
   useEffect(() => {
     async function fetchData() {
       try {
+        setLoading(true);
         const userData = await getBackendDataWithRetry("/user");
         setUserData(userData);
+        setPhotoObject({ uri: userData.photoURL })
       } catch (error) {
         Alert.alert("An error occurred", error);
       } finally {
@@ -28,6 +32,15 @@ export default function SettingsScreen() {
     }
     fetchData();
   }, []);
+
+  async function handleEditPhoto(photoObject) {
+    setPhotoObject(photoObject);
+    try {
+      await postBackendDataWithPhoto("user/photo", { photoObject });
+    } catch (error) {
+      Alert.alert(error.message);
+    }
+  }
 
   // Logout confirmation dialog
   // Note: styles only affect iOS
@@ -53,7 +66,7 @@ export default function SettingsScreen() {
 
   return (
     <View style={styles.container}>
-      <FocusAwareStatusBar translucent backgroundColor="transparent" barStyle={"dark-content"}/>
+      <FocusAwareStatusBar translucent backgroundColor="transparent" barStyle={"dark-content"} />
       <View style={styles.header}>
         <Text style={styles.headerText}>Settings</Text>
       </View>
@@ -63,42 +76,33 @@ export default function SettingsScreen() {
         <View style={styles.contentContainer}>
           {/* Profile picture, name, and email */}
           <View style={styles.profileContainer}>
-            {/* To be implemented */}
-            <TouchableOpacity onPress={() => console.log("Change profile picture")}>
-              <View style={styles.profileImageContainer}>
-                <Image source={{ uri: userData?.photoURL }} style={styles.profileImage} />
-                <View style={styles.cameraIconContainer}>
-                  <Feather name="camera" size={24} color="white" />
-                </View>
-              </View>
-            </TouchableOpacity>
+            <AvatarPicker photoObject={{ uri: photoObject.uri }} setPhotoObject={handleEditPhoto} />
             <Text style={styles.profileName} >{userData.name.split(" ")[0]}</Text>
             <Text style={styles.profileEmail}>{userData.email}</Text>
           </View>
-          {/* Horizontal line */}
-          <View style={styles.horizontalLine} />
+          <View style={styles.horizontalLine}></View>
           {/* Buttons */}
           <View style={styles.buttonsContainer}>
             {/* To be implemented (User information like weight, height, etc.) */}
-            <TouchableOpacity onPress={() => console.log("Edit profile")}>
+            <Pressable onPress={() => console.log("Edit profile")}>
               <View style={styles.buttonRow}>
                 <Feather name="user" size={24} color="black" style={styles.icon} />
                 <Text style={styles.button}>Edit Profile</Text>
               </View>
-            </TouchableOpacity>
+            </Pressable>
             {/* To be implemented */}
-            <TouchableOpacity onPress={() => console.log("Notifications settings")}>
+            <Pressable onPress={() => console.log("Notifications settings")}>
               <View style={styles.buttonRow}>
                 <Feather name="bell" size={24} color="black" style={styles.icon} />
                 <Text style={styles.button}>Notifications</Text>
               </View>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={handleLogout}>
+            </Pressable>
+            <Pressable onPress={handleLogout}>
               <View style={styles.buttonRow}>
                 <Feather name="log-out" size={24} color="black" style={styles.icon} />
                 <Text style={styles.button}>Logout</Text>
               </View>
-            </TouchableOpacity>
+            </Pressable>
           </View>
         </View>
       )}
@@ -129,23 +133,7 @@ const styles = StyleSheet.create({
   profileContainer: {
     alignItems: "center",
     marginBottom: 20,
-    bottom: 60,
-  },
-  profileImageContainer: {
-    position: "relative",
-  },
-  profileImage: {
-    width: 200,
-    height: 200,
-    borderRadius: 100,
-  },
-  cameraIconContainer: {
-    position: "absolute",
-    bottom: 10,
-    right: 20,
-    backgroundColor: "#004A85",
-    padding: 5,
-    borderRadius: 20,
+    bottom: 40,
   },
   profileName: {
     marginTop: 10,
@@ -156,7 +144,6 @@ const styles = StyleSheet.create({
     height: 1,
     backgroundColor: "rgba(0, 0, 0, 0.25)",
     marginTop: 20,
-    bottom: 60,
   },
   buttonsContainer: {
     alignSelf: "flex-start",
