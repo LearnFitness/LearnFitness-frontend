@@ -27,7 +27,7 @@ export default function Onboard1Screen({ navigation }) {
         setLoading(true);
         const userData = await getBackendData("/user");
         setUserData(userData);
-      } catch (error) {
+      } catch (error) {npm
         Alert.alert("An error occured", error);
       } finally {
         setLoading(false);

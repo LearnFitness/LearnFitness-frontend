@@ -4,23 +4,35 @@ import { View, Text, StyleSheet, ScrollView, Image, Pressable, Alert, ActivityIn
 import LinearBackground from "../../components/LinearBackground";
 import { getBackendData } from "./../../utils/backendAPI";
 
-function Workout({ workout, onWorkoutPress }) {
+function Workout({ workout }) {
+  const [expanded, setExpanded] = useState(false);
+
+  const toggleExpanded = () => {
+    setExpanded(!expanded);
+  };
+
   return (
     <View style={styles.workoutPlanContainer}>
-      <Pressable onPress={() => onWorkoutPress(workout)}>
+      <Pressable onPress={toggleExpanded}>
         <Image source={require("./../../assets/workout_plans_images/leg1.jpg")} style={styles.workoutImage} />
         <View style={{ padding: 10 }}>
           <Text style={styles.workoutName}>{workout.name}</Text>
-          <Text style={styles.workoutDescription}>{workout.description}</Text>
-          {workout.exercises.map(exercise => (
-            <Text key={exercise.id} style={styles.exerciseName}>{exercise.sets + " x " + exercise.name}</Text>
-          ))
-          }
+          <View style={{ height: expanded ? 'auto' : 0, overflow: 'hidden' }}>
+            <Text style={styles.workoutDescription}>{workout.description}</Text>
+            {workout.exercises.map(exercise => (
+              <Text key={exercise.id} style={styles.exerciseName}>{exercise.sets + " x " + exercise.name}</Text>
+            ))}
+          </View>
+          <Pressable onPress={toggleExpanded} style={styles.toggleButton}>
+            <Text style={styles.toggleButtonText}>{expanded ? 'Show Less' : 'Show More'}</Text>
+          </Pressable>
         </View>
       </Pressable>
     </View>
   );
 };
+
+
 
 export default function WorkoutsScreen() {
   const [loading, setLoading] = useState(false);
@@ -163,4 +175,9 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
+  toggleButtonText: {
+    color: 'blue', 
+    textAlign: 'center',
+  },
+  
 });
