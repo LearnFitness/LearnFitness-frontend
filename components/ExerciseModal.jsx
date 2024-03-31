@@ -8,7 +8,7 @@ export default function ExerciseModal({ loading, exercise, isModalVisible, setMo
       {loading ? <ActivityIndicator style={{ flex: 1 }} /> :
         <>
           <View style={styles.buttonsContainer}>
-            <Button title="Add to Workout" />
+            <Button title="Add to Workout" onPress={() => console.log("Add to Workout")}/>
             <Button title="Close" onPress={() => setModalVisible(false)} />
           </View>
           <Divider />
@@ -18,7 +18,7 @@ export default function ExerciseModal({ loading, exercise, isModalVisible, setMo
 
             <View style={styles.keyValueRow}>
               <View style={{ flex: 1 }}>
-                <Text style={styles.exerciseKey}>Body part</Text>
+                <Text style={styles.exerciseKey}>Body Part</Text>
                 <Text style={styles.exerciseValue}>{exercise?.bodyPart}</Text>
               </View>
               <View style={{ flex: 1 }}>
@@ -28,11 +28,11 @@ export default function ExerciseModal({ loading, exercise, isModalVisible, setMo
             </View>
             <View style={{ flexDirection: "row" }}>
               <View style={{ flex: 1 }}>
-                <Text style={styles.exerciseKey}>Target muscle</Text>
+                <Text style={styles.exerciseKey}>Target Muscle</Text>
                 <Text style={styles.exerciseValue}>{exercise?.target}</Text>
               </View>
               <View style={{ flex: 1 }}>
-                <Text style={styles.exerciseKey}>Secondary muscles</Text>
+                <Text style={styles.exerciseKey}>Secondary Muscles</Text>
                 <View style={styles.exerciseValue}>
                   {exercise?.secondaryMuscles.map((muscle, index) => {
                     return <Text key={index} style={styles.exerciseValue}>{muscle}</Text>
