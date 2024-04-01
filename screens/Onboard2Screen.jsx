@@ -11,7 +11,7 @@ import PrimaryButton from "../components/PrimaryButton";
 export default function Onboard2Screen({ navigation }) {
   const [loading, setLoading] = useState(false);
   const { onboardData, updateOnboardData } = useContext(OnboardContext);
-  const [selectedIndex, setSelectedIndex] = useState(0);
+  const [selectedIndex, setSelectedIndex] = useState(-1);
   const expLevels = ["Beginner", "Intermediate", "Advanced"];
   const expDescriptions = ["You are new to fitness training", "You have been training regularly", "You're fit and ready for an intensive workout plan"];
 
@@ -60,7 +60,7 @@ export default function Onboard2Screen({ navigation }) {
         })}
       </View>
 
-      <PrimaryButton title="Create Account" handleOnPress={handleSubmitOnboardData} loading={loading} disabled={loading} />
+      <PrimaryButton title="Create Account" handleOnPress={handleSubmitOnboardData} loading={loading} disabled={loading || selectedIndex < 0} />
 
     </SafeAreaView>
   )

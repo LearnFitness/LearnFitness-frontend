@@ -1,16 +1,27 @@
 import { Avatar } from '@rneui/themed';
+import { StyleSheet } from 'react-native';
 
-export default function AvatarDisplay({ handleOnPress, source, size, editable = true, rounded = true }) {
+export default function AvatarDisplay({ source, size, handleOnPress = null, pressable = true, editable = true, rounded = true }) {
+  console.log(source);
   return (
     source ?
       (
-        <Avatar source={source} size={size} rounded={rounded} onPress={handleOnPress} >
-          {editable ? <Avatar.Accessory name='camera' type='feather' size={size / 5} onPress={handleOnPress} style={{ position: 'absolute', right: 15, bottom: 5, backgroundColor: '#004A85' }}/> : null}
+        <Avatar source={source} size={size} rounded={rounded} onPress={pressable ? handleOnPress : null} >
+          {editable ? <Avatar.Accessory name='camera' type='feather' size={size / 5} onPress={pressable ? handleOnPress : null} style={styles.avatarAccessory} /> : null}
         </Avatar>
       ) : (
-        <Avatar icon={{ name: "user", type: "font-awesome" }} containerStyle={{ backgroundColor: 'grey'}} size={size} rounded={rounded} onPress={handleOnPress} >
-          {editable ? <Avatar.Accessory name='camera' type='feather' size={size / 5} onPress={handleOnPress} /> : null}
+        <Avatar icon={{ name: "user", type: "font-awesome" }} containerStyle={{ backgroundColor: 'grey' }} size={size} rounded={rounded} onPress={pressable ? handleOnPress : null} >
+          {editable ? <Avatar.Accessory name='camera' type='feather' size={size / 5} onPress={pressable ? handleOnPress : null} style={styles.avatarAccessory} /> : null}
         </Avatar >
       )
   )
 }
+
+const styles = StyleSheet.create({
+  avatarAccessory: {
+    position: 'absolute',
+    right: 10,
+    bottom: 5,
+    backgroundColor: '#004A85'
+  }
+});

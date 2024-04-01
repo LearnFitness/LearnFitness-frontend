@@ -8,7 +8,7 @@ import AvatarPicker from "../../components/AvatarPicker";
 
 export default function SettingsScreen() {
   const [userData, setUserData] = useState(null);
-  const [photoObject, setPhotoObject] = useState({ uri: userData ? userData.photoURL : null });
+  const [photoObject, setPhotoObject] = useState(null);
   const [loading, setLoading] = useState(false);
 
   // Modifies status bar color ONLY on Settings screen
@@ -76,7 +76,7 @@ export default function SettingsScreen() {
         <View style={styles.contentContainer}>
           {/* Profile picture, name, and email */}
           <View style={styles.profileContainer}>
-            <AvatarPicker photoObject={{ uri: photoObject.uri }} setPhotoObject={handleEditPhoto} />
+              <AvatarPicker photoObject={photoObject.uri ? { uri: photoObject.uri } : null} setPhotoObject={handleEditPhoto} />
             <Text style={styles.profileName} >{userData.name.split(" ")[0]}</Text>
             <Text style={styles.profileEmail}>{userData.email}</Text>
           </View>
