@@ -1,6 +1,16 @@
 import { GoogleSignin, GoogleSigninButton, statusCodes } from "@react-native-google-signin/google-signin";
 import auth from "@react-native-firebase/auth";
-import { Alert, View } from "react-native";
+import { Alert, Pressable, View, Text } from "react-native";
+import FontAwesome from "react-native-vector-icons/FontAwesome6";
+
+function GoogleButton({ handlePress }) {
+  return (
+    <Pressable style={{ width: 300, height: 40, borderRadius: 50, backgroundColor: "#a03e3e", flexDirection: "row", justifyContent: "center", alignItems: "center"}} onPress={handlePress}>
+      <FontAwesome name="google" color="white"/>
+      <Text style={{color: "white", marginLeft: 5, fontSize: 15, fontWeight: "500"}}>Sign in with Google</Text>
+    </Pressable>
+  )
+}
 
 export default function GoogleSignIn() {
   GoogleSignin.configure({
@@ -23,17 +33,14 @@ export default function GoogleSignIn() {
         // Bypass this error for better UX
       } else {
         Alert.alert(error.message);
-
       }
     }
   }
 
   return (
-    <View style={{ margin: 10 }}>
-      <GoogleSigninButton
-        size={GoogleSigninButton.Size.Wide}
-        color={GoogleSigninButton.Color.Light}
-        onPress={() => signInWithGoogle()}
+    <View style={{marginBottom: 15}}>
+      <GoogleButton
+        handlePress={() => signInWithGoogle()}
       />
     </View>
   )
