@@ -57,7 +57,9 @@ export default function DashboardScreen({ navigation }) {
                   <Text style={styles.greetingText} >Good Afternoon,</Text>
                   <Text style={styles.greetingName} >{userData.name.split(" ")[0]}</Text>
                 </View>
-                <AvatarDisplay source={{ uri: userData.photoURL }} size={120} editable={false} />
+                <Pressable onPress={() => navigation.navigate("Settings")}>
+                  <AvatarDisplay source={{ uri: userData.photoURL }} size={120} editable={false} />
+                </Pressable>
               </View>
               <View style={styles.finishedWorkoutsContainer}>
                 <Text style={styles.finishedWorkoutsText}>Completed Workouts</Text>
