@@ -118,11 +118,10 @@ const styles = StyleSheet.create({
   },
   header: {
     alignSelf: "flex-start",
-    marginTop: 40,
-    marginLeft: 10,
+    marginTop: 80,
   },
   headerText: {
-    fontSize: 24,
+    fontSize: 26,
     fontWeight: "bold",
   },
   contentContainer: {

@@ -4,35 +4,34 @@ import { View, Text, StyleSheet, ScrollView, Image, Pressable, Alert, ActivityIn
 import LinearBackground from "../../components/LinearBackground";
 import { getBackendData } from "./../../utils/backendAPI";
 
-function Workout({ workout }) {
+function WorkoutItem({ workout }) {
   const [expanded, setExpanded] = useState(false);
 
   const toggleExpanded = () => {
-    setExpanded(!expanded);
+    setExpanded(expanded => !expanded);
   };
 
   return (
-    <View style={styles.workoutPlanContainer}>
-      <Pressable onPress={toggleExpanded}>
+    <View style={[styles.workoutItemContainer, { height: expanded ? "auto" : 250 }]}>
+      <Pressable>
         <Image source={require("./../../assets/workout_plans_images/leg1.jpg")} style={styles.workoutImage} />
-        <View style={{ padding: 10 }}>
+        <Pressable onPress={toggleExpanded} style={styles.toggleButton}>
+          <Text style={styles.toggleButtonText}>{expanded ? 'Show Less' : 'Show More'}</Text>
+        </Pressable>
+        <View style={{ paddingHorizontal: 10, paddingBottom: 10 }}>
           <Text style={styles.workoutName}>{workout.name}</Text>
-          <View style={{ height: expanded ? 'auto' : 0, overflow: 'hidden' }}>
-            <Text style={styles.workoutDescription}>{workout.description}</Text>
+          <View>
+            {expanded ? <Text style={styles.workoutDescription}>{workout.description}</Text> : null}
             {workout.exercises.map(exercise => (
               <Text key={exercise.id} style={styles.exerciseName}>{exercise.sets + " x " + exercise.name}</Text>
             ))}
           </View>
-          <Pressable onPress={toggleExpanded} style={styles.toggleButton}>
-            <Text style={styles.toggleButtonText}>{expanded ? 'Show Less' : 'Show More'}</Text>
-          </Pressable>
+
         </View>
       </Pressable>
     </View>
   );
 };
-
-
 
 export default function WorkoutsScreen() {
   const [loading, setLoading] = useState(false);
@@ -81,12 +80,12 @@ export default function WorkoutsScreen() {
 
   return (
     <LinearBackground containerStyle={styles.container}>
-      <ScrollView>
+      <ScrollView contentContainerStyle={{ paddingBottom: 80 }}>
         <Text style={styles.title}>Your Workouts</Text>
         <View style={styles.workoutsContainer}>
           {workouts.length === 0 ? <Text style={{ color: "darkgrey", fontSize: 17 }}>You have no workouts yet</Text> :
             workouts.map((workout, index) => (
-              <Workout
+              <WorkoutItem
                 key={index}
                 workout={workout}
                 onWorkoutPress={handleWorkoutPress}
@@ -99,7 +98,7 @@ export default function WorkoutsScreen() {
         <View style={styles.workoutsContainer}>
           {recommendedWorkouts.length === 0 ? <Text style={{ color: "darkgrey", fontSize: 17 }}>No recommendations available</Text> :
             recommendedWorkouts.map((workout, index) => (
-              <Workout
+              <WorkoutItem
                 key={index}
                 workout={workout}
                 onWorkoutPress={handleWorkoutPress}
@@ -109,8 +108,6 @@ export default function WorkoutsScreen() {
         </View>
 
       </ScrollView>
-
-
       <Pressable style={styles.addButton} onPress={handleAddWorkoutPlan}>
         <Text style={styles.addButtonText}>+</Text>
       </Pressable>
@@ -127,7 +124,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: "bold",
     color: "white",
-    marginTop: 45,
+    marginTop: 25,
     marginBottom: 10
   },
   workoutsContainer: {
@@ -135,10 +132,12 @@ const styles = StyleSheet.create({
     flexWrap: "wrap",
     justifyContent: "space-between",
   },
-  workoutPlanContainer: {
+  workoutItemContainer: {
+    overflow: "hidden",
     width: "47%",
     borderRadius: 10,
     backgroundColor: "rgba(255, 255, 255, 1)",
+    marginBottom: 10
   },
   workoutImage: {
     width: '100%',
@@ -150,12 +149,6 @@ const styles = StyleSheet.create({
   workoutDescription: {
     color: "darkgrey",
     fontStyle: "italic",
-    marginBottom: 10
-  },
-  addButtonText: {
-    color: "rgba(0, 0, 0, 0.25)",
-    fontSize: 30,
-    fontWeight: "bold",
   },
   workoutName: {
     fontSize: 18,
@@ -171,13 +164,19 @@ const styles = StyleSheet.create({
     width: 60,
     height: 60,
     borderRadius: 10,
-    backgroundColor: "rgba(255, 255, 255, 0.25)",
+    backgroundColor: "teal",
     justifyContent: "center",
     alignItems: "center",
   },
-  toggleButtonText: {
-    color: 'blue', 
-    textAlign: 'center',
+  addButtonText: {
+    color: "rgba(0, 0, 0, 0.3)",
+    fontSize: 30,
+    fontWeight: "bold",
   },
-  
+  toggleButtonText: {
+    color: 'blue',
+    textAlign: 'center',
+    margin: 3
+  },
+
 });

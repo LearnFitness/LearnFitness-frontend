@@ -67,6 +67,7 @@ export default function SignInScreen({ navigation }) {
           loading={loading}
           disabled={loading}
           title="Sign In"
+          titleStyle={{fontWeight: "600"}}
           handleOnPress={signInWithEmail}
         />
         <Pressable
@@ -114,10 +115,10 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
     color: "white",
     marginVertical: 10,
-    fontSize: 17,
+    fontSize: 15,
     position: "relative",
     bottom: 26,
-    backgroundColor: "teal"
+    backgroundColor: "teal",
   },
   footer: {
     flexDirection: "row",
@@ -125,7 +126,7 @@ const styles = StyleSheet.create({
     justifyContent: "center"
   },
   footerText: {
-    color: "white",
+    color: "lightgrey",
     fontSize: 17
   }
 });

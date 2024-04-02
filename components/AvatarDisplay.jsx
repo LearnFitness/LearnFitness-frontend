@@ -2,7 +2,6 @@ import { Avatar } from '@rneui/themed';
 import { StyleSheet } from 'react-native';
 
 export default function AvatarDisplay({ source, size, handleOnPress = null, pressable = true, editable = true, rounded = true }) {
-  console.log(source);
   return (
     source ?
       (

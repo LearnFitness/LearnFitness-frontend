@@ -94,7 +94,6 @@ export async function postBackendDataWithPhoto(endpoint, data) {
   delete data.photoObject;
 
   try {
-    console.log("Form Data:", formData);
     const response = await apiClient.post(endpoint, formData, {
       headers: {
         "Content-Type": "multipart/form-data",
