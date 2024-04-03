@@ -24,7 +24,7 @@ function WorkoutItem({ workout }) {
           <View>
             {expanded ? <Text style={styles.workoutDescription}>{workout.description}</Text> : null}
             {workout.exercises.map(exercise => (
-              <Text key={exercise.id} style={styles.exerciseName}>{exercise.sets + " x " + exercise.name}</Text>
+              <Text key={exercise.id} style={styles.exerciseName}>{exercise.sets + " x " + exercise.name + (expanded ? " (" + exercise.target + ")" : "")}</Text>
             ))}
           </View>
 
@@ -34,7 +34,7 @@ function WorkoutItem({ workout }) {
   );
 };
 
-export default function WorkoutsScreen() {
+export default function WorkoutsScreen({ navigation }) {
   const [loading, setLoading] = useState(false);
   const [workouts, setWorkouts] = useState([]);
   const [recommendedWorkouts, setRecommendedWorkouts] = useState([]);
@@ -74,7 +74,7 @@ export default function WorkoutsScreen() {
   //   // Handle adding a workout plan
   // };
   const handleAddWorkoutPlan = () => {
-    navigation.navigate('AddCustomScreen');
+    navigation.navigate("AddWorkoutScreen");
   };
   
 

@@ -9,6 +9,7 @@ import ResetPasswordScreen from "./screens/auth/ResetPasswordScreen";
 import HomeNavigator from "./navigators/HomeNavigator";
 import OnboardNavigator from "./navigators/OnboardNavigator";
 import SignUpScreen from "./screens/auth/SignUpScreen";
+import AddWorkoutScreen from "./screens/AddWorkoutScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -37,6 +38,7 @@ export default function App() {
           <>
             <Stack.Screen name="OnboardNavigator" component={OnboardNavigator} />
             <Stack.Screen name="HomeNavigator" component={HomeNavigator} options={{ animation: "none" }} />
+            <Stack.Screen name="AddWorkoutScreen" component={AddWorkoutScreen} />
           </>
           :
           <>
