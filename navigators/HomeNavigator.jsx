@@ -6,6 +6,7 @@ import WorkoutsScreen from "../screens/home/WorkoutsScreen";
 import ExercisesScreen from "../screens/home/ExercisesScreen";
 import ProgressScreen from "../screens/home/ProgressScreen";
 import SettingsScreen from "../screens/home/SettingsScreen";
+import AddCustomScreen from "../screens/home/AddCustomScreen";
 
 const Tab = createBottomTabNavigator();
 
@@ -35,6 +36,7 @@ export default function HomeNavigator() {
       <Tab.Screen name="Exercises" component={ExercisesScreen} />
       <Tab.Screen name="Progress" component={ProgressScreen} />
       <Tab.Screen name="Settings" component={SettingsScreen} />
+      <Tab.Screen name="AddCustomScreen" component={AddCustomScreen}/>
     </Tab.Navigator>
   )
 }

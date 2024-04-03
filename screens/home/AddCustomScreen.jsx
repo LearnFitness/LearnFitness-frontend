@@ -1,31 +1,51 @@
-import React, { useState } from "react";
-import { View, Text, StyleSheet, TextInput, ScrollView, Image, Pressable } from "react-native";
+import React, { useState, useRef } from "react";
+import { View, StyleSheet, ScrollView, Pressable, Text } from "react-native";
+import LinearBackground from "../../components/LinearBackground";
+import { FontAwesome } from "@expo/vector-icons";
+import { useNavigation } from '@react-navigation/native';
 
-export default function CreateWorkoutPlanPopup() {
-  const [title, setTitle] = useState('');
+// Need to make this searchable 
+const mockExercises = [
+  { id: 1, name: "Exercise 1" },
+  { id: 2, name: "Exercise 2" },
+  { id: 3, name: "Exercise 3" },
+  // Add more exercises as needed
+];
+
+export default function AddCustomScreen() {
   const [selectedExercises, setSelectedExercises] = useState([]);
+  const listRef = useRef(null);
+  const navigation = useNavigation();
 
   const handleExerciseSelection = (exercise) => {
-    // Implement logic to handle exercise selection
-    if (selectedExercises.includes(exercise)) {
-      setSelectedExercises(selectedExercises.filter(item => item !== exercise));
-    } else {
-      setSelectedExercises([...selectedExercises, exercise]);
-    }
+    // Toggle the selection state of the exercise
+    setSelectedExercises((prevSelectedExercises) => {
+      if (prevSelectedExercises.includes(exercise)) {
+        return prevSelectedExercises.filter((item) => item !== exercise);
+      } else {
+        return [...prevSelectedExercises, exercise];
+      }
+    });
+  };
+
+  const handleCreateWorkoutPlan = () => {
+    // Logic to add exxercise
+    // Maybe need at least 3
+    // basically save button
+    console.log("Creating workout plan with selected exercises:", selectedExercises);
+  };
+
+  const addMoreExercise = () => {
+    // min is 3 so ofc they can have more
+    // exercise is hard code rn so not sure how to implement this
+    console.log("Add more exercise");
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Create Your Own Workout Plan</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Enter title"
-        value={title}
-        onChangeText={setTitle}
-      />
-      <ScrollView style={styles.exerciseContainer}>
-        {/* Assume exercises are passed as props from ExercisesScreen */}
-        {exercises.map((exercise, index) => (
+    <LinearBackground>
+      <ScrollView contentContainerStyle={styles.container}>
+        <Text style={styles.title}>Select Exercises</Text>
+        {mockExercises.map((exercise, index) => (
           <Pressable
             key={index}
             style={[styles.exerciseItem, selectedExercises.includes(exercise) ? styles.selectedExercise : null]}
@@ -34,36 +54,26 @@ export default function CreateWorkoutPlanPopup() {
             <Text style={styles.exerciseName}>{exercise.name}</Text>
           </Pressable>
         ))}
+        <Pressable style={styles.addExerciseButton} onPress={addMoreExercise }>
+          <Text style={styles.addExerciseButtonText}>Add More Exercises</Text>
+        </Pressable>
+        <Pressable style={styles.saveButton} onPress={handleCreateWorkoutPlan}>
+          <Text style={styles.saveButtonText}>Create</Text>
+        </Pressable>
       </ScrollView>
-      <View style={styles.imageCard}>
-        {/* Image card component for displaying the plan */}
-        <Image source={require("./../../assets/workout_plans_images/leg1.jpg")} style={styles.image} />
-      </View>
-    </View>
+    </LinearBackground>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
+    paddingHorizontal: 20,
+    paddingVertical: 30,
   },
   title: {
     fontSize: 24,
+    color: "white",
     fontWeight: "bold",
-    marginBottom: 20,
-  },
-  input: {
-    width: "80%",
-    height: 40,
-    borderColor: "gray",
-    borderWidth: 1,
-    marginBottom: 20,
-    paddingHorizontal: 10,
-  },
-  exerciseContainer: {
-    maxHeight: 200,
     marginBottom: 20,
   },
   exerciseItem: {
@@ -79,17 +89,30 @@ const styles = StyleSheet.create({
   },
   exerciseName: {
     fontSize: 16,
+    color: "white",
   },
-  imageCard: {
-    width: 300,
-    height: 200,
-    borderWidth: 1,
-    borderColor: "lightgrey",
-    borderRadius: 10,
-    overflow: "hidden",
+  addExerciseButton: {
+    backgroundColor: "teal",
+    padding: 15,
+    borderRadius: 5,
+    marginTop: 20,
+    alignItems: "center",
   },
-  image: {
-    width: "100%",
-    height: "100%",
+  addExerciseButtonText: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  saveButton: {
+    backgroundColor: "teal",
+    padding: 15,
+    borderRadius: 5,
+    marginTop: 20,
+    alignItems: "center",
+  },
+  saveButtonText: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "bold",
   },
 });

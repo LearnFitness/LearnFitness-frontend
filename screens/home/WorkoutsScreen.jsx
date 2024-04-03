@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { View, Text, StyleSheet, ScrollView, Image, Pressable, Alert, ActivityIndicator } from "react-native";
 import LinearBackground from "../../components/LinearBackground";
 import { getBackendData } from "./../../utils/backendAPI";
+import { useNavigation } from '@react-navigation/native';
 
 function WorkoutItem({ workout }) {
   const [expanded, setExpanded] = useState(false);
@@ -37,6 +38,7 @@ export default function WorkoutsScreen() {
   const [loading, setLoading] = useState(false);
   const [workouts, setWorkouts] = useState([]);
   const [recommendedWorkouts, setRecommendedWorkouts] = useState([]);
+  const navigation = useNavigation();
 
   useEffect(() => {
     async function getWorkouts() {
@@ -67,10 +69,14 @@ export default function WorkoutsScreen() {
     // Handle accessing the workout here, such as navigating to a detailed view
   };
 
+  // const handleAddWorkoutPlan = () => {
+  //   console.log("Making your own workout plan");
+  //   // Handle adding a workout plan
+  // };
   const handleAddWorkoutPlan = () => {
-    console.log("Making your own workout plan");
-    // Handle adding a workout plan
+    navigation.navigate('AddCustomScreen');
   };
+  
 
   if (loading) return (
     <LinearBackground>
