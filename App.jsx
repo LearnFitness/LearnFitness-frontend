@@ -38,7 +38,7 @@ export default function App() {
           <>
             <Stack.Screen name="OnboardNavigator" component={OnboardNavigator} />
             <Stack.Screen name="HomeNavigator" component={HomeNavigator} options={{ animation: "none" }} />
-            <Stack.Screen name="AddWorkoutScreen" component={AddWorkoutScreen} />
+            <Stack.Screen name="AddWorkoutScreen" component={AddWorkoutScreen} options={{ gestureEnabled: false }} />
           </>
           :
           <>

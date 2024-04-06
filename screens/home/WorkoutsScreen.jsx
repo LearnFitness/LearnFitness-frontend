@@ -3,14 +3,12 @@ import React, { useEffect, useState } from "react";
 import { View, Text, StyleSheet, ScrollView, Image, Pressable, Alert, ActivityIndicator, Modal } from "react-native";
 import LinearBackground from "../../components/LinearBackground";
 import { getBackendData } from "./../../utils/backendAPI";
-import { useNavigation } from '@react-navigation/native';
 
-export default function WorkoutsScreen() {
+export default function WorkoutsScreen({ navigation }) {
   const [loading, setLoading] = useState(false);
   const [workouts, setWorkouts] = useState([]);
   const [recommendedWorkouts, setRecommendedWorkouts] = useState([]);
   const [selectedWorkout, setSelectedWorkout] = useState(null);
-  const navigation = useNavigation();
 
   useEffect(() => {
     async function getWorkouts() {
@@ -181,9 +179,9 @@ const styles = StyleSheet.create({
     width: 60,
     height: 60,
     borderRadius: 10,
-    backgroundColor: "teal",
     justifyContent: "center",
     alignItems: "center",
+    backgroundColor: "teal"
   },
   addButtonText: {
     color: "rgba(0, 0, 0, 0.3)",

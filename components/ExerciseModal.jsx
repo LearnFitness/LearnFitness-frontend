@@ -2,13 +2,13 @@ import { Button, Modal, View, Text, StyleSheet, ScrollView, ActivityIndicator } 
 import FastImage from "react-native-fast-image";
 import { Divider } from "@rneui/themed";
 
-export default function ExerciseModal({ loading, exercise, isModalVisible, setModalVisible }) {
+export default function ExerciseModal({ loading, exercise, isModalVisible, setModalVisible, handleAddToWorkout }) {
   return (
     <Modal animationType="slide" presentationStyle="pageSheet" visible={isModalVisible}>
       {loading ? <ActivityIndicator style={{ flex: 1 }} /> :
         <>
           <View style={styles.buttonsContainer}>
-            <Button title="Add to Workout" onPress={() => console.log("Add to Workout")}/>
+            <Button title="Add to Workout" onPress={() => handleAddToWorkout()}/>
             <Button title="Close" onPress={() => setModalVisible(false)} />
           </View>
           <Divider />

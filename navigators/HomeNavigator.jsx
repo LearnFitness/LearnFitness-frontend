@@ -36,7 +36,6 @@ export default function HomeNavigator() {
       <Tab.Screen name="Exercises" component={ExercisesScreen} />
       <Tab.Screen name="Progress" component={ProgressScreen} />
       <Tab.Screen name="Settings" component={SettingsScreen} />
-      <Tab.Screen name="AddCustomScreen" component={AddCustomScreen}/>
     </Tab.Navigator>
   )
 }

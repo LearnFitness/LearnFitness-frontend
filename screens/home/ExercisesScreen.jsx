@@ -6,7 +6,7 @@ const statusBarHeight = Platform.OS === 'android' ? StatusBar.currentHeight : 0;
 
 export default function ExercisesScreen() {
   return (
-    <LinearBackground containerStyle={[styles.container, { paddingTop: statusBarHeight }]}>
+    <LinearBackground containerStyle={styles.container}>
       <ExercisesSearch />
     </LinearBackground>
   )
@@ -14,17 +14,7 @@ export default function ExercisesScreen() {
 
 const styles = StyleSheet.create({
   container: {
-    marginHorizontal: "4%"
+    marginHorizontal: "4%",
+    paddingTop: statusBarHeight
   },
-  searchContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 10,
-    marginTop: 10,
-  },
-  filterButton: {
-    padding: 10,
-    top: 3,
-  }
 })

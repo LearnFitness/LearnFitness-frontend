@@ -1,5 +1,5 @@
 import React, { forwardRef, useState } from 'react';
-import { StyleSheet, View, FlatList, Text, Pressable } from 'react-native';
+import { StyleSheet, View, FlatList, Text, Pressable, Alert } from 'react-native';
 import { useInfiniteHits } from 'react-instantsearch-core';
 import firestore from "@react-native-firebase/firestore";
 import ExerciseModal from './ExerciseModal';
@@ -25,6 +25,10 @@ export default InfiniteHits = forwardRef(
       }
     }
 
+    function handleAddToWorkout() {
+      
+    }
+
     return (<>
       <FlatList
         ref={ref}
@@ -34,7 +38,7 @@ export default InfiniteHits = forwardRef(
         renderItem={({ item }) => (<SearchResult item={item} />)}
       />
 
-      <ExerciseModal loading={loading} exercise={exercise} isModalVisible={isModalVisible} setModalVisible={setModalVisible} />
+      <ExerciseModal loading={loading} exercise={exercise} isModalVisible={isModalVisible} setModalVisible={setModalVisible} handleAddToWorkout={handleAddToWorkout}/>
     </>
     );
 
