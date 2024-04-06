@@ -46,44 +46,50 @@ export default function WorkoutsScreen() {
 
   return (
     <LinearBackground containerStyle={styles.container}>
-      <ScrollView contentContainerStyle={{ paddingBottom: 80 }}>
-        <Text style={styles.title}>Your Workouts</Text>
-        <View style={styles.workoutsContainer}>
-          {workouts.length === 0 ? <Text style={{ color: "darkgrey", fontSize: 17 }}>You have no workouts yet</Text> :
-            workouts.map((workout, index) => (
-              <WorkoutItem
-                key={index}
-                workout={workout}
-                onPress={handleWorkoutPress}
+      {loading ? <ActivityIndicator style={{ flex: 1 }} />
+        : (
+          <>
+            <ScrollView contentContainerStyle={{ paddingBottom: 80 }}>
+              <Text style={styles.title}>Your Workouts</Text>
+              <View style={styles.workoutsContainer}>
+                {workouts.length === 0 ? <Text style={{ color: "darkgrey", fontSize: 17 }}>You have no workouts yet</Text> :
+                  workouts.map((workout, index) => (
+                    <WorkoutItem
+                      key={index}
+                      workout={workout}
+                      onPress={handleWorkoutPress}
+                    />
+                  )
+                  )}
+              </View>
+
+              <Text style={styles.title}>Recommended for you</Text>
+              <View style={styles.workoutsContainer}>
+                {recommendedWorkouts.length === 0 ? <Text style={{ color: "darkgrey", fontSize: 17 }}>No recommendations available</Text> :
+                  recommendedWorkouts.map((workout, index) => (
+                    <WorkoutItem
+                      key={index}
+                      workout={workout}
+                      onPress={handleWorkoutPress}
+                    />
+                  )
+                  )}
+              </View>
+
+            </ScrollView>
+            <Pressable style={styles.addButton} onPress={handleAddWorkoutPlan}>
+              <Text style={styles.addButtonText}>+</Text>
+            </Pressable>
+
+            {selectedWorkout && (
+              <WorkoutDetailsModal
+                workout={selectedWorkout}
+                onClose={() => setSelectedWorkout(null)}
               />
-            )
-          )}
-        </View>
+            )}
+          </>
+        )}
 
-        <Text style={styles.title}>Recommended for you</Text>
-        <View style={styles.workoutsContainer}>
-          {recommendedWorkouts.length === 0 ? <Text style={{ color: "darkgrey", fontSize: 17 }}>No recommendations available</Text> :
-            recommendedWorkouts.map((workout, index) => (
-              <WorkoutItem
-                key={index}
-                workout={workout}
-                onPress={handleWorkoutPress}
-              />
-            )
-          )}
-        </View>
-
-      </ScrollView>
-      <Pressable style={styles.addButton} onPress={handleAddWorkoutPlan}>
-        <Text style={styles.addButtonText}>+</Text>
-      </Pressable>
-
-      {selectedWorkout && (
-        <WorkoutDetailsModal
-          workout={selectedWorkout}
-          onClose={() => setSelectedWorkout(null)}
-        />
-      )}
     </LinearBackground>
   );
 }
@@ -120,7 +126,7 @@ const WorkoutItem = ({ workout, onPress }) => {
       <View style={styles.workoutDetailsContainer}>
         <Text style={styles.workoutName}>{workout.name}</Text>
         <Pressable onPress={() => onPress(workout)} style={styles.showMoreButton}>
-          <Text style={{color: "blue"}}>Quick View → </Text>
+          <Text style={{ color: "blue" }}>Quick View → </Text>
         </Pressable>
       </View>
     </View>
