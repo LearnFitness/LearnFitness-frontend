@@ -1,43 +1,15 @@
 import firestore from "@react-native-firebase/firestore";
 import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet, ScrollView, Image, Pressable, Alert, ActivityIndicator } from "react-native";
+import { View, Text, StyleSheet, ScrollView, Image, Pressable, Alert, ActivityIndicator, Modal } from "react-native";
 import LinearBackground from "../../components/LinearBackground";
 import { getBackendData } from "./../../utils/backendAPI";
 import { useNavigation } from '@react-navigation/native';
 
-function WorkoutItem({ workout }) {
-  const [expanded, setExpanded] = useState(false);
-
-  const toggleExpanded = () => {
-    setExpanded(expanded => !expanded);
-  };
-
-  return (
-    <View style={[styles.workoutItemContainer, { height: expanded ? "auto" : 250 }]}>
-      <Pressable>
-        <Image source={require("./../../assets/workout_plans_images/leg1.jpg")} style={styles.workoutImage} />
-        <Pressable onPress={toggleExpanded} style={styles.toggleButton}>
-          <Text style={styles.toggleButtonText}>{expanded ? 'Show Less' : 'Show More'}</Text>
-        </Pressable>
-        <View style={{ paddingHorizontal: 10, paddingBottom: 10 }}>
-          <Text style={styles.workoutName}>{workout.name}</Text>
-          <View>
-            {expanded ? <Text style={styles.workoutDescription}>{workout.description}</Text> : null}
-            {workout.exercises.map(exercise => (
-              <Text key={exercise.id} style={styles.exerciseName}>{exercise.sets + " x " + exercise.name + (expanded ? " (" + exercise.target + ")" : "")}</Text>
-            ))}
-          </View>
-
-        </View>
-      </Pressable>
-    </View>
-  );
-};
-
-export default function WorkoutsScreen({ navigation }) {
+export default function WorkoutsScreen() {
   const [loading, setLoading] = useState(false);
   const [workouts, setWorkouts] = useState([]);
   const [recommendedWorkouts, setRecommendedWorkouts] = useState([]);
+  const [selectedWorkout, setSelectedWorkout] = useState(null);
   const navigation = useNavigation();
 
   useEffect(() => {
@@ -65,24 +37,12 @@ export default function WorkoutsScreen({ navigation }) {
   }, []);
 
   const handleWorkoutPress = (workout) => {
-    console.log("Accessing workout:", workout);
-    // Handle accessing the workout here, such as navigating to a detailed view
+    setSelectedWorkout(workout);
   };
 
-  // const handleAddWorkoutPlan = () => {
-  //   console.log("Making your own workout plan");
-  //   // Handle adding a workout plan
-  // };
   const handleAddWorkoutPlan = () => {
     navigation.navigate("AddWorkoutScreen");
   };
-  
-
-  if (loading) return (
-    <LinearBackground>
-      <ActivityIndicator style={{ flex: 1 }} />
-    </LinearBackground>
-  )
 
   return (
     <LinearBackground containerStyle={styles.container}>
@@ -94,10 +54,10 @@ export default function WorkoutsScreen({ navigation }) {
               <WorkoutItem
                 key={index}
                 workout={workout}
-                onWorkoutPress={handleWorkoutPress}
+                onPress={handleWorkoutPress}
               />
             )
-            )}
+          )}
         </View>
 
         <Text style={styles.title}>Recommended for you</Text>
@@ -107,10 +67,10 @@ export default function WorkoutsScreen({ navigation }) {
               <WorkoutItem
                 key={index}
                 workout={workout}
-                onWorkoutPress={handleWorkoutPress}
+                onPress={handleWorkoutPress}
               />
             )
-            )}
+          )}
         </View>
 
       </ScrollView>
@@ -118,9 +78,54 @@ export default function WorkoutsScreen({ navigation }) {
         <Text style={styles.addButtonText}>+</Text>
       </Pressable>
 
+      {selectedWorkout && (
+        <WorkoutDetailsModal
+          workout={selectedWorkout}
+          onClose={() => setSelectedWorkout(null)}
+        />
+      )}
     </LinearBackground>
   );
 }
+
+const WorkoutDetailsModal = ({ workout, onClose }) => {
+  return (
+    <Modal
+      animationType="slide"
+      transparent={true}
+      visible={true}
+      onRequestClose={onClose}
+    >
+      <Pressable style={styles.modalContainer} onPress={onClose}>
+        <View style={styles.modalContent}>
+          <Pressable onPress={onClose} style={styles.closeButton}>
+            <Text style={{ color: "blue" }}>Close</Text>
+          </Pressable>
+          <Text style={styles.modalHeader}>Workout Summary</Text>
+          <Text style={styles.workoutName}>{workout.name}</Text>
+          {workout.exercises.map((exercise, index) => (
+            <Text key={index}>• {exercise.sets} x {exercise.name}</Text>
+          ))}
+        </View>
+      </Pressable>
+    </Modal>
+  );
+};
+
+
+const WorkoutItem = ({ workout, onPress }) => {
+  return (
+    <View style={styles.workoutItemContainer}>
+      <Image source={require("./../../assets/workout_plans_images/leg1.jpg")} style={styles.workoutImage} />
+      <View style={styles.workoutDetailsContainer}>
+        <Text style={styles.workoutName}>{workout.name}</Text>
+        <Pressable onPress={() => onPress(workout)} style={styles.showMoreButton}>
+          <Text style={{color: "blue"}}>Quick View → </Text>
+        </Pressable>
+      </View>
+    </View>
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -152,16 +157,16 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 10,
     borderTopRightRadius: 10
   },
-  workoutDescription: {
-    color: "darkgrey",
-    fontStyle: "italic",
+  workoutDetailsContainer: {
+    paddingHorizontal: 10,
+    paddingBottom: 10
   },
   workoutName: {
     fontSize: 18,
     fontWeight: "700"
   },
-  exerciseName: {
-    fontSize: 15
+  showMoreButton: {
+    paddingVertical: 5,
   },
   addButton: {
     position: "absolute",
@@ -179,10 +184,26 @@ const styles = StyleSheet.create({
     fontSize: 30,
     fontWeight: "bold",
   },
-  toggleButtonText: {
-    color: 'blue',
-    textAlign: 'center',
-    margin: 3
+  modalContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
-
+  modalContent: {
+    backgroundColor: "#fff",
+    padding: 20,
+    borderRadius: 10,
+    width: "80%",
+  },
+  modalHeader: {
+    fontSize: 24,
+    fontWeight: "bold",
+    marginBottom: 10,
+  },
+  closeButton: {
+    position: "absolute",
+    top: 10,
+    right: 10,
+  },
 });
