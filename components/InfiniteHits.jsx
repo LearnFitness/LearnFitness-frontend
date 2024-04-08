@@ -38,7 +38,7 @@ export default InfiniteHits = forwardRef(
         renderItem={({ item }) => (<SearchResult item={item} />)}
       />
 
-      <ExerciseModal loading={loading} exercise={exercise} isModalVisible={isModalVisible} setModalVisible={setModalVisible} handleAddToWorkout={handleAddToWorkout}/>
+      <ExerciseModal loading={loading} exercise={exercise} isModalVisible={isModalVisible} setModalVisible={setModalVisible} />
     </>
     );
 
