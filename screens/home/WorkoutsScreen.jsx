@@ -1,37 +1,60 @@
 import firestore from "@react-native-firebase/firestore";
+import auth from "@react-native-firebase/auth";
 import React, { useEffect, useState } from "react";
 import { View, Text, StyleSheet, ScrollView, Image, Pressable, Alert, ActivityIndicator, Modal } from "react-native";
 import LinearBackground from "../../components/LinearBackground";
 import { getBackendData } from "./../../utils/backendAPI";
+import { useFocusEffect } from '@react-navigation/native';
 
-export default function WorkoutsScreen({ navigation }) {
+export default function WorkoutsScreen({ route, navigation }) {
   const [loading, setLoading] = useState(false);
   const [workouts, setWorkouts] = useState([]);
   const [recommendedWorkouts, setRecommendedWorkouts] = useState([]);
   const [selectedWorkout, setSelectedWorkout] = useState(null);
 
+  async function getWorkoutsAsync() {
+    setLoading(true);
+    try {
+      const userDocRef = await firestore().collection("users").doc(auth().currentUser.uid).get();
+      const userExp = userDocRef.data().expLevel;
+      const workouts = await getBackendData("user/workouts");
+      const premadeWorkoutsSnapshot = await firestore().collection("premade_workouts").where("expLevel", "==", userExp.toLowerCase()).get();
+
+      let recommendedWorkoutsArray = [];
+      premadeWorkoutsSnapshot.forEach((workout) => {
+        recommendedWorkoutsArray.push(workout.data());
+      })
+
+      setWorkouts(workouts);
+      setRecommendedWorkouts(recommendedWorkoutsArray);
+    } catch (error) {
+      Alert.alert(error.message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
   useEffect(() => {
     async function getWorkouts() {
-      setLoading(true);
-      try {
-        const userData = await getBackendData("user");
-        const workouts = await getBackendData("user/workouts");
-        const premadeWorkoutsSnapshot = await firestore().collection("premade_workouts").where("expLevel", "==", userData.expLevel.toLowerCase()).get();
-
-        let recommendedWorkoutsArray = [];
-        premadeWorkoutsSnapshot.forEach((workout) => {
-          recommendedWorkoutsArray.push(workout.data());
-        })
-
-        setWorkouts(workouts);
-        setRecommendedWorkouts(recommendedWorkoutsArray);
-      } catch (error) {
-        Alert.alert(error.message);
-      } finally {
-        setLoading(false);
-      }
+      await getWorkoutsAsync();
     }
     getWorkouts();
+  }, []);
+
+  useEffect(() => {
+    const unsubscribe = firestore()
+      .collection('users')
+      .doc(auth().currentUser.uid)
+      .collection("workouts")
+      .onSnapshot(() => {
+        async function getWorkouts() {
+          await getWorkoutsAsync();
+        }
+        getWorkouts();
+      });
+
+    // Stop listening for updates when no longer required
+    return () => unsubscribe();
   }, []);
 
   const handleWorkoutPress = (workout) => {

@@ -8,7 +8,7 @@ export default function ExerciseModal({ loading, exercise, isModalVisible, setMo
   const { addExercise } = useContext(AddWorkoutContext);
 
   return (
-    <Modal animationType="slide" presentationStyle="pageSheet" visible={isModalVisible}>
+    <Modal animationType="slide" presentationStyle="pageSheet" visible={isModalVisible} onRequestClose={() => setModalVisible(false)}>
       {loading ? <ActivityIndicator style={{ flex: 1 }} /> :
         <>
           <View style={styles.buttonsContainer}>

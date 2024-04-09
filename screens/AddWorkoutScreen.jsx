@@ -2,38 +2,48 @@ import { View, ScrollView, Text, StyleSheet, Pressable, Alert, TextInput } from 
 import LinearBackground from "../components/LinearBackground";
 import { useState } from "react";
 import ExercisesSearchModal from "../components/ExercisesSearchModal";
-import BackButton from "../components/BackButton";
 import FontAwesome from "react-native-vector-icons/FontAwesome6";
 import ExerciseSets from "../components/ExerciseSets";
 import { AddWorkoutContext } from "../context/AddWorkoutContext";
+import firestore from "@react-native-firebase/firestore";
+import auth from "@react-native-firebase/auth";
 
-export default function AddWorkoutScreen({ navigation }) {
+export default function AddWorkoutScreen({ route, navigation }) {
   const [isSearchModalVisible, setSearchModalVisible] = useState(false);
   const [workoutName, setWorkoutName] = useState("");
   const [workoutDescription, setWorkoutDescription] = useState("");
-  const [selectedExercises, setSelectedExercises] = useState([]);
+  const [selectedExercises, setSelectedExercises] = useState(() => {
+    if (route.params) {
+      return [{ ...route.params, sets: 1 }];
+    } else return [];
+  })
 
   function handleGoBack() {
-    Alert.alert(
-      "Cancel editing this workout plan?",
-      "You will lose all your changes",
-      [
-        {
-          text: "Continue editing",
-          style: "cancel"
-        },
-        {
-          text: "Delete workout plan",
-          style: "destructive",
-          onPress: () => navigation.goBack()
-        }
-      ]
-    )
+    if (!workoutName && selectedExercises.length === 0) {
+      navigation.goBack();
+    } else {
+      Alert.alert(
+        "Discard workout plan?",
+        "You will lose all your changes.",
+        [
+          {
+            text: "Keep editing",
+            style: "cancel"
+          },
+          {
+            text: "Discard",
+            style: "destructive",
+            onPress: () => navigation.goBack()
+          }
+        ]
+      )
+    }
+
   }
 
   function addExercise(exercise) {
     if (selectedExercises.findIndex(element => element.id === exercise.id) === -1)
-      setSelectedExercises(prevData => [...prevData, exercise]);
+      setSelectedExercises(prevData => [...prevData, { ...exercise, sets: 1 }]);
     else throw Error("This exercise is already in the workout.");
   }
 
@@ -41,42 +51,58 @@ export default function AddWorkoutScreen({ navigation }) {
     setSelectedExercises(prevData => prevData.filter(exercise => exercise.id !== exerciseId));
   }
 
-  function handleCreateWorkout() {
-    console.log("Creating workout plan")
+  async function handleCreateWorkout() {
+    if (!workoutName) {
+      Alert.alert("Workout name required!");
+      return;
+    }
+    if (selectedExercises.length === 0) {
+      Alert.alert("Empty workout not allowed!");
+      return;
+    }
+
+    try {
+      await firestore().collection("users").doc(auth().currentUser.uid).collection("workouts").add({
+        name: workoutName,
+        description: workoutDescription,
+        exercises: selectedExercises
+      })
+      Alert.alert("Workout created successfully");
+      navigation.goBack();
+    } catch (error) {
+      Alert.alert(error.message);
+    }
   }
 
   return (
     <AddWorkoutContext.Provider value={{ selectedExercises, addExercise }}>
       <LinearBackground containerStyle={styles.container}>
         <ScrollView>
-          <BackButton handleOnPress={handleGoBack} />
-          <View>
-            <TextInput style={styles.workoutName} placeholder="Workout Name" placeholderTextColor="darkgrey" value={workoutName} onChangeText={text => setWorkoutName(text)} />
-            <View style={styles.actionButtonsContainer}>
-              <Pressable style={[styles.actionButton, { backgroundColor: "#aa3155" }]} onPress={handleGoBack} >
-                <Text style={styles.actionButtonText}>Cancel</Text>
-              </Pressable>
-              <Pressable style={[styles.actionButton, { backgroundColor: "#0087d6" }]} onPress={handleCreateWorkout} >
-                <Text style={styles.actionButtonText}>Save</Text>
-              </Pressable>
-            </View>
-
-            {selectedExercises.map(exercise => {
-              return (
-                <View key={exercise.id}>
-                  <FontAwesome name="square-xmark" color="#aa3155" size={22} style={{ position: "absolute", zIndex: 2, right: 15, top: 28 }} onPress={() => removeExercise(exercise.id)}/>               
-                  <ExerciseSets exercise={exercise} />
-                </View>
-              )
-            })}
-
-            <Pressable style={styles.addExerciseButton} onPress={() => setSearchModalVisible(true)} >
-              <FontAwesome name="plus" color="white" size={23} />
-              <Text style={styles.addExerciseButtonText}>Add Exercise</Text>
+          <TextInput style={styles.workoutName} placeholder="Workout name" placeholderTextColor="darkgrey" value={workoutName} onChangeText={text => setWorkoutName(text)} />
+          <TextInput style={styles.workoutDescription} placeholder="Workout description" placeholderTextColor="darkgrey" value={workoutDescription} onChangeText={text => setWorkoutDescription(text)} />
+          <View style={styles.actionButtonsContainer}>
+            <Pressable style={[styles.actionButton, { backgroundColor: "#aa3155" }]} onPress={handleGoBack} >
+              <Text style={styles.actionButtonText}>Cancel</Text>
             </Pressable>
-
-            <ExercisesSearchModal isModalVisible={isSearchModalVisible} setModalVisible={setSearchModalVisible} />
+            <Pressable style={[styles.actionButton, { backgroundColor: "#0087d6" }]} onPress={handleCreateWorkout} >
+              <Text style={styles.actionButtonText}>Save</Text>
+            </Pressable>
           </View>
+
+          {selectedExercises.map(exercise => {
+            return (
+              <View key={exercise.id}>
+                <FontAwesome name="square-xmark" color="#aa3155" size={23} style={{ position: "absolute", zIndex: 2, right: 15, top: 28 }} onPress={() => removeExercise(exercise.id)} />
+                <ExerciseSets exercise={exercise} />
+              </View>
+            )
+          })}
+
+          <Pressable style={styles.addExerciseButton} onPress={() => setSearchModalVisible(true)} >
+            <FontAwesome name="plus" color="white" size={23} />
+            <Text style={styles.addExerciseButtonText}>Add Exercise</Text>
+          </Pressable>
+          <ExercisesSearchModal isModalVisible={isSearchModalVisible} setModalVisible={setSearchModalVisible} />
         </ScrollView>
       </LinearBackground>
     </AddWorkoutContext.Provider>
@@ -85,13 +111,20 @@ export default function AddWorkoutScreen({ navigation }) {
 
 const styles = StyleSheet.create({
   container: {
-    alignItems: "center"
+    marginHorizontal: "5%"
   },
   workoutName: {
     color: "white",
     textAlign: "center",
     fontSize: 28,
-    margin: 15,
+    fontWeight: "600",
+    marginTop: 20,
+  },
+  workoutDescription: {
+    color: "lightgrey",
+    textAlign: "center",
+    fontSize: 18,
+    marginVertical: 10
   },
   actionButtonsContainer: {
     flexDirection: "row",
@@ -108,6 +141,7 @@ const styles = StyleSheet.create({
   },
   actionButtonText: {
     color: "white",
+    fontSize: 15,
     fontWeight: "600"
   },
   addExerciseButton: {

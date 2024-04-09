@@ -4,7 +4,7 @@ import LinearBackground from "./LinearBackground";
 
 export default function ExercisesSearchModal({ isModalVisible, setModalVisible }) {
   return (
-    <Modal animationType="slide" presentationStyle="pageSheet" visible={isModalVisible}>
+    <Modal animationType="slide" presentationStyle="pageSheet" visible={isModalVisible} onRequestClose={() => setModalVisible(false)}>
       <LinearBackground containerStyle={{marginHorizontal: "4%"}}>
         <Pressable onPress={() => setModalVisible(false)}>
           <Text style={{ textAlign: "right", fontSize: 20, marginTop: 20, color: "crimson" }}>Close</Text>

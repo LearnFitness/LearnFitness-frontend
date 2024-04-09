@@ -14,7 +14,7 @@ export default function ExerciseSets({ exercise }) {
       </Pressable>
       <Text style={styles.exerciseTarget}>{exercise.target}</Text>
       <View style={styles.exerciseHeader}>
-        <Text style={[{ flex: 1, marginLeft: 8 }, styles.exerciseHeaderText]}>Set</Text>
+        <Text style={[{ flex: 1, marginLeft: 15 }, styles.exerciseHeaderText]}>Set</Text>
         <Text style={[{ flex: 2 }, styles.exerciseHeaderText]}>lbs</Text>
         <Text style={[{ flex: 2 }, styles.exerciseHeaderText]}>Reps</Text>
       </View>
@@ -22,7 +22,7 @@ export default function ExerciseSets({ exercise }) {
         {[...Array(sets)].map((value, index) => {
           return (
             <View style={styles.exerciseSet} key={index}>
-              <FontAwesome name="circle-minus" color="#aa3155" onPress={() => { exercise.sets = sets - 1; updateSets(set => set - 1) }} />
+              <FontAwesome name="circle-minus" color="#aa3155" size={17} onPress={() => { exercise.sets = sets - 1; updateSets(set => set - 1) }} />
               <Text style={{ flex: 1, textAlign: "center", fontSize: 15 }}>{index + 1}</Text>
               <TextInput keyboardType="numeric" style={[{ flex: 2 }, styles.exerciseInput]} />
               <TextInput keyboardType="numeric" style={[{ flex: 2 }, styles.exerciseInput]} />
