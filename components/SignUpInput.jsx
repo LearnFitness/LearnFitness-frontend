@@ -2,7 +2,7 @@ import { View, Text, StyleSheet } from "react-native";
 
 export default function SignUpInput({ title, InputComponent, flexDirection = "row", ...props }) {
   return (
-    <View style={[styles.container, {flexDirection: flexDirection}]}>
+    <View style={[styles.container, { flexDirection: flexDirection }]}>
       <Text style={styles.title}>{title}</Text>
       <InputComponent style={styles.inputComponent} {...props} />
     </View>
@@ -12,8 +12,8 @@ export default function SignUpInput({ title, InputComponent, flexDirection = "ro
 const styles = StyleSheet.create({
   container: {
     height: 50,
-    justifyContent: "space-between",
     alignItems: "center",
+    justifyContent: "space-between",
     margin: 5
   },
   title: {
@@ -22,6 +22,5 @@ const styles = StyleSheet.create({
     margin: 5
   },
   inputComponent: {
-
   }
 })

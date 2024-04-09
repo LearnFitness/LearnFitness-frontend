@@ -53,12 +53,12 @@ export default function DashboardScreen({ navigation }) {
             <View>
               <View style={styles.greetingContainer}>
                 <View>
-                  <FontAwesome name="moon" size={20} color="darkgrey"/>
+                  <FontAwesome name="moon" size={20} color="darkgrey" />
                   <Text style={styles.greetingText} >Good Afternoon,</Text>
                   <Text style={styles.greetingName} >{userData.name.split(" ")[0]}</Text>
                 </View>
                 <Pressable onPress={() => navigation.navigate("Settings")}>
-                  <AvatarDisplay source={{ uri: userData.photoURL }} size={120} editable={false} />
+                  <AvatarDisplay source={userData.photoURL ? { uri: userData.photoURL } : null} size={120} editable={false} clickable={false} />
                 </Pressable>
               </View>
               <View style={styles.finishedWorkoutsContainer}>
@@ -96,7 +96,7 @@ export default function DashboardScreen({ navigation }) {
               <Text style={styles.motivationalText}>{getRandomSentence()}</Text>
               <View style={styles.buttonContainer}>
                 <Pressable onPress={() => navigation.navigate("Workouts")} style={{ height: 55, width: 250, backgroundColor: "#FFFFFF", borderRadius: 30, justifyContent: "center", alignItems: "center" }}>
-                  <Text style={{ color: "#0044AA", fontWeight: "700", fontSize: 23, textAlign: "center" }}>View Workouts  <FontAwesome name={rightArrowIcon} size={23} color="#0044AA"/> </Text>
+                  <Text style={{ color: "#0044AA", fontWeight: "700", fontSize: 23, textAlign: "center" }}>View Workouts  <FontAwesome name={rightArrowIcon} size={23} color="#0044AA" /> </Text>
                 </Pressable>
               </View>
             </View>

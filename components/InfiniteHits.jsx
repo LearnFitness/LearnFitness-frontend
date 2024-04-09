@@ -1,5 +1,5 @@
 import React, { forwardRef, useState } from 'react';
-import { StyleSheet, View, FlatList, Text, Pressable } from 'react-native';
+import { StyleSheet, View, FlatList, Text, Pressable, Alert } from 'react-native';
 import { useInfiniteHits } from 'react-instantsearch-core';
 import firestore from "@react-native-firebase/firestore";
 import ExerciseModal from './ExerciseModal';
@@ -23,6 +23,10 @@ export default InfiniteHits = forwardRef(
       } finally {
         setLoading(false);
       }
+    }
+
+    function handleAddToWorkout() {
+      
     }
 
     return (<>

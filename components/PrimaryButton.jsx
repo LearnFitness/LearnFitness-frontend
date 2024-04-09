@@ -1,8 +1,9 @@
 import { Button } from "@rneui/themed";
 
-export default function PrimaryButton({ title, loading, disabled, handleOnPress }) {
+export default function PrimaryButton({ title, titleStyle, loading, disabled, handleOnPress }) {
   return (
     <Button
+      titleStyle={titleStyle}
       title={title}
       loading={loading}
       disabled={disabled}

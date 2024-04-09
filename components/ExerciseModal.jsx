@@ -1,14 +1,25 @@
-import { Button, Modal, View, Text, StyleSheet, ScrollView, ActivityIndicator } from "react-native";
+import { Button, Modal, View, Text, StyleSheet, ScrollView, ActivityIndicator, Alert } from "react-native";
 import FastImage from "react-native-fast-image";
 import { Divider } from "@rneui/themed";
+import { useContext } from "react";
+import { AddWorkoutContext } from "../context/AddWorkoutContext";
 
 export default function ExerciseModal({ loading, exercise, isModalVisible, setModalVisible }) {
+  const { addExercise } = useContext(AddWorkoutContext);
+
   return (
-    <Modal animationType="slide" presentationStyle="pageSheet" visible={isModalVisible}>
+    <Modal animationType="slide" presentationStyle="pageSheet" visible={isModalVisible} onRequestClose={() => setModalVisible(false)}>
       {loading ? <ActivityIndicator style={{ flex: 1 }} /> :
         <>
           <View style={styles.buttonsContainer}>
-            <Button title="Add to Workout" onPress={() => console.log("Add to Workout")}/>
+            <Button title="Add to Workout" onPress={() => {
+              try { 
+                addExercise(exercise);
+                setModalVisible(false);
+              } catch (error) {
+                Alert.alert(error.message);
+              };
+            }} />
             <Button title="Close" onPress={() => setModalVisible(false)} />
           </View>
           <Divider />

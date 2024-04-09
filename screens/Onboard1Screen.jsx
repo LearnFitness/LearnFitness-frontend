@@ -27,7 +27,7 @@ export default function Onboard1Screen({ navigation }) {
         setLoading(true);
         const userData = await getBackendData("/user");
         setUserData(userData);
-      } catch (error) {npm
+      } catch (error) {
         Alert.alert("An error occured", error);
       } finally {
         setLoading(false);
@@ -90,7 +90,7 @@ export default function Onboard1Screen({ navigation }) {
             />
             <Divider />
             <SignUpInput
-              title="Height"
+              title="Height (ft.in)"
               InputComponent={TextInput}
               value={onboardData.height}
               onChangeText={(text) => updateOnboardData("height", text)}
@@ -99,7 +99,7 @@ export default function Onboard1Screen({ navigation }) {
             />
             <Divider />
             <SignUpInput
-              title="Weight"
+              title="Weight (lbs)"
               InputComponent={TextInput}
               value={onboardData.weight}
               onChangeText={(text) => updateOnboardData("weight", text)}
@@ -118,7 +118,7 @@ export default function Onboard1Screen({ navigation }) {
               textStyle={{ fontSize: 17 }}
             />
           </View>
-          <PrimaryButton title="Next" handleOnPress={handleNext} />
+          <PrimaryButton title="Next" handleOnPress={handleNext} disabled={!onboardData.name}/>
         </KeyboardAvoidView>
       </SafeAreaView>
     )

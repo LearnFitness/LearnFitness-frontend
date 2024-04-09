@@ -46,7 +46,7 @@ export default function Filters({ isOpen, onClose, onChange }) {
   };
 
   return (
-    <Modal animationType="slide" visible={isOpen} presentationStyle="pageSheet">
+    <Modal animationType="slide" visible={isOpen} presentationStyle="pageSheet" onRequestClose={onClose}>
       <TouchableWithoutFeedback onPress={onClose}>
         <SafeAreaView style={styles.modalOverlay}>
           <View style={styles.container}>

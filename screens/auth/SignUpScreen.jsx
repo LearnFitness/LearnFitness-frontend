@@ -90,7 +90,7 @@ const styles = StyleSheet.create({
     justifyContent: "center"
   },
   footerText: {
-    color: "white",
+    color: "lightgrey",
     fontSize: 17
   }
 })

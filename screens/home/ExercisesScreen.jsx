@@ -1,55 +1,64 @@
-import { StyleSheet, Platform, StatusBar, View, Pressable } from "react-native";
-import { FontAwesome } from "@expo/vector-icons";
-import { useState, useRef } from "react";
+import { StyleSheet, Platform, StatusBar, View, Pressable, Modal, Alert, Text, SafeAreaView, TextInput, ScrollView } from "react-native";
 import LinearBackground from "../../components/LinearBackground";
-import { InstantSearch } from 'react-instantsearch-core';
-import SearchBox from "../../components/SearchBox";
-import InfiniteHits from "../../components/InfiniteHits";
-import Filters from "../../components/Filters";
-import { searchClient } from "../../utils/algoliaSearchClient";
+import ExercisesSearch from "../../components/ExercisesSearch";
+import { AddWorkoutContext } from "../../context/AddWorkoutContext";
+import firestore from "@react-native-firebase/firestore";
+import auth from "@react-native-firebase/auth";
+import { useState } from "react";
+import AddExerciseScreen from "../AddExerciseScreen";
 
-export default function ExercisesScreen() {
-  const [isFilterModalOpen, setFilterModalOpen] = useState(false);
-  const listRef = useRef(null);
+const statusBarHeight = Platform.OS === 'android' ? StatusBar.currentHeight : 0;
 
-  function scrollToTop() {
-    listRef.current?.scrollToOffset({ animated: false, offset: 0 });
+export default function ExercisesScreen({ navigation }) {
+  const [isWorkoutsModalVisible, setWorkoutsModalVisible] = useState(false);
+  const [workouts, setWorkouts] = useState([]);
+  const [exerciseToAdd, setExerciseToAdd] = useState(null);
+
+  async function fetchAndDisplayWorkouts() {
+    try {
+      const workoutsSnapshot = await firestore().collection("users").doc(auth().currentUser.uid).collection("workouts").get();
+      setWorkouts(workoutsSnapshot.docs);
+    } catch (error) {
+      Alert.alert(error.message);
+    }
+    setWorkoutsModalVisible(true);
   }
 
-  const statusBarHeight = Platform.OS === 'android' ? StatusBar.currentHeight : 0;
+  async function handleAddExerciseRequest(exercise) {
+    setExerciseToAdd({ ...exercise });
+    await fetchAndDisplayWorkouts();
+  }
+
+  async function addExerciseToWorkout(workoutId, sets) {
+    try {
+      const workoutDocRef = await firestore().collection("users").doc(auth().currentUser.uid).collection("workouts").doc(workoutId).get();
+      const existingExercises = workoutDocRef.data().exercises;
+      const newExercise = { ...exerciseToAdd, sets }
+      existingExercises.push(newExercise);
+
+      await firestore().collection("users").doc(auth().currentUser.uid).collection("workouts").doc(workoutId).update({
+        exercises: existingExercises
+      })
+      Alert.alert("Exercise added successfully.");
+      setWorkoutsModalVisible(false);
+    } catch (error) {
+      Alert.alert(error.message);
+    }
+  }
 
   return (
-    <LinearBackground containerStyle={[styles.container, { paddingTop: statusBarHeight }]}>
-      <InstantSearch searchClient={searchClient} indexName="exercises_search" future={{ preserveSharedStateOnUnmount: true }}>
-        <View style={styles.searchContainer}>
-          <SearchBox onChange={scrollToTop} style={{ width: '90%' }} />
-          <Pressable
-            style={styles.filterButton}
-            onPress={() => setFilterModalOpen(!isFilterModalOpen)}
-          >
-            <FontAwesome name="filter" size={22} color="white" />
-          </Pressable>
-        </View>
-        <Filters isOpen={isFilterModalOpen} onClose={() => setFilterModalOpen(false)} onChange={scrollToTop} />
-        <InfiniteHits ref={listRef} />
-      </InstantSearch>
-    </LinearBackground>
+    <AddWorkoutContext.Provider value={{ addExercise: handleAddExerciseRequest }} >
+      <LinearBackground containerStyle={styles.container}>
+        <ExercisesSearch />
+        <AddExerciseScreen exerciseToAdd={exerciseToAdd} workouts={workouts} isModalVisible={isWorkoutsModalVisible} setModalVisible={setWorkoutsModalVisible} addExerciseToWorkout={addExerciseToWorkout} />
+      </LinearBackground>
+    </AddWorkoutContext.Provider>
   )
 }
 
 const styles = StyleSheet.create({
   container: {
-    marginHorizontal: "4%"
+    marginHorizontal: "4%",
+    paddingTop: statusBarHeight
   },
-  searchContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 10,
-    marginTop: 10,
-  },
-  filterButton: {
-    padding: 10,
-    top: 3,
-  }
 })
