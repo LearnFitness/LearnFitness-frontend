@@ -4,8 +4,19 @@ import ExerciseModal from "./ExerciseModal";
 import FontAwesome from "react-native-vector-icons/FontAwesome6";
 
 export default function ExerciseSets({ exercise }) {
-  const [sets, updateSets] = useState(1);
+  const initialSets = exercise.sets || 1;
+  const [sets, setSets] = useState(initialSets);
   const [isExerciseModalVisible, setExerciseModalVisible] = useState(false);
+
+  const handleAddSet = () => {
+    setSets(sets + 1);
+  };
+
+  const handleRemoveSet = (index) => {
+    if (sets > 1) {
+      setSets(sets - 1);
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -22,22 +33,27 @@ export default function ExerciseSets({ exercise }) {
         {[...Array(sets)].map((value, index) => {
           return (
             <View style={styles.exerciseSet} key={index}>
-              <FontAwesome name="circle-minus" color="#aa3155" size={17} onPress={() => { exercise.sets = sets - 1; updateSets(set => set - 1) }} />
+              <FontAwesome
+                name="circle-minus"
+                color="#aa3155"
+                size={17}
+                onPress={() => handleRemoveSet(index)}
+              />
               <Text style={{ flex: 1, textAlign: "center", fontSize: 15 }}>{index + 1}</Text>
               <TextInput keyboardType="numeric" style={[{ flex: 2 }, styles.exerciseInput]} />
               <TextInput keyboardType="numeric" style={[{ flex: 2 }, styles.exerciseInput]} />
             </View>
-          )
+          );
         })}
       </View>
-      <Pressable style={styles.addSetButton} onPress={() => { exercise.sets = sets + 1; updateSets(set => set + 1) }}>
+      <Pressable style={styles.addSetButton} onPress={handleAddSet}>
         <Text style={styles.addSetButtonText}>+ Add Set</Text>
       </Pressable>
 
       <ExerciseModal exercise={exercise} isModalVisible={isExerciseModalVisible} setModalVisible={setExerciseModalVisible} />
 
     </View>
-  )
+  );
 }
 
 const styles = StyleSheet.create({
@@ -93,4 +109,4 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginTop: 5
   }
-})
+});
