@@ -40,7 +40,8 @@ export default function AddWorkoutScreen({ route, navigation }) {
   function addExercise(exercise) {
     const exerciseExists = selectedExercises.some((ex) => ex.id === exercise.id);
     if (!exerciseExists) {
-      setSelectedExercises((prevExercises) => [...prevExercises, { ...exercise, sets: 1 }]);
+      const initialSets = workout ? exercise.sets : 1; // If modifying, use the existing sets value
+      setSelectedExercises((prevExercises) => [...prevExercises, { ...exercise, sets: initialSets }]);
     } else {
       Alert.alert("Exercise already added to the workout.");
     }

@@ -111,6 +111,7 @@ export default function WorkoutsScreen({ route, navigation }) {
               <WorkoutDetailsModal
                 workout={selectedWorkout}
                 onClose={() => setSelectedWorkout(null)}
+                navigation={navigation}
               />
             )}
           </>
@@ -120,7 +121,26 @@ export default function WorkoutsScreen({ route, navigation }) {
   );
 }
 
-const WorkoutDetailsModal = ({ workout, onClose }) => {
+const WorkoutDetailsModal = ({ workout, onClose, navigation }) => {
+  const handleModifyWorkout = () => {
+    onClose(); 
+    navigation.navigate("AddWorkoutScreen", { workout });
+  };
+
+  const handleDeleteWorkout = async () => {
+    try {
+      await firestore()
+        .collection('users')
+        .doc(auth().currentUser.uid)
+        .collection('workouts')
+        .doc(workout.id) 
+        .delete();
+      onClose(); 
+    } catch (error) {
+      console.error("Error deleting workout:", error);
+    }
+  };
+
   return (
     <Modal
       animationType="slide"
@@ -138,6 +158,14 @@ const WorkoutDetailsModal = ({ workout, onClose }) => {
           {workout.exercises.map((exercise, index) => (
             <Text key={index}>• {exercise.sets} x {exercise.name}</Text>
           ))}
+          <View style={styles.buttonsContainer}>
+            <Pressable onPress={handleModifyWorkout} style={[styles.button, styles.modifyButton]}>
+              <Text style={{ color: "blue" }}>Modify</Text>
+            </Pressable>
+            <Pressable onPress={handleDeleteWorkout} style={[styles.button, styles.deleteButton]}>
+              <Text style={{ color: "red" }}>Delete</Text>
+            </Pressable>
+          </View>
         </View>
       </Pressable>
     </Modal>
@@ -146,40 +174,30 @@ const WorkoutDetailsModal = ({ workout, onClose }) => {
 
 
 const WorkoutItem = ({ workout, onPress, isYourWorkout }) => {
-  const handleModifyWorkout = () => {
-    if (isYourWorkout) {
-      Alert.alert(
-        "Modify Workout Plan",
-        "Do you want to modify this plan?",
-        [
-          {
-            text: "Cancel",
-            style: "cancel"
-          },
-          {
-            text: "Yes",
-            onPress: () => onPress(workout, true) // Proceed with modification
-          }
-        ]
-      );
-    }
+  const handleQuickView = () => {
+    onPress(workout); 
   };
 
-  const handleQuickView = () => {
-    onPress(workout); // Trigger quick view when clicking the "Quick View" option
+  const generateBriefDescription = () => {
+    if (workout.exercises.length === 0) {
+      return "No exercises available";
+    } else if (workout.exercises.length === 1) {
+      return `• ${workout.exercises[0].sets} x ${workout.exercises[0].name}`;
+    } else {
+      const firstTwoExercises = workout.exercises.slice(0, 2).map(exercise => `• ${exercise.sets} x ${exercise.name}`);
+      return `${firstTwoExercises.join("\n")} \n...`;
+    }
   };
 
   return (
     <View style={styles.workoutItemContainer}>
-      <Pressable onPress={handleModifyWorkout}>
+      <Pressable onPress={handleQuickView}>
         <Image source={require("./../../assets/workout_plans_images/leg1.jpg")} style={styles.workoutImage} />
+        <View style={styles.workoutDetailsContainer}>
+          <Text style={styles.workoutName}>{workout.name}</Text>
+          <Text style={styles.workoutDescription}>{generateBriefDescription()}</Text>
+        </View>
       </Pressable>
-      <View style={styles.workoutDetailsContainer}>
-        <Text style={styles.workoutName}>{workout.name}</Text>
-        <Pressable onPress={handleQuickView} style={styles.quickViewButton}>
-        <Text style={[styles.quickViewButtonText, { color: "blue" }]}>Quick View →</Text>
-        </Pressable>
-      </View>
     </View>
   );
 };
@@ -262,5 +280,28 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: 10,
     right: 10,
+  },
+  workoutName: {
+    fontSize: 18,
+    fontWeight: "700"
+  },
+  buttonsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 10,
+  },
+  button: {
+    flex: 1,
+    alignItems: 'center',
+    paddingVertical: 10,
+    borderRadius: 5,
+  },
+  modifyButton: {
+    backgroundColor: '#e0e0e0', 
+    marginRight: 5,
+  },
+  deleteButton: {
+    backgroundColor: '#ffcdd2', 
+    marginLeft: 5,
   },
 });
