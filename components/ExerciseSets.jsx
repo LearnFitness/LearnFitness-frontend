@@ -4,7 +4,7 @@ import ExerciseModal from "./ExerciseModal";
 import FontAwesome from "react-native-vector-icons/FontAwesome6";
 
 export default function ExerciseSets({ exercise }) {
-  const initialSets = exercise.sets || 1;
+  const initialSets = exercise.sets || 1;  // check initialSets, else default to 1
   const [sets, setSets] = useState(initialSets);
   const [isExerciseModalVisible, setExerciseModalVisible] = useState(false);
 
