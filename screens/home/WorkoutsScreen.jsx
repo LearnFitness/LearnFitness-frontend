@@ -57,8 +57,12 @@ export default function WorkoutsScreen({ route, navigation }) {
     return () => unsubscribe();
   }, []);
 
-  const handleWorkoutPress = (workout) => {
-    setSelectedWorkout(workout);
+  const handleWorkoutPress = (workout, isModify = false) => {
+    if (isModify) {
+      navigation.navigate("AddWorkoutScreen", { workout }); // Navigate to AddWorkoutScreen with workout data
+    } else {
+      setSelectedWorkout(workout);
+    }
   };
 
   const handleAddWorkoutPlan = () => {
@@ -79,6 +83,7 @@ export default function WorkoutsScreen({ route, navigation }) {
                       key={index}
                       workout={workout}
                       onPress={handleWorkoutPress}
+                      isYourWorkout={true}
                     />
                   )
                   )}
@@ -140,14 +145,39 @@ const WorkoutDetailsModal = ({ workout, onClose }) => {
 };
 
 
-const WorkoutItem = ({ workout, onPress }) => {
+const WorkoutItem = ({ workout, onPress, isYourWorkout }) => {
+  const handleModifyWorkout = () => {
+    if (isYourWorkout) {
+      Alert.alert(
+        "Modify Workout Plan",
+        "Do you want to modify this plan?",
+        [
+          {
+            text: "Cancel",
+            style: "cancel"
+          },
+          {
+            text: "Yes",
+            onPress: () => onPress(workout, true) // Proceed with modification
+          }
+        ]
+      );
+    }
+  };
+
+  const handleQuickView = () => {
+    onPress(workout); // Trigger quick view when clicking the "Quick View" option
+  };
+
   return (
     <View style={styles.workoutItemContainer}>
-      <Image source={require("./../../assets/workout_plans_images/leg1.jpg")} style={styles.workoutImage} />
+      <Pressable onPress={handleModifyWorkout}>
+        <Image source={require("./../../assets/workout_plans_images/leg1.jpg")} style={styles.workoutImage} />
+      </Pressable>
       <View style={styles.workoutDetailsContainer}>
         <Text style={styles.workoutName}>{workout.name}</Text>
-        <Pressable onPress={() => onPress(workout)} style={styles.showMoreButton}>
-          <Text style={{ color: "blue" }}>Quick View → </Text>
+        <Pressable onPress={handleQuickView} style={styles.quickViewButton}>
+        <Text style={[styles.quickViewButtonText, { color: "blue" }]}>Quick View →</Text>
         </Pressable>
       </View>
     </View>

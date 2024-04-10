@@ -1,22 +1,19 @@
+import React, { useState, useEffect } from "react";
 import { View, ScrollView, Text, StyleSheet, Pressable, Alert, TextInput } from "react-native";
 import LinearBackground from "../components/LinearBackground";
-import { useState } from "react";
+import { AddWorkoutContext } from "../context/AddWorkoutContext";
+import ExerciseSets from "../components/ExerciseSets";
 import ExercisesSearchModal from "../components/ExercisesSearchModal";
 import FontAwesome from "react-native-vector-icons/FontAwesome6";
-import ExerciseSets from "../components/ExerciseSets";
-import { AddWorkoutContext } from "../context/AddWorkoutContext";
 import firestore from "@react-native-firebase/firestore";
 import auth from "@react-native-firebase/auth";
 
 export default function AddWorkoutScreen({ route, navigation }) {
+  const { workout } = route.params || {};
   const [isSearchModalVisible, setSearchModalVisible] = useState(false);
-  const [workoutName, setWorkoutName] = useState("");
-  const [workoutDescription, setWorkoutDescription] = useState("");
-  const [selectedExercises, setSelectedExercises] = useState(() => {
-    if (route.params) {
-      return [{ ...route.params, sets: 1 }];
-    } else return [];
-  })
+  const [workoutName, setWorkoutName] = useState(workout ? workout.name : "");
+  const [workoutDescription, setWorkoutDescription] = useState(workout ? workout.description : "");
+  const [selectedExercises, setSelectedExercises] = useState(workout ? workout.exercises : []);
 
   function handleGoBack() {
     if (!workoutName && selectedExercises.length === 0) {
@@ -38,67 +35,103 @@ export default function AddWorkoutScreen({ route, navigation }) {
         ]
       )
     }
-
   }
 
   function addExercise(exercise) {
-    if (selectedExercises.findIndex(element => element.id === exercise.id) === -1)
-      setSelectedExercises(prevData => [...prevData, { ...exercise, sets: 1 }]);
-    else throw Error("This exercise is already in the workout.");
+    const exerciseExists = selectedExercises.some((ex) => ex.id === exercise.id);
+    if (!exerciseExists) {
+      setSelectedExercises((prevExercises) => [...prevExercises, { ...exercise, sets: 1 }]);
+    } else {
+      Alert.alert("Exercise already added to the workout.");
+    }
   }
 
   function removeExercise(exerciseId) {
-    setSelectedExercises(prevData => prevData.filter(exercise => exercise.id !== exerciseId));
+    setSelectedExercises((prevExercises) => prevExercises.filter((ex) => ex.id !== exerciseId));
   }
 
   async function handleCreateWorkout() {
-    if (!workoutName) {
-      Alert.alert("Workout name required!");
+    if (!workoutName.trim()) {
+      Alert.alert("Workout name is required.");
       return;
     }
     if (selectedExercises.length === 0) {
-      Alert.alert("Empty workout not allowed!");
+      Alert.alert("Please add exercises to your workout.");
       return;
     }
 
     try {
-      await firestore().collection("users").doc(auth().currentUser.uid).collection("workouts").add({
+      const newWorkout = {
         name: workoutName,
         description: workoutDescription,
         exercises: selectedExercises
-      })
-      Alert.alert("Workout created successfully");
+      };
+
+      if (workout) {
+        // Update existing workout
+        await firestore().collection("users").doc(auth().currentUser.uid).collection("workouts").doc(workout.id).update(newWorkout);
+      } else {
+        // Create new workout
+        await firestore().collection("users").doc(auth().currentUser.uid).collection("workouts").add(newWorkout);
+      }
+
+      Alert.alert(workout ? "Workout updated successfully." : "Workout created successfully.");
       navigation.goBack();
     } catch (error) {
       Alert.alert(error.message);
     }
   }
 
+  useEffect(() => {
+    if (workout) {
+      setWorkoutName(workout.name);
+      setWorkoutDescription(workout.description);
+      setSelectedExercises(workout.exercises);
+    }
+  }, [workout]);
+
   return (
     <AddWorkoutContext.Provider value={{ selectedExercises, addExercise }}>
       <LinearBackground containerStyle={styles.container}>
         <ScrollView>
-          <TextInput style={styles.workoutName} placeholder="Workout name" placeholderTextColor="darkgrey" value={workoutName} onChangeText={text => setWorkoutName(text)} />
-          <TextInput style={styles.workoutDescription} placeholder="Workout description" placeholderTextColor="darkgrey" value={workoutDescription} onChangeText={text => setWorkoutDescription(text)} />
+          <TextInput
+            style={styles.workoutName}
+            placeholder="Workout name"
+            placeholderTextColor="darkgrey"
+            value={workoutName}
+            onChangeText={setWorkoutName}
+          />
+          <TextInput
+            style={styles.workoutDescription}
+            placeholder="Workout description"
+            placeholderTextColor="darkgrey"
+            value={workoutDescription}
+            onChangeText={setWorkoutDescription}
+          />
+
           <View style={styles.actionButtonsContainer}>
-            <Pressable style={[styles.actionButton, { backgroundColor: "#aa3155" }]} onPress={handleGoBack} >
+            <Pressable style={[styles.actionButton, { backgroundColor: "#aa3155" }]} onPress={handleGoBack}>
               <Text style={styles.actionButtonText}>Cancel</Text>
             </Pressable>
-            <Pressable style={[styles.actionButton, { backgroundColor: "#0087d6" }]} onPress={handleCreateWorkout} >
-              <Text style={styles.actionButtonText}>Save</Text>
+            <Pressable style={[styles.actionButton, { backgroundColor: "#0087d6" }]} onPress={handleCreateWorkout}>
+              <Text style={styles.actionButtonText}>{workout ? "Update" : "Save"}</Text>
             </Pressable>
           </View>
 
-          {selectedExercises.map(exercise => {
-            return (
-              <View key={exercise.id}>
-                <FontAwesome name="square-xmark" color="#aa3155" size={23} style={{ position: "absolute", zIndex: 2, right: 15, top: 28 }} onPress={() => removeExercise(exercise.id)} />
-                <ExerciseSets exercise={exercise} />
-              </View>
-            )
-          })}
+          {selectedExercises.map((exercise) => (
+            <View key={exercise.id}>
+              <FontAwesome
+                name="square-xmark"
+                color="#aa3155"
+                size={23}
+                style={{ position: "absolute", zIndex: 2, right: 15, top: 28 }}
+                onPress={() => removeExercise(exercise.id)}
+              />
+              <ExerciseSets exercise={exercise} />
+            </View>
+          ))}
 
-          <Pressable style={styles.addExerciseButton} onPress={() => setSearchModalVisible(true)} >
+          <Pressable style={styles.addExerciseButton} onPress={() => setSearchModalVisible(true)}>
             <FontAwesome name="plus" color="white" size={23} />
             <Text style={styles.addExerciseButtonText}>Add Exercise</Text>
           </Pressable>
@@ -106,7 +139,7 @@ export default function AddWorkoutScreen({ route, navigation }) {
         </ScrollView>
       </LinearBackground>
     </AddWorkoutContext.Provider>
-  )
+  );
 }
 
 const styles = StyleSheet.create({
@@ -118,7 +151,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontSize: 28,
     fontWeight: "600",
-    marginTop: 20,
+    marginTop: 20
   },
   workoutDescription: {
     color: "lightgrey",
@@ -157,4 +190,4 @@ const styles = StyleSheet.create({
     fontSize: 17,
     margin: 5
   }
-})
+});
