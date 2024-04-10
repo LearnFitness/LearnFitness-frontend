@@ -5,7 +5,7 @@ import { InstantSearch } from 'react-instantsearch-core';
 import SearchBox from "./SearchBox";
 import InfiniteHits from "./InfiniteHits";
 import Filters from "./Filters";
-import { searchClient } from "../utils/AlgoliaSearchClient";
+import { searchClient } from "../utils/algoliaSearchClient";
 
 
 export default function ExercisesSearch() {
