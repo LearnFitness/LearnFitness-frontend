@@ -1,9 +1,9 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import {
+  Modal,
   Button,
   StyleSheet,
   SafeAreaView,
-  Modal,
   Text,
   TouchableOpacity,
   View,
@@ -13,29 +13,20 @@ import {
 } from 'react-native';
 import {
   useClearRefinements,
-  useCurrentRefinements,
   useRefinementList,
 } from 'react-instantsearch-core';
 
-export default function Filters({ isOpen, onClose, onChange }) {
+export default function FilterModal({ isOpen, onClose, onChange }) {
   const { items, refine } = useRefinementList({ attribute: 'bodyPart' });
   const { canRefine: canClear, refine: clear } = useClearRefinements();
-  const { items: currentRefinements } = useCurrentRefinements();
-  const totalRefinements = currentRefinements.reduce(
-    (acc, { refinements }) => acc + refinements.length,
-    0
-  );
 
-  const renderCategoryItem = ({ item }) => {
+  const renderCategoryItem = useCallback(({ item }) => {
     return (
       <TouchableOpacity
-        style={{ ...styles.item, backgroundColor: item.isRefined ? '#cee7ff' : 'transparent' }}
-        onPress={() => {
-          refine(item.value);
-          onChange();
-        }}
+        style={[styles.item, { backgroundColor: item.isRefined ? '#cee7ff' : 'transparent' }]}
+        onPress={() => { refine(item.value); onChange(); }}
       >
-        <Text style={{ ...styles.labelText, fontWeight: item.isRefined ? '700' : '400' }}>
+        <Text style={[styles.labelText, { fontWeight: item.isRefined ? '700' : '400' }]}>
           {item.label}
         </Text>
         <View style={styles.itemCount}>
@@ -43,10 +34,10 @@ export default function Filters({ isOpen, onClose, onChange }) {
         </View>
       </TouchableOpacity>
     );
-  };
+  }, []);
 
   return (
-    <Modal animationType="slide" visible={isOpen} presentationStyle="pageSheet" onRequestClose={onClose}>
+    <Modal animationType="slide" presentationStyle="pageSheet" visible={isOpen} onRequestClose={() => onClose()}>
       <TouchableWithoutFeedback onPress={onClose}>
         <SafeAreaView style={styles.modalOverlay}>
           <View style={styles.container}>
@@ -57,8 +48,8 @@ export default function Filters({ isOpen, onClose, onChange }) {
               data={items}
               renderItem={renderCategoryItem}
               keyExtractor={item => item.value}
-              numColumns={2} 
-              columnWrapperStyle={styles.list} 
+              numColumns={2}
+              columnWrapperStyle={styles.list}
             />
           </View>
           <View style={styles.filterListButtonContainer}>
@@ -66,10 +57,7 @@ export default function Filters({ isOpen, onClose, onChange }) {
               <Button
                 title="Clear all"
                 disabled={!canClear}
-                onPress={() => {
-                  clear();
-                  onChange();
-                }}
+                onPress={() => { clear(); onChange(); }}
               />
             </View>
             <View style={styles.filterListButton}>
@@ -98,10 +86,10 @@ const styles = StyleSheet.create({
   },
   list: {
     marginTop: 16,
-    justifyContent: 'space-between', 
+    justifyContent: 'space-between',
   },
   item: {
-    flex: 1, 
+    flex: 1,
     paddingVertical: 12,
     margin: 8,
     borderWidth: 1,

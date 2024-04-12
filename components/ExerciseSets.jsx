@@ -1,26 +1,25 @@
 import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import { useState } from "react";
-import ExerciseModal from "./ExerciseModal";
 import FontAwesome from "react-native-vector-icons/FontAwesome6";
+import { useNavigation } from "@react-navigation/native";
 
 export default function ExerciseSets({ exercise }) {
-  const initialSets = exercise.sets || 1;  // check initialSets, else default to 1
-  const [sets, setSets] = useState(initialSets);
-  const [isExerciseModalVisible, setExerciseModalVisible] = useState(false);
+  const [sets, setSets] = useState(exercise.sets ? exercise.sets : 1);
+  const navigation = useNavigation();
 
   const handleAddSet = () => {
-    setSets(sets + 1);
+    setSets(sets => sets + 1);
   };
 
   const handleRemoveSet = (index) => {
     if (sets > 1) {
-      setSets(sets - 1);
+      setSets(sets => sets - 1);
     }
   };
 
   return (
     <View style={styles.container}>
-      <Pressable onPress={() => setExerciseModalVisible(true)}>
+      <Pressable onPress={() => navigation.navigate("ExerciseModal", { exerciseId: exercise.id })}>
         <Text style={styles.exerciseName}>{exercise.name}</Text>
       </Pressable>
       <Text style={styles.exerciseTarget}>{exercise.target}</Text>
@@ -49,9 +48,6 @@ export default function ExerciseSets({ exercise }) {
       <Pressable style={styles.addSetButton} onPress={handleAddSet}>
         <Text style={styles.addSetButtonText}>+ Add Set</Text>
       </Pressable>
-
-      <ExerciseModal exercise={exercise} isModalVisible={isExerciseModalVisible} setModalVisible={setExerciseModalVisible} />
-
     </View>
   );
 }

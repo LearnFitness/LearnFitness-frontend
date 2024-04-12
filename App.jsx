@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect } from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import auth from '@react-native-firebase/auth';
@@ -11,6 +11,8 @@ import OnboardNavigator from "./navigators/OnboardNavigator";
 import SignUpScreen from "./screens/auth/SignUpScreen";
 import AddWorkoutScreen from "./screens/AddWorkoutScreen";
 import AddExerciseScreen from "./screens/AddExerciseScreen";
+import ExerciseModal from "./components/ExerciseModal";
+import ExercisesSearchModal from "./components/ExercisesSearchModal";
 
 const Stack = createNativeStackNavigator();
 
@@ -39,8 +41,10 @@ export default function App() {
           <>
             <Stack.Screen name="OnboardNavigator" component={OnboardNavigator} />
             <Stack.Screen name="HomeNavigator" component={HomeNavigator} options={{ animation: "none" }} />
-            <Stack.Screen name="AddWorkoutScreen" component={AddWorkoutScreen} options={{ gestureEnabled: false }} />
-            <Stack.Screen name="AddExcerciseScreen" component={AddExerciseScreen} options={{ gestureEnabled: false }} />
+            <Stack.Screen name="AddWorkoutScreen" component={AddWorkoutScreen} options={{ headerShown: true, gestureEnabled: false, headerBackTitle: "Workouts" }} />
+            <Stack.Screen name="AddExerciseScreen" component={AddExerciseScreen} options={{ presentation: "modal" }} />
+            <Stack.Screen name="ExercisesSearchModal" component={ExercisesSearchModal} options={{ presentation: "modal" }} />
+            <Stack.Screen name="ExerciseModal" component={ExerciseModal} options={{ presentation: "modal" }} />
           </>
           :
           <>
