@@ -1,4 +1,4 @@
-import { View, Text, ActivityIndicator, Alert, StyleSheet, StatusBar, Pressable, ScrollView } from "react-native";
+import { View, Text, ActivityIndicator, Alert, StyleSheet, StatusBar, Pressable, ScrollView, Platform, TouchableOpacity } from "react-native";
 import { useEffect, useState } from "react";
 import { getBackendDataWithRetry } from "../../utils/backendAPI";
 import LinearBackground from "../../components/LinearBackground";
@@ -45,7 +45,7 @@ export default function DashboardScreen({ navigation }) {
       <ScrollView>
         {/* Changes status bar icon color for ALL pages to white
       (use FocusAwareStatusBar as seen in SettingsScreen.jsx for individual screens) */}
-        <StatusBar translucent backgroundColor="transparent" barStyle={"light-content"} />
+        {Platform.OS === "android" ? <StatusBar translucent backgroundColor="transparent" barStyle={"light-content"} /> : null}
         {loading || !userData ?
           (
             <ActivityIndicator style={{ flex: 1 }} />
@@ -63,10 +63,10 @@ export default function DashboardScreen({ navigation }) {
               </View>
               <View style={styles.finishedWorkoutsContainer}>
                 <Text style={styles.finishedWorkoutsText}>Completed Workouts</Text>
-                <Pressable
+                <TouchableOpacity
                   onPress={() => navigation.navigate("Progress")}>
                   <Text style={{ textAlign: "center", marginTop: 4, fontSize: 17, color: "#9E9E9E" }}>View All →</Text>
-                </Pressable>
+                </TouchableOpacity>
               </View>
               <View style={styles.completedWorkoutsContainer}>
                 <Text style={styles.completedWorkoutsText}>
@@ -95,9 +95,9 @@ export default function DashboardScreen({ navigation }) {
               <Text style={styles.dayText}>It's {currentDayOfWeek}!</Text>
               <Text style={styles.motivationalText}>{getRandomSentence()}</Text>
               <View style={styles.buttonContainer}>
-                <Pressable onPress={() => navigation.navigate("Workouts")} style={{ height: 55, width: 250, backgroundColor: "#FFFFFF", borderRadius: 30, justifyContent: "center", alignItems: "center" }}>
+                <TouchableOpacity onPress={() => navigation.navigate("Workouts")} style={{ height: 55, width: 250, backgroundColor: "#FFFFFF", borderRadius: 30, justifyContent: "center", alignItems: "center" }}>
                   <Text style={{ color: "#0044AA", fontWeight: "700", fontSize: 23, textAlign: "center" }}>View Workouts  <FontAwesome name={rightArrowIcon} size={23} color="#0044AA" /> </Text>
-                </Pressable>
+                </TouchableOpacity>
               </View>
             </View>
           )

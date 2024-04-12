@@ -1,10 +1,9 @@
 import firestore from "@react-native-firebase/firestore";
 import auth from "@react-native-firebase/auth";
 import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet, ScrollView, Image, Pressable, Alert, ActivityIndicator, Modal } from "react-native";
+import { View, Text, StyleSheet, ScrollView, Image, Pressable, Alert, ActivityIndicator, Modal, TouchableOpacity } from "react-native";
 import LinearBackground from "../../components/LinearBackground";
 import { getBackendData } from "./../../utils/backendAPI";
-import { useFocusEffect } from '@react-navigation/native';
 
 export default function WorkoutsScreen({ route, navigation }) {
   const [loading, setLoading] = useState(false);
@@ -103,9 +102,9 @@ export default function WorkoutsScreen({ route, navigation }) {
               </View>
 
             </ScrollView>
-            <Pressable style={styles.addButton} onPress={handleAddWorkoutPlan}>
+            <TouchableOpacity style={styles.addButton} onPress={handleAddWorkoutPlan}>
               <Text style={styles.addButtonText}>+</Text>
-            </Pressable>
+            </TouchableOpacity>
 
             {selectedWorkout && (
               <WorkoutDetailsModal
