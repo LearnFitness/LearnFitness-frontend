@@ -5,18 +5,27 @@ import ExerciseSets from "../components/ExerciseSets";
 import FontAwesome from "react-native-vector-icons/FontAwesome6";
 import firestore from "@react-native-firebase/firestore";
 import auth from "@react-native-firebase/auth";
+import Ionicon from "react-native-vector-icons/Ionicons";
+import toast from "../utils/toast";
 
 export default function AddWorkoutScreen({ route, navigation }) {
-  const { workout, exerciseToAdd } = route.params || {};
-  const [workoutName, setWorkoutName] = useState(workout ? workout.name : "");
-  const [workoutDescription, setWorkoutDescription] = useState(workout ? workout.description : "");
-  const [selectedExercises, setSelectedExercises] = useState(workout ? workout.exercises : []);
+  const { workout, exercise, action } = route.params ? route.params : {};
+  const [workoutId, setWorkoutId] = useState("");
+  const [workoutName, setWorkoutName] = useState("");
+  const [workoutDescription, setWorkoutDescription] = useState("");
+  const [selectedExercises, setSelectedExercises] = useState([]);
 
   useEffect(() => {
-    if (exerciseToAdd) {
-      addExercise(exerciseToAdd);
+    if (exercise) {
+      addExercise(exercise);
     }
-  }, [exerciseToAdd]);
+    if (workout) {
+      setWorkoutId(workout.id);
+      setWorkoutName(workout.name);
+      setWorkoutDescription(workout.description);
+      setSelectedExercises(workout.exercises);
+    }
+  }, [exercise, workout]);
 
   function handleGoBack() {
     if (!workoutName && selectedExercises.length === 0) {
@@ -54,7 +63,7 @@ export default function AddWorkoutScreen({ route, navigation }) {
     setSelectedExercises((prevExercises) => prevExercises.filter((ex) => ex.id !== exerciseId));
   }
 
-  async function handleCreateWorkout() {
+  async function handleSaveWorkout() {
     if (!workoutName.trim()) {
       Alert.alert("Workout name is required.");
       return;
@@ -71,28 +80,20 @@ export default function AddWorkoutScreen({ route, navigation }) {
         exercises: selectedExercises
       };
 
-      if (workout) {
+      if (action === "edit") {
         // Update existing workout
-        await firestore().collection("users").doc(auth().currentUser.uid).collection("workouts").doc(workout.id).update(newWorkout);
-      } else {
+        await firestore().collection("users").doc(auth().currentUser.uid).collection("workouts").doc(workoutId).update(newWorkout);
+        toast("Workout updated");
+      } else if (action === "create") {
         // Create new workout
         await firestore().collection("users").doc(auth().currentUser.uid).collection("workouts").add(newWorkout);
+        toast("Workout created");
       }
-
-      Alert.alert(workout ? "Workout updated successfully." : "Workout created successfully.");
       navigation.goBack();
     } catch (error) {
       Alert.alert(error.message);
     }
   }
-
-  useEffect(() => {
-    if (workout) {
-      setWorkoutName(workout.name);
-      setWorkoutDescription(workout.description);
-      setSelectedExercises(workout.exercises);
-    }
-  }, [workout]);
 
   return (
     <LinearBackground containerStyle={styles.container}>
@@ -116,15 +117,15 @@ export default function AddWorkoutScreen({ route, navigation }) {
           <TouchableOpacity style={[styles.actionButton, { backgroundColor: "#aa3155" }]} onPress={handleGoBack}>
             <Text style={styles.actionButtonText}>Cancel</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={[styles.actionButton, { backgroundColor: "#0087d6" }]} onPress={handleCreateWorkout}>
-            <Text style={styles.actionButtonText}>{workout ? "Update" : "Save"}</Text>
+          <TouchableOpacity style={[styles.actionButton, { backgroundColor: "#0087d6" }]} onPress={handleSaveWorkout}>
+            <Text style={styles.actionButtonText}>Save</Text>
           </TouchableOpacity>
         </View>
 
         {selectedExercises.map((exercise) => (
           <View key={exercise.id}>
-            <FontAwesome
-              name="square-xmark"
+            <Ionicon
+              name="close-circle-outline"
               color="#aa3155"
               size={23}
               style={{ position: "absolute", zIndex: 2, right: 15, top: 28 }}
