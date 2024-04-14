@@ -102,7 +102,7 @@ export default function AddExerciseScreen({ route, navigation }) {
 
 const styles = StyleSheet.create({
   container: {
-    padding: 30,
+    paddingHorizontal: 30,
     backgroundColor: "white",
     flex: 1
   },
@@ -135,7 +135,8 @@ const styles = StyleSheet.create({
     fontSize: 25,
     textTransform: "capitalize",
     fontWeight: "600",
-    marginVertical: 10
+    marginTop: 30,
+    marginBottom: 5
   },
   addWorkoutSubPrompt: {
     textAlign: "center",
@@ -188,6 +189,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     color: "red",
     textAlign: "center",
-    margin: 10
+    margin: 10,
+    marginBottom: 30
   }
 })

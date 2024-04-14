@@ -43,7 +43,7 @@ export default function App() {
             <>
               <Stack.Screen name="OnboardNavigator" component={OnboardNavigator} />
               <Stack.Screen name="HomeNavigator" component={HomeNavigator} options={{ animation: "none" }} />
-              <Stack.Screen name="AddWorkoutScreen" component={AddWorkoutScreen} options={({ route }) => ({ title: route.params.headerTitle, headerShown: true, headerBackTitle: "Workouts" })} />
+              <Stack.Screen name="AddWorkoutScreen" component={AddWorkoutScreen} options={({ route }) => ({ title: route.params.headerTitle, gestureEnabled: false, headerBackVisible: false, headerShown: true })} />
               <Stack.Screen name="AddExerciseScreen" component={AddExerciseScreen} options={{ presentation: "modal" }} />
               <Stack.Screen name="ExercisesSearchModal" component={ExercisesSearchModal} options={{ presentation: "modal" }} />
               <Stack.Screen name="ExerciseModal" component={ExerciseModal} options={{ presentation: "modal" }} />

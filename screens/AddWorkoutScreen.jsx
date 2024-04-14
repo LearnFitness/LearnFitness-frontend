@@ -32,12 +32,13 @@ export default function AddWorkoutScreen({ route, navigation }) {
       navigation.goBack();
     } else {
       Alert.alert(
-        "Discard workout plan?",
-        "You will lose all your changes.",
+        "Discard changes?",
+        "Any unsaved changes will be lost.",
         [
           {
             text: "Keep editing",
-            style: "cancel"
+            style: "cancel",
+            onPress: () => { }
           },
           {
             text: "Discard",
