@@ -1,17 +1,19 @@
-import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import { StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { useState } from "react";
-import FontAwesome from "react-native-vector-icons/FontAwesome6";
 import { useNavigation } from "@react-navigation/native";
+import Ionicon from "react-native-vector-icons/Ionicons";
 
 export default function ExerciseSets({ exercise }) {
   const [sets, setSets] = useState(exercise.sets ? exercise.sets : 1);
   const navigation = useNavigation();
 
   const handleAddSet = () => {
+    exercise.sets += 1;
     setSets(sets => sets + 1);
   };
 
   const handleRemoveSet = (index) => {
+    exercise.sets -= 1;
     if (sets > 1) {
       setSets(sets => sets - 1);
     }
@@ -19,9 +21,9 @@ export default function ExerciseSets({ exercise }) {
 
   return (
     <View style={styles.container}>
-      <Pressable onPress={() => navigation.navigate("ExerciseModal", { exerciseId: exercise.id })}>
+      <TouchableOpacity onPress={() => navigation.navigate("ExerciseModal", { exerciseId: exercise.id })}>
         <Text style={styles.exerciseName}>{exercise.name}</Text>
-      </Pressable>
+      </TouchableOpacity>
       <Text style={styles.exerciseTarget}>{exercise.target}</Text>
       <View style={styles.exerciseHeader}>
         <Text style={[{ flex: 1, marginLeft: 15 }, styles.exerciseHeaderText]}>Set</Text>
@@ -32,8 +34,8 @@ export default function ExerciseSets({ exercise }) {
         {[...Array(sets)].map((value, index) => {
           return (
             <View style={styles.exerciseSet} key={index}>
-              <FontAwesome
-                name="circle-minus"
+              <Ionicon
+                name="remove-circle-outline"
                 color="#aa3155"
                 size={17}
                 onPress={() => handleRemoveSet(index)}
@@ -45,9 +47,9 @@ export default function ExerciseSets({ exercise }) {
           );
         })}
       </View>
-      <Pressable style={styles.addSetButton} onPress={handleAddSet}>
+      <TouchableOpacity style={styles.addSetButton} onPress={handleAddSet}>
         <Text style={styles.addSetButtonText}>+ Add Set</Text>
-      </Pressable>
+      </TouchableOpacity>
     </View>
   );
 }
@@ -65,7 +67,8 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     textAlign: "center",
     textTransform: "capitalize",
-    marginBottom: 5
+    marginBottom: 5,
+    marginHorizontal: "5%"
   },
   exerciseTarget: {
     color: "grey",

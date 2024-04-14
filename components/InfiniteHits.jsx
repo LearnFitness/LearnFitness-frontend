@@ -1,5 +1,5 @@
 import React, { forwardRef, useState, memo, useCallback, useMemo } from 'react';
-import { StyleSheet, View, FlatList, Text, Pressable, Alert } from 'react-native';
+import { StyleSheet, View, FlatList, Text, Pressable, Alert, TouchableOpacity } from 'react-native';
 import { useInfiniteHits } from 'react-instantsearch-core';
 import FastImage from "react-native-fast-image";
 import { useNavigation } from '@react-navigation/native';
@@ -11,25 +11,23 @@ export default InfiniteHits = forwardRef(
 
     // Use callback to avoid re-render of items
     const renderExerciseItem = useCallback(({ item }) =>
-      <Pressable onPress={() => navigation.navigate("ExerciseModal", { exerciseId: item.objectID })} style={styles.exerciseContainer}>
+      <TouchableOpacity activeOpacity={0.7} onPress={() => navigation.navigate("ExerciseModal", { exerciseId: item.objectID })} style={styles.exerciseContainer}>
         <FastImage source={{ uri: item.gifUrl }} style={styles.exerciseGif} />
-        <View style={{ paddingRight: 50 }}>
+        <View style={{ maxWidth: "80%" }}>
           <Text style={styles.exerciseName}>{item.name}</Text>
           <Text style={styles.exerciseBodyPart}>{item.bodyPart}</Text>
         </View>
-      </Pressable>
+      </TouchableOpacity>
       , []);
 
     return (
-      <>
-        <FlatList
-          ref={ref}
-          data={hits}
-          keyExtractor={item => item.objectID}
-          onEndReached={() => { if (!isLastPage) showMore(); }}
-          renderItem={renderExerciseItem}
-        />
-      </>
+      <FlatList
+        ref={ref}
+        data={hits}
+        keyExtractor={item => item.objectID}
+        onEndReached={() => { if (!isLastPage) showMore(); }}
+        renderItem={renderExerciseItem}
+      />
     );
   });
 
