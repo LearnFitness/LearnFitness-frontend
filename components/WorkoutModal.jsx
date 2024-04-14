@@ -40,6 +40,7 @@ export const WorkoutModal = ({ workout, navigation, isWorkoutModalVisible, handl
 
     async function deleteWorkout() {
       try {
+        console.log("deleting workout id", workout.id)
         await firestore()
           .collection('users')
           .doc(auth().currentUser.uid)
@@ -61,7 +62,11 @@ export const WorkoutModal = ({ workout, navigation, isWorkoutModalVisible, handl
         .collection('users')
         .doc(auth().currentUser.uid)
         .collection('workouts')
-        .add(workout);
+        .add({
+          name: workout.name,
+          description: workout.description,
+          exercises: workout.exercises
+        });
       toast("Workout duplicated");
     } catch (error) {
       Alert.alert(error.message);
@@ -69,7 +74,10 @@ export const WorkoutModal = ({ workout, navigation, isWorkoutModalVisible, handl
       handleCloseModal();
     }
   };
-  
+
+  function handleStartWorkout() {
+    navigation.navigate("StartWorkoutScreen", { workout });
+  }
 
   return (
     <Modal
@@ -130,7 +138,7 @@ export const WorkoutModal = ({ workout, navigation, isWorkoutModalVisible, handl
           ))}
         </ScrollView>
 
-        <TouchableOpacity onPress={handleEditWorkout} style={styles.startButton}>
+        <TouchableOpacity onPress={handleStartWorkout} style={styles.startButton}>
           <Text style={{ fontSize: 18, color: "white", fontWeight: "600" }}>Start workout</Text>
         </TouchableOpacity>
       </View>
