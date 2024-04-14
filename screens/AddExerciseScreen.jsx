@@ -3,29 +3,20 @@ import { useState, useEffect } from "react";
 import firestore from "@react-native-firebase/firestore";
 import auth from "@react-native-firebase/auth";
 
-export default function AddExerciseScreen({ route, navigation }) {
-  const { exercise } = route.params;
-  const [sets, updateSets] = useState(3);
-  const [workouts, setWorkouts] = useState([]);
+function WorkoutItem({ exerciseToAdd, workout, sets }) {
   const [exerciseAdded, setExerciseAdded] = useState(false);
 
   useEffect(() => {
-    async function fetchWorkouts() {
-      try {
-        const workoutsSnapshot = await firestore().collection("users").doc(auth().currentUser.uid).collection("workouts").get();
-        setWorkouts(workoutsSnapshot.docs);
-      } catch (error) {
-        Alert.alert(error.message);
-      }
+    if (workout.data().exercises.some(exercise => exercise.id === exerciseToAdd.id)) {
+      setExerciseAdded(true);
     }
-    fetchWorkouts();
-  }, [])
+  }, []);
 
   async function handleAddExercise(workoutId) {
     try {
       const workoutDocRef = await firestore().collection("users").doc(auth().currentUser.uid).collection("workouts").doc(workoutId).get();
       const existingExercises = workoutDocRef.data().exercises;
-      const newExercise = { ...exercise, sets }
+      const newExercise = { ...exerciseToAdd, sets }
       existingExercises.push(newExercise);
 
       await firestore().collection("users").doc(auth().currentUser.uid).collection("workouts").doc(workoutId).update({
@@ -37,6 +28,37 @@ export default function AddExerciseScreen({ route, navigation }) {
       Alert.alert(error.message);
     }
   }
+
+  return (
+    <View style={styles.workout}>
+      <Text style={styles.workoutName}>{workout.data().name}</Text>
+      <TouchableOpacity
+        disabled={exerciseAdded}
+        style={[styles.addExerciseButton, { backgroundColor: workout.data().added || exerciseAdded ? "darkgrey" : "teal" }]}
+        onPress={() => handleAddExercise(workout.id)}
+      >
+        <Text style={styles.addExerciseButtonText}>{exerciseAdded ? "Added" : "Add"}</Text>
+      </TouchableOpacity>
+    </View>
+  )
+}
+
+export default function AddExerciseScreen({ route, navigation }) {
+  const { exercise } = route.params;
+  const [sets, updateSets] = useState(3);
+  const [workouts, setWorkouts] = useState([]);
+
+  useEffect(() => {
+    async function fetchWorkouts() {
+      try {
+        const workoutsSnapshot = await firestore().collection("users").doc(auth().currentUser.uid).collection("workouts").get();
+        setWorkouts(workoutsSnapshot.docs);
+      } catch (error) {
+        Alert.alert(error.message);
+      }
+    }
+    fetchWorkouts();
+  }, [workouts])
 
   return (
     <View style={styles.container}>
@@ -64,26 +86,14 @@ export default function AddExerciseScreen({ route, navigation }) {
               <Text style={styles.exerciseSetText}>sets</Text>
             </View>
             <Text style={styles.addWorkoutSubPrompt}>Choose a workout to add this exercise.</Text>
-            {workouts.map(workout => {
-              if (workout.data().exercises.some(e => e.id === exercise.id)) {
-                workout.data().added = true;
-              }
-              return (
-                <View key={workout.id} style={styles.workout}>
-                  <Text style={styles.workoutName}>{workout.data().name}</Text>
-                  <TouchableOpacity
-                    disabled={workout.data().added || exerciseAdded}
-                    style={[styles.addExerciseButton, { backgroundColor: workout.data().added || exerciseAdded ? "darkgrey" : "teal" }]} onPress={() => handleAddExercise(workout.id)}
-                  >
-                    <Text style={styles.addExerciseButtonText}>{workout.data().added || exerciseAdded ? "Added" : "Add"}</Text>
-                  </TouchableOpacity>
-                </View>
-              )
-            })}
-          </>}
+            {workouts.map(workout =>
+              <WorkoutItem key={workout.id} workout={workout} exerciseToAdd={exercise} sets={sets} />
+            )}
+          </>
+        }
 
         <TouchableOpacity style={styles.cancleButton} onPress={() => navigation.goBack()}>
-          <Text style={styles.cancleButtonText}>Cancel</Text>
+          <Text style={styles.cancleButtonText}>Close</Text>
         </TouchableOpacity>
       </ScrollView>
     </View>
@@ -117,7 +127,8 @@ const styles = StyleSheet.create({
   },
   workoutName: {
     fontSize: 20,
-    fontWeight: "500"
+    fontWeight: "500",
+    maxWidth: "70%"
   },
   addWorkoutPrompt: {
     textAlign: "center",
