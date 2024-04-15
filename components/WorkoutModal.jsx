@@ -9,6 +9,7 @@ import auth from "@react-native-firebase/auth";
 import toast from "../utils/toast";
 
 export const WorkoutModal = ({ workout, navigation, isWorkoutModalVisible, handleCloseModal }) => {
+  const isPremade = workout?.isPremade ? true : false;
   const [isMenuVisible, setMenuVisible] = useState(false);
 
   function closeModal() {
@@ -75,6 +76,34 @@ export const WorkoutModal = ({ workout, navigation, isWorkoutModalVisible, handl
     }
   };
 
+  function handleAddToWorkouts() {
+
+  }
+
+  async function handleRemoveRecommendation() {
+
+    const userDocRef = await firestore().collection('users').doc(auth().currentUser.uid).get();
+    const prevRecommendedWorkouts =  userDocRef.data().recommendedWorkouts;
+    const newRecommendedWorkouts = prevRecommendedWorkouts.filter(workoutId => workoutId !== workout.id);
+    console.log(workout)
+    console.log(prevRecommendedWorkouts);
+    console.log(newRecommendedWorkouts);
+
+    try {
+      await firestore()
+        .collection('users')
+        .doc(auth().currentUser.uid)
+        .update({
+          recommendedWorkouts: newRecommendedWorkouts
+        });
+      toast("Recommendation removed");
+    } catch (error) {
+      Alert.alert(error.message);
+    } finally {
+      handleCloseModal();
+    }
+  }
+
   function handleStartWorkout() {
     navigation.navigate("StartWorkoutScreen", { workout });
   }
@@ -91,33 +120,58 @@ export const WorkoutModal = ({ workout, navigation, isWorkoutModalVisible, handl
         </BlurView>
       </Pressable>
       <View style={styles.modalContent}>
-        <FAB
-          title="Edit"
-          visible={isMenuVisible}
-          icon={{ name: 'edit', color: 'white' }}
-          size="small"
-          style={{ position: "absolute", top: -45 }}
-          onPress={handleEditWorkout}
-          color="royalblue"
-        />
-        <FAB
-          title="Delete"
-          visible={isMenuVisible}
-          icon={{ name: 'delete', color: 'white' }}
-          size="small"
-          style={{ position: "absolute", top: -90 }}
-          onPress={handleDeleteWorkout}
-          color="royalblue"
-        />
-        <FAB
-          title="Duplicate"
-          visible={isMenuVisible}
-          icon={{ name: 'add', color: 'white' }}
-          size="small"
-          style={{ position: "absolute", top: -135 }}
-          onPress={handleDuplicateWorkout}
-          color="royalblue"
-        />
+        {isPremade ?
+          <>
+            <FAB
+              title="Add to workouts"
+              visible={isMenuVisible}
+              icon={{ name: 'add', color: 'white' }}
+              size="small"
+              style={{ position: "absolute", top: -45 }}
+              onPress={handleAddToWorkouts}
+              color="royalblue"
+            />
+            <FAB
+              title="Remove recommendation"
+              visible={isMenuVisible}
+              icon={{ name: 'delete', color: 'white' }}
+              size="small"
+              style={{ position: "absolute", top: -90 }}
+              onPress={handleRemoveRecommendation}
+              color="royalblue"
+            />
+          </>
+          :
+          <>
+            <FAB
+              title="Edit"
+              visible={isMenuVisible}
+              icon={{ name: 'edit', color: 'white' }}
+              size="small"
+              style={{ position: "absolute", top: -45 }}
+              onPress={handleEditWorkout}
+              color="royalblue"
+            />
+            <FAB
+              title="Delete"
+              visible={isMenuVisible}
+              icon={{ name: 'delete', color: 'white' }}
+              size="small"
+              style={{ position: "absolute", top: -90 }}
+              onPress={handleDeleteWorkout}
+              color="royalblue"
+            />
+            <FAB
+              title="Duplicate"
+              visible={isMenuVisible}
+              icon={{ name: 'add', color: 'white' }}
+              size="small"
+              style={{ position: "absolute", top: -135 }}
+              onPress={handleDuplicateWorkout}
+              color="royalblue"
+            />
+          </>}
+
 
         <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
           <Ionicon name={isMenuVisible ? "close" : "menu"} color="grey" size={27} onPress={() => setMenuVisible(!isMenuVisible)} />

@@ -25,14 +25,6 @@ export default function WorkoutsScreen({ route, navigation }) {
           try {
             // Get user's workouts
             const workouts = await getBackendData("user/workouts");
-            // Get user's recommended workouts
-            const userDocRef = await firestore().collection("users").doc(auth().currentUser.uid).get();
-            
-            setRecommendedWorkouts([]);
-            userDocRef.data().recommendedWorkouts.forEach(async (workoutId) => {
-              const workoutSnapshot = await firestore().collection("premade_workouts").doc(workoutId).get();
-              setRecommendedWorkouts(prev => [ ...prev, workoutSnapshot.data()]);
-            })
             setWorkouts(workouts);
           } catch (error) {
             Alert.alert(error.message);
@@ -42,8 +34,32 @@ export default function WorkoutsScreen({ route, navigation }) {
         }
         getWorkouts();
       });
-
     // Stop listening for updates when no longer required
+    return () => unsubscribe();
+  }, []);
+
+  useEffect(() => {
+    const unsubscribe = firestore()
+      .collection('users')
+      .doc(auth().currentUser.uid)
+      .onSnapshot(() => {
+        async function getRecommendedWorkouts() {
+          try {
+            // Get user's recommended workouts
+            const userDocRef = await firestore().collection("users").doc(auth().currentUser.uid).get();
+
+            setRecommendedWorkouts([]);
+            userDocRef.data().recommendedWorkouts.forEach(async (workoutId) => {
+              const workoutSnapshot = await firestore().collection("premade_workouts").doc(workoutId).get();
+              setRecommendedWorkouts(prev => [...prev, { ...workoutSnapshot.data(), id: workoutSnapshot.id }]);
+            })
+          }
+          catch (error) {
+            Alert.alert(error.message);
+          }
+        }
+        getRecommendedWorkouts();
+      })
     return () => unsubscribe();
   }, []);
 
@@ -56,7 +72,7 @@ export default function WorkoutsScreen({ route, navigation }) {
   };
 
 
-  const WorkoutItem = ({ workout, isYourWorkout }) => {
+  const WorkoutItem = ({ workout }) => {
     const handleQuickView = () => {
       setSelectedWorkout(workout);
       setWorkoutModalVisible(true);
@@ -97,7 +113,6 @@ export default function WorkoutsScreen({ route, navigation }) {
                     <WorkoutItem
                       key={index}
                       workout={workout}
-                      isYourWorkout={true}
                     />
                   )
                   )}
@@ -114,7 +129,6 @@ export default function WorkoutsScreen({ route, navigation }) {
                   )
                   )}
               </View>
-
             </ScrollView>
             <TouchableOpacity activeOpacity={0.4} style={styles.addButton} onPress={handleAddWorkout}>
               <Text style={styles.addButtonText}>+</Text>
