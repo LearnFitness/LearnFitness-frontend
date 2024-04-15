@@ -23,18 +23,17 @@ export default function WorkoutsScreen({ route, navigation }) {
         async function getWorkouts() {
           setLoading(true);
           try {
-            const userDocRef = await firestore().collection("users").doc(auth().currentUser.uid).get();
-            const userExp = userDocRef.data().expLevel;
+            // Get user's workouts
             const workouts = await getBackendData("user/workouts");
-            const premadeWorkoutsSnapshot = await firestore().collection("premade_workouts").where("expLevel", "==", userExp.toLowerCase()).get();
-
-            let recommendedWorkoutsArray = [];
-            premadeWorkoutsSnapshot.forEach((workout) => {
-              recommendedWorkoutsArray.push(workout.data());
+            // Get user's recommended workouts
+            const userDocRef = await firestore().collection("users").doc(auth().currentUser.uid).get();
+            
+            setRecommendedWorkouts([]);
+            userDocRef.data().recommendedWorkouts.forEach(async (workoutId) => {
+              const workoutSnapshot = await firestore().collection("premade_workouts").doc(workoutId).get();
+              setRecommendedWorkouts(prev => [ ...prev, workoutSnapshot.data()]);
             })
-
             setWorkouts(workouts);
-            setRecommendedWorkouts(recommendedWorkoutsArray);
           } catch (error) {
             Alert.alert(error.message);
           } finally {
