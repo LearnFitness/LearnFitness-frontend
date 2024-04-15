@@ -1,16 +1,14 @@
-import { Modal, Text, View, Pressable } from "react-native";
+import { Text, TouchableOpacity } from "react-native";
 import ExercisesSearch from "./ExercisesSearch";
 import LinearBackground from "./LinearBackground";
 
-export default function ExercisesSearchModal({ isModalVisible, setModalVisible }) {
+export default function ExercisesSearchModal({ navigation }) {
   return (
-    <Modal animationType="slide" presentationStyle="pageSheet" visible={isModalVisible} onRequestClose={() => setModalVisible(false)}>
-      <LinearBackground containerStyle={{marginHorizontal: "4%"}}>
-        <Pressable onPress={() => setModalVisible(false)}>
-          <Text style={{ textAlign: "right", fontSize: 20, marginTop: 20, color: "crimson" }}>Close</Text>
-        </Pressable>
-        <ExercisesSearch />
-      </LinearBackground>
-    </Modal>
+    <LinearBackground containerStyle={{ marginHorizontal: "4%" }}>
+      <TouchableOpacity onPress={() => navigation.goBack()}>
+        <Text style={{ textAlign: "right", fontSize: 20, marginTop: 20, color: "crimson" }}>Close</Text>
+      </TouchableOpacity>
+      <ExercisesSearch />
+    </LinearBackground>
   )
 }

@@ -4,9 +4,8 @@ import { useState, useRef } from "react";
 import { InstantSearch } from 'react-instantsearch-core';
 import SearchBox from "./SearchBox";
 import InfiniteHits from "./InfiniteHits";
-import Filters from "./Filters";
+import FilterModal from "./FilterModal";
 import { searchClient } from "../utils/algoliaSearchClient";
-
 
 export default function ExercisesSearch() {
   const [isFilterModalOpen, setFilterModalOpen] = useState(false);
@@ -27,7 +26,7 @@ export default function ExercisesSearch() {
           <FontAwesome name="filter" size={22} color="white" />
         </Pressable>
       </View>
-      <Filters isOpen={isFilterModalOpen} onClose={() => setFilterModalOpen(false)} onChange={scrollToTop} />
+      <FilterModal isOpen={isFilterModalOpen} onClose={() => setFilterModalOpen(false)} onChange={scrollToTop} />
       <InfiniteHits ref={listRef} />
     </InstantSearch>
   )

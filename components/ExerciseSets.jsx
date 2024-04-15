@@ -1,17 +1,29 @@
-import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import { StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { useState } from "react";
-import ExerciseModal from "./ExerciseModal";
-import FontAwesome from "react-native-vector-icons/FontAwesome6";
+import { useNavigation } from "@react-navigation/native";
+import Ionicon from "react-native-vector-icons/Ionicons";
 
 export default function ExerciseSets({ exercise }) {
-  const [sets, updateSets] = useState(1);
-  const [isExerciseModalVisible, setExerciseModalVisible] = useState(false);
+  const [sets, setSets] = useState(exercise.sets ? exercise.sets : 1);
+  const navigation = useNavigation();
+
+  const handleAddSet = () => {
+    exercise.sets += 1;
+    setSets(sets => sets + 1);
+  };
+
+  const handleRemoveSet = (index) => {
+    exercise.sets -= 1;
+    if (sets > 1) {
+      setSets(sets => sets - 1);
+    }
+  };
 
   return (
     <View style={styles.container}>
-      <Pressable onPress={() => setExerciseModalVisible(true)}>
+      <TouchableOpacity onPress={() => navigation.navigate("ExerciseModal", { exerciseId: exercise.id })}>
         <Text style={styles.exerciseName}>{exercise.name}</Text>
-      </Pressable>
+      </TouchableOpacity>
       <Text style={styles.exerciseTarget}>{exercise.target}</Text>
       <View style={styles.exerciseHeader}>
         <Text style={[{ flex: 1, marginLeft: 15 }, styles.exerciseHeaderText]}>Set</Text>
@@ -22,22 +34,24 @@ export default function ExerciseSets({ exercise }) {
         {[...Array(sets)].map((value, index) => {
           return (
             <View style={styles.exerciseSet} key={index}>
-              <FontAwesome name="circle-minus" color="#aa3155" size={17} onPress={() => { exercise.sets = sets - 1; updateSets(set => set - 1) }} />
+              <Ionicon
+                name="remove-circle-outline"
+                color="#aa3155"
+                size={17}
+                onPress={() => handleRemoveSet(index)}
+              />
               <Text style={{ flex: 1, textAlign: "center", fontSize: 15 }}>{index + 1}</Text>
               <TextInput keyboardType="numeric" style={[{ flex: 2 }, styles.exerciseInput]} />
               <TextInput keyboardType="numeric" style={[{ flex: 2 }, styles.exerciseInput]} />
             </View>
-          )
+          );
         })}
       </View>
-      <Pressable style={styles.addSetButton} onPress={() => { exercise.sets = sets + 1; updateSets(set => set + 1) }}>
+      <TouchableOpacity style={styles.addSetButton} onPress={handleAddSet}>
         <Text style={styles.addSetButtonText}>+ Add Set</Text>
-      </Pressable>
-
-      <ExerciseModal exercise={exercise} isModalVisible={isExerciseModalVisible} setModalVisible={setExerciseModalVisible} />
-
+      </TouchableOpacity>
     </View>
-  )
+  );
 }
 
 const styles = StyleSheet.create({
@@ -53,7 +67,8 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     textAlign: "center",
     textTransform: "capitalize",
-    marginBottom: 5
+    marginBottom: 5,
+    marginHorizontal: "5%"
   },
   exerciseTarget: {
     color: "grey",
@@ -93,4 +108,4 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginTop: 5
   }
-})
+});

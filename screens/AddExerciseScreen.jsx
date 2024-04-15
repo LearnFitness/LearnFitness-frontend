@@ -1,56 +1,110 @@
-import { StyleSheet, Modal, SafeAreaView, ScrollView, Text, Pressable, View, TextInput } from "react-native";
-import { useState } from "react";
-import { useNavigation } from "@react-navigation/native"
+import { StyleSheet, ScrollView, Text, View, TextInput, Alert, TouchableOpacity } from "react-native";
+import { useState, useEffect } from "react";
+import firestore from "@react-native-firebase/firestore";
+import auth from "@react-native-firebase/auth";
 
-export default function AddExerciseScreen({ exerciseToAdd, workouts, isModalVisible, setModalVisible, addExerciseToWorkout }) {
-  const [sets, updateSets] = useState(3);
-  const navigation = useNavigation();
+function WorkoutItem({ exerciseToAdd, workout, sets }) {
+  const [exerciseAdded, setExerciseAdded] = useState(false);
+
+  useEffect(() => {
+    if (workout.data().exercises.some(exercise => exercise.id === exerciseToAdd.id)) {
+      setExerciseAdded(true);
+    }
+  }, []);
+
+  async function handleAddExercise(workoutId) {
+    try {
+      const workoutDocRef = await firestore().collection("users").doc(auth().currentUser.uid).collection("workouts").doc(workoutId).get();
+      const existingExercises = workoutDocRef.data().exercises;
+      const newExercise = { ...exerciseToAdd, sets }
+      existingExercises.push(newExercise);
+
+      await firestore().collection("users").doc(auth().currentUser.uid).collection("workouts").doc(workoutId).update({
+        exercises: existingExercises
+      })
+
+      setExerciseAdded(true);
+    } catch (error) {
+      Alert.alert(error.message);
+    }
+  }
 
   return (
-    <Modal animationType="slide" presentationStyle="pageSheet" visible={isModalVisible} onRequestClose={() => setModalVisible(false)} >
-      <SafeAreaView style={styles.workoutModalContainer}>
-        <ScrollView>
-          {workouts.length === 0 ?
-            <>
-              <Text style={styles.addWorkoutPrompt}>You have no workouts yet!</Text>
-              <Text style={styles.addWorkoutSubPrompt}>Create a new workout first.</Text>
-              <Pressable style={styles.addWorkoutButton} onPress={() => { setModalVisible(false); navigation.navigate("AddWorkoutScreen", { ...exerciseToAdd }) }}>
-                <Text style={styles.addWorkoutButtonText}>Add a workout</Text>
-              </Pressable>
-            </>
-            :
-            <>
-              <Text style={styles.addWorkoutPrompt}>{exerciseToAdd?.name}</Text>
-              <Text style={styles.exerciseTarget}>{exerciseToAdd?.target}</Text>
-              <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", margin: 10, marginBottom: 20 }}>
-                <TextInput style={styles.exerciseSet} value={sets ? sets.toString() : ""} onChangeText={text => text ? updateSets(parseInt(text, 10)) : updateSets(null)} keyboardType="numeric" />
-                <Text style={styles.exerciseSetText}>sets</Text>
-              </View>
-              <Text style={styles.addWorkoutSubPrompt}>Choose a workout to add this exercise.</Text>
-              {workouts.map(workout => {
-                return (
-                  <View key={workout.id} style={styles.workout}>
-                    <Text style={styles.workoutName}>{workout.data().name}</Text>
-                    <Pressable style={styles.addExerciseButton} onPress={() => addExerciseToWorkout(workout.id, sets)}>
-                      <Text style={styles.addExerciseButtonText}>Add</Text>
-                    </Pressable>
-                  </View>
-                )
-              })}
-            </>}
+    <View style={styles.workout}>
+      <Text style={styles.workoutName}>{workout.data().name}</Text>
+      <TouchableOpacity
+        disabled={exerciseAdded}
+        style={[styles.addExerciseButton, { backgroundColor: workout.data().added || exerciseAdded ? "darkgrey" : "teal" }]}
+        onPress={() => handleAddExercise(workout.id)}
+      >
+        <Text style={styles.addExerciseButtonText}>{exerciseAdded ? "Added" : "Add"}</Text>
+      </TouchableOpacity>
+    </View>
+  )
+}
 
-          <Pressable style={styles.cancleButton} onPress={() => setModalVisible(false)}>
-            <Text style={styles.cancleButtonText}>Cancel</Text>
-          </Pressable>
-        </ScrollView>
-      </SafeAreaView>
-    </Modal >
+export default function AddExerciseScreen({ route, navigation }) {
+  const { exercise } = route.params;
+  const [sets, updateSets] = useState(3);
+  const [workouts, setWorkouts] = useState([]);
+
+  useEffect(() => {
+    async function fetchWorkouts() {
+      try {
+        const workoutsSnapshot = await firestore().collection("users").doc(auth().currentUser.uid).collection("workouts").get();
+        setWorkouts(workoutsSnapshot.docs);
+      } catch (error) {
+        Alert.alert(error.message);
+      }
+    }
+    fetchWorkouts();
+  }, [workouts])
+
+  return (
+    <View style={styles.container}>
+      <ScrollView>
+        {workouts.length === 0 ?
+          <>
+            <Text style={styles.addWorkoutPrompt}>You have no workouts yet!</Text>
+            <Text style={styles.addWorkoutSubPrompt}>Create a new workout first.</Text>
+            <TouchableOpacity
+              style={styles.addWorkoutButton}
+              onPress={() => {
+                navigation.navigate("HomeNavigator", { screen: "Workouts" });
+                navigation.navigate("AddWorkoutScreen", { exerciseToAdd: exercise })
+              }}
+            >
+              <Text style={styles.addWorkoutButtonText}>Add a workout</Text>
+            </TouchableOpacity>
+          </>
+          :
+          <>
+            <Text style={styles.addWorkoutPrompt}>{exercise.name}</Text>
+            <Text style={styles.exerciseTarget}>{exercise.target}</Text>
+            <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", margin: 10, marginBottom: 20 }}>
+              <TextInput style={styles.exerciseSet} value={sets ? sets.toString() : ""} onChangeText={text => text ? updateSets(parseInt(text, 10)) : updateSets(null)} keyboardType="numeric" />
+              <Text style={styles.exerciseSetText}>sets</Text>
+            </View>
+            <Text style={styles.addWorkoutSubPrompt}>Choose a workout to add this exercise.</Text>
+            {workouts.map(workout =>
+              <WorkoutItem key={workout.id} workout={workout} exerciseToAdd={exercise} sets={sets} />
+            )}
+          </>
+        }
+
+        <TouchableOpacity style={styles.cancleButton} onPress={() => navigation.goBack()}>
+          <Text style={styles.cancleButtonText}>Close</Text>
+        </TouchableOpacity>
+      </ScrollView>
+    </View>
   )
 }
 
 const styles = StyleSheet.create({
-  workoutModalContainer: {
-    margin: 30
+  container: {
+    paddingHorizontal: 30,
+    backgroundColor: "white",
+    flex: 1
   },
   workout: {
     flexDirection: "row",
@@ -73,14 +127,16 @@ const styles = StyleSheet.create({
   },
   workoutName: {
     fontSize: 20,
-    fontWeight: "500"
+    fontWeight: "500",
+    maxWidth: "70%"
   },
   addWorkoutPrompt: {
     textAlign: "center",
     fontSize: 25,
     textTransform: "capitalize",
     fontWeight: "600",
-    marginVertical: 10
+    marginTop: 30,
+    marginBottom: 5
   },
   addWorkoutSubPrompt: {
     textAlign: "center",
@@ -122,17 +178,18 @@ const styles = StyleSheet.create({
   addExerciseButton: {
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "lightblue",
     padding: 10,
     borderRadius: 10
   },
   addExerciseButtonText: {
     fontSize: 18,
+    color: "white"
   },
   cancleButtonText: {
     fontSize: 20,
     color: "red",
     textAlign: "center",
-    margin: 10
+    margin: 10,
+    marginBottom: 30
   }
 })

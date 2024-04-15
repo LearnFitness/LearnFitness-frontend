@@ -1,58 +1,34 @@
-import React, { forwardRef, useState } from 'react';
-import { StyleSheet, View, FlatList, Text, Pressable, Alert } from 'react-native';
+import React, { forwardRef, useState, memo, useCallback, useMemo } from 'react';
+import { StyleSheet, View, FlatList, Text, Pressable, Alert, TouchableOpacity } from 'react-native';
 import { useInfiniteHits } from 'react-instantsearch-core';
-import firestore from "@react-native-firebase/firestore";
-import ExerciseModal from './ExerciseModal';
 import FastImage from "react-native-fast-image";
+import { useNavigation } from '@react-navigation/native';
 
 export default InfiniteHits = forwardRef(
   ({ ...props }, ref) => {
     const { hits, isLastPage, showMore } = useInfiniteHits({ ...props, escapeHTML: false, });
-    const [exercise, setExercise] = useState(null);
-    const [isModalVisible, setModalVisible] = useState(false);
-    const [loading, setLoading] = useState(false);
+    const navigation = useNavigation();
 
-    async function handleViewItem(item) {
-      setModalVisible(true);
-      setLoading(true);
-      try {
-        const exercise = await firestore().collection("exercises").doc(item.objectID).get();
-        setExercise(exercise.data());
-      } catch (error) {
-        Alert.alert(error.message);
-      } finally {
-        setLoading(false);
-      }
-    }
+    // Use callback to avoid re-render of items
+    const renderExerciseItem = useCallback(({ item }) =>
+      <TouchableOpacity activeOpacity={0.7} onPress={() => navigation.navigate("ExerciseModal", { exerciseId: item.objectID })} style={styles.exerciseContainer}>
+        <FastImage source={{ uri: item.gifUrl }} style={styles.exerciseGif} />
+        <View style={{ maxWidth: "80%" }}>
+          <Text style={styles.exerciseName}>{item.name}</Text>
+          <Text style={styles.exerciseBodyPart}>{item.bodyPart}</Text>
+        </View>
+      </TouchableOpacity>
+      , []);
 
-    function handleAddToWorkout() {
-      
-    }
-
-    return (<>
+    return (
       <FlatList
         ref={ref}
         data={hits}
-        keyExtractor={(item) => item.objectID}
+        keyExtractor={item => item.objectID}
         onEndReached={() => { if (!isLastPage) showMore(); }}
-        renderItem={({ item }) => (<SearchResult item={item} />)}
+        renderItem={renderExerciseItem}
       />
-
-      <ExerciseModal loading={loading} exercise={exercise} isModalVisible={isModalVisible} setModalVisible={setModalVisible} />
-    </>
     );
-
-    function SearchResult({ item }) {
-      return (
-        <Pressable onPress={() => handleViewItem(item)} style={styles.exerciseContainer}>
-          <FastImage source={{ uri: item.gifUrl }} style={styles.exerciseGif} />
-          <View style={{ paddingRight: 50 }}>
-            <Text style={styles.exerciseName}>{item.name}</Text>
-            <Text style={styles.exerciseBodyPart}>{item.bodyPart}</Text>
-          </View>
-        </Pressable>
-      )
-    }
   });
 
 const styles = StyleSheet.create({

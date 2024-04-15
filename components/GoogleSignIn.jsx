@@ -1,4 +1,4 @@
-import { GoogleSignin, GoogleSigninButton, statusCodes } from "@react-native-google-signin/google-signin";
+import { GoogleSignin, statusCodes } from "@react-native-google-signin/google-signin";
 import auth from "@react-native-firebase/auth";
 import { Alert, Pressable, View, Text } from "react-native";
 import FontAwesome from "react-native-vector-icons/FontAwesome6";

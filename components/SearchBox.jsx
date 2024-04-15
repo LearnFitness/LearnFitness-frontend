@@ -1,7 +1,7 @@
 import React, { useRef, useState } from 'react';
-import { StyleSheet, View, TextInput } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { useSearchBox } from 'react-instantsearch-core';
-import { SearchBar, Input } from '@rneui/themed';
+import { Input } from '@rneui/themed';
 
 export default function SearchBox({ onChange, ...props }) {
   const { query, refine } = useSearchBox(props);

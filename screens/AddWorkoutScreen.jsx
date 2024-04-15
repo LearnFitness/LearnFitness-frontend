@@ -1,34 +1,44 @@
-import { View, ScrollView, Text, StyleSheet, Pressable, Alert, TextInput } from "react-native";
+import React, { useState, useEffect } from "react";
+import { View, ScrollView, Text, StyleSheet, Alert, TextInput, TouchableOpacity } from "react-native";
 import LinearBackground from "../components/LinearBackground";
-import { useState } from "react";
-import ExercisesSearchModal from "../components/ExercisesSearchModal";
-import FontAwesome from "react-native-vector-icons/FontAwesome6";
 import ExerciseSets from "../components/ExerciseSets";
-import { AddWorkoutContext } from "../context/AddWorkoutContext";
+import FontAwesome from "react-native-vector-icons/FontAwesome6";
 import firestore from "@react-native-firebase/firestore";
 import auth from "@react-native-firebase/auth";
+import Ionicon from "react-native-vector-icons/Ionicons";
+import toast from "../utils/toast";
 
 export default function AddWorkoutScreen({ route, navigation }) {
-  const [isSearchModalVisible, setSearchModalVisible] = useState(false);
+  const { workout, exercise, action } = route.params ? route.params : {};
+  const [workoutId, setWorkoutId] = useState("");
   const [workoutName, setWorkoutName] = useState("");
   const [workoutDescription, setWorkoutDescription] = useState("");
-  const [selectedExercises, setSelectedExercises] = useState(() => {
-    if (route.params) {
-      return [{ ...route.params, sets: 1 }];
-    } else return [];
-  })
+  const [selectedExercises, setSelectedExercises] = useState([]);
+
+  useEffect(() => {
+    if (exercise) {
+      addExercise(exercise);
+    }
+    if (workout) {
+      setWorkoutId(workout.id);
+      setWorkoutName(workout.name);
+      setWorkoutDescription(workout.description);
+      setSelectedExercises(workout.exercises);
+    }
+  }, [exercise, workout]);
 
   function handleGoBack() {
     if (!workoutName && selectedExercises.length === 0) {
       navigation.goBack();
     } else {
       Alert.alert(
-        "Discard workout plan?",
-        "You will lose all your changes.",
+        "Discard changes?",
+        "Any unsaved changes will be lost.",
         [
           {
             text: "Keep editing",
-            style: "cancel"
+            style: "cancel",
+            onPress: () => { }
           },
           {
             text: "Discard",
@@ -38,36 +48,48 @@ export default function AddWorkoutScreen({ route, navigation }) {
         ]
       )
     }
-
   }
 
   function addExercise(exercise) {
-    if (selectedExercises.findIndex(element => element.id === exercise.id) === -1)
-      setSelectedExercises(prevData => [...prevData, { ...exercise, sets: 1 }]);
-    else throw Error("This exercise is already in the workout.");
+    const exerciseExists = selectedExercises.some((ex) => ex.id === exercise.id);
+    if (!exerciseExists) {
+      const initialSets = workout ? exercise.sets : 1; // If modifying, use the existing sets value
+      setSelectedExercises((prevExercises) => [...prevExercises, { ...exercise, sets: initialSets }]);
+    } else {
+      Alert.alert("Exercise already added to the workout.");
+    }
   }
 
   function removeExercise(exerciseId) {
-    setSelectedExercises(prevData => prevData.filter(exercise => exercise.id !== exerciseId));
+    setSelectedExercises((prevExercises) => prevExercises.filter((ex) => ex.id !== exerciseId));
   }
 
-  async function handleCreateWorkout() {
-    if (!workoutName) {
-      Alert.alert("Workout name required!");
+  async function handleSaveWorkout() {
+    if (!workoutName.trim()) {
+      Alert.alert("Workout name is required.");
       return;
     }
     if (selectedExercises.length === 0) {
-      Alert.alert("Empty workout not allowed!");
+      Alert.alert("Please add exercises to your workout.");
       return;
     }
 
     try {
-      await firestore().collection("users").doc(auth().currentUser.uid).collection("workouts").add({
+      const newWorkout = {
         name: workoutName,
         description: workoutDescription,
         exercises: selectedExercises
-      })
-      Alert.alert("Workout created successfully");
+      };
+
+      if (action === "edit") {
+        // Update existing workout
+        await firestore().collection("users").doc(auth().currentUser.uid).collection("workouts").doc(workoutId).update(newWorkout);
+        toast("Workout updated");
+      } else if (action === "create") {
+        // Create new workout
+        await firestore().collection("users").doc(auth().currentUser.uid).collection("workouts").add(newWorkout);
+        toast("Workout created");
+      }
       navigation.goBack();
     } catch (error) {
       Alert.alert(error.message);
@@ -75,38 +97,52 @@ export default function AddWorkoutScreen({ route, navigation }) {
   }
 
   return (
-    <AddWorkoutContext.Provider value={{ selectedExercises, addExercise }}>
-      <LinearBackground containerStyle={styles.container}>
-        <ScrollView>
-          <TextInput style={styles.workoutName} placeholder="Workout name" placeholderTextColor="darkgrey" value={workoutName} onChangeText={text => setWorkoutName(text)} />
-          <TextInput style={styles.workoutDescription} placeholder="Workout description" placeholderTextColor="darkgrey" value={workoutDescription} onChangeText={text => setWorkoutDescription(text)} />
-          <View style={styles.actionButtonsContainer}>
-            <Pressable style={[styles.actionButton, { backgroundColor: "#aa3155" }]} onPress={handleGoBack} >
-              <Text style={styles.actionButtonText}>Cancel</Text>
-            </Pressable>
-            <Pressable style={[styles.actionButton, { backgroundColor: "#0087d6" }]} onPress={handleCreateWorkout} >
-              <Text style={styles.actionButtonText}>Save</Text>
-            </Pressable>
+    <LinearBackground containerStyle={styles.container}>
+      <ScrollView>
+        <TextInput
+          style={styles.workoutName}
+          placeholder="Workout name"
+          placeholderTextColor="darkgrey"
+          value={workoutName}
+          onChangeText={setWorkoutName}
+        />
+        <TextInput
+          style={styles.workoutDescription}
+          placeholder="Workout description"
+          placeholderTextColor="darkgrey"
+          value={workoutDescription}
+          onChangeText={setWorkoutDescription}
+        />
+
+        <View style={styles.actionButtonsContainer}>
+          <TouchableOpacity style={[styles.actionButton, { backgroundColor: "#aa3155" }]} onPress={handleGoBack}>
+            <Text style={styles.actionButtonText}>Cancel</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={[styles.actionButton, { backgroundColor: "#0087d6" }]} onPress={handleSaveWorkout}>
+            <Text style={styles.actionButtonText}>Save</Text>
+          </TouchableOpacity>
+        </View>
+
+        {selectedExercises.map((exercise) => (
+          <View key={exercise.id}>
+            <Ionicon
+              name="close-circle-outline"
+              color="#aa3155"
+              size={23}
+              style={{ position: "absolute", zIndex: 2, right: 15, top: 28 }}
+              onPress={() => removeExercise(exercise.id)}
+            />
+            <ExerciseSets exercise={exercise} />
           </View>
+        ))}
 
-          {selectedExercises.map(exercise => {
-            return (
-              <View key={exercise.id}>
-                <FontAwesome name="square-xmark" color="#aa3155" size={23} style={{ position: "absolute", zIndex: 2, right: 15, top: 28 }} onPress={() => removeExercise(exercise.id)} />
-                <ExerciseSets exercise={exercise} />
-              </View>
-            )
-          })}
-
-          <Pressable style={styles.addExerciseButton} onPress={() => setSearchModalVisible(true)} >
-            <FontAwesome name="plus" color="white" size={23} />
-            <Text style={styles.addExerciseButtonText}>Add Exercise</Text>
-          </Pressable>
-          <ExercisesSearchModal isModalVisible={isSearchModalVisible} setModalVisible={setSearchModalVisible} />
-        </ScrollView>
-      </LinearBackground>
-    </AddWorkoutContext.Provider>
-  )
+        <TouchableOpacity style={styles.addExerciseButton} onPress={() => navigation.navigate("ExercisesSearchModal")}>
+          <FontAwesome name="plus" color="white" size={23} />
+          <Text style={styles.addExerciseButtonText}>Add Exercise</Text>
+        </TouchableOpacity>
+      </ScrollView>
+    </LinearBackground>
+  );
 }
 
 const styles = StyleSheet.create({
@@ -118,7 +154,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontSize: 28,
     fontWeight: "600",
-    marginTop: 20,
+    marginTop: 20
   },
   workoutDescription: {
     color: "lightgrey",
@@ -157,4 +193,4 @@ const styles = StyleSheet.create({
     fontSize: 17,
     margin: 5
   }
-})
+});
