@@ -76,27 +76,38 @@ export const WorkoutModal = ({ workout, navigation, isWorkoutModalVisible, handl
     }
   };
 
-  function handleAddToWorkouts() {
-
+  async function handleAddToWorkouts() {
+    try {
+      await firestore()
+        .collection('users')
+        .doc(auth().currentUser.uid)
+        .collection('workouts')
+        .add({
+          name: workout.name,
+          description: workout.description,
+          exercises: workout.exercises
+        });
+      await handleRemoveRecommendation(toastShown = false);
+      toast("Workout added");
+    } catch (error) {
+      Alert.alert(error.message);
+    } finally {
+      handleCloseModal();
+    }
   }
 
-  async function handleRemoveRecommendation() {
-
+  async function handleRemoveRecommendation(toastShown) {
     const userDocRef = await firestore().collection('users').doc(auth().currentUser.uid).get();
     const prevRecommendedWorkouts =  userDocRef.data().recommendedWorkouts;
-    const newRecommendedWorkouts = prevRecommendedWorkouts.filter(workoutId => workoutId !== workout.id);
-    console.log(workout)
-    console.log(prevRecommendedWorkouts);
-    console.log(newRecommendedWorkouts);
 
     try {
       await firestore()
         .collection('users')
         .doc(auth().currentUser.uid)
         .update({
-          recommendedWorkouts: newRecommendedWorkouts
+          recommendedWorkouts: prevRecommendedWorkouts.filter(workoutId => workoutId !== workout.id)
         });
-      toast("Recommendation removed");
+      toastShown ? toast("Recommendation removed") : null;
     } catch (error) {
       Alert.alert(error.message);
     } finally {
@@ -200,7 +211,6 @@ export const WorkoutModal = ({ workout, navigation, isWorkoutModalVisible, handl
     </Modal>
   );
 };
-
 
 const styles = StyleSheet.create({
   container: {
