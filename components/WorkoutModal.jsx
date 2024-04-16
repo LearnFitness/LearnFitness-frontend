@@ -98,7 +98,7 @@ export const WorkoutModal = ({ workout, navigation, isWorkoutModalVisible, handl
 
   async function handleRemoveRecommendation(toastShown) {
     const userDocRef = await firestore().collection('users').doc(auth().currentUser.uid).get();
-    const prevRecommendedWorkouts =  userDocRef.data().recommendedWorkouts;
+    const prevRecommendedWorkouts = userDocRef.data().recommendedWorkouts;
 
     try {
       await firestore()
@@ -116,6 +116,7 @@ export const WorkoutModal = ({ workout, navigation, isWorkoutModalVisible, handl
   }
 
   function handleStartWorkout() {
+    closeModal();
     navigation.navigate("StartWorkoutScreen", { workout });
   }
 
