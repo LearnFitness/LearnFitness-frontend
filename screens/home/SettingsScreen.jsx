@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { SafeAreaView, Text, ActivityIndicator, StyleSheet, Alert, StatusBar, Pressable, Modal, Switch } from "react-native";
+import { View, SafeAreaView, Text, ActivityIndicator, StyleSheet, Alert, StatusBar, Pressable, Modal, Switch } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import auth from "@react-native-firebase/auth";
 import { getBackendDataWithRetry, postBackendDataWithPhoto } from "../../utils/backendAPI";
@@ -72,80 +72,80 @@ export default function SettingsScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <FocusAwareStatusBar translucent backgroundColor="transparent" barStyle={"dark-content"} />
-      <SafeAreaView style={styles.header}>
+      <View style={styles.header}>
         <Text style={styles.headerText}>Settings</Text>
-      </SafeAreaView>
+      </View>
       {loading || !userData ? (
         <ActivityIndicator />
       ) : (
-        <SafeAreaView style={styles.contentContainer}>
+        <View style={styles.contentContainer}>
           {/* Profile picture, name, and email */}
-          <SafeAreaView style={styles.profileContainer}>
+          <View style={styles.profileContainer}>
             <AvatarPicker photoObject={photoObject.uri ? { uri: photoObject.uri } : null} setPhotoObject={handleEditPhoto} />
             <Text style={styles.profileName} >{userData.name.split(" ")[0]}</Text>
             <Text style={styles.profileEmail}>{userData.email}</Text>
-          </SafeAreaView>
-          <SafeAreaView style={styles.horizontalLine}></SafeAreaView>
+          </View>
+          <View style={styles.horizontalLine}></View>
           {/* Buttons */}
-          <SafeAreaView style={styles.buttonsContainer}>
+          <View style={styles.buttonsContainer}>
             {/* To be implemented (User information like weight, height, etc.) */}
             <Pressable onPress={() => console.log("Edit profile")}>
-              <SafeAreaView style={styles.buttonRow}>
+              <View style={styles.buttonRow}>
                 <Feather name="user" size={24} color="black" style={styles.icon} />
                 <Text style={styles.button}>Edit Profile</Text>
-              </SafeAreaView>
+              </View>
             </Pressable>
             {/* Notifications settings */}
             <Pressable onPress={toggleNotificationSettings}>
-              <SafeAreaView style={styles.buttonRow}>
+              <View style={styles.buttonRow}>
                 <Feather name="bell" size={24} color="black" style={styles.icon} />
                 <Text style={styles.button}>Notifications</Text>
-              </SafeAreaView>
+              </View>
             </Pressable>
             {/* Logout button */}
             <Pressable onPress={handleLogout}>
-              <SafeAreaView style={styles.buttonRow}>
+              <View style={styles.buttonRow}>
                 <Feather name="log-out" size={24} color="black" style={styles.icon} />
                 <Text style={styles.button}>Logout</Text>
-              </SafeAreaView>
+              </View>
             </Pressable>
-          </SafeAreaView>
-        </SafeAreaView>
+          </View>
+        </View>
       )}
       {/* Notifications settings tab */}
       <Modal
       animationType="slide"
-      transparent={true}
+      // transparent={true}
       visible={showNotificationSettings}
       onRequestClose={toggleNotificationSettings}>
       <SafeAreaView style={styles.modalContainer}>
-        <SafeAreaView style={styles.notificationSettingsContainer}>
-          <SafeAreaView style={styles.notificationsHeader}>
+        <View style={styles.notificationSettingsContainer}>
+          <View style={styles.notificationsHeader}>
             <Pressable onPress={toggleNotificationSettings}>
               <Feather name="arrow-left" size={26} color="black" />
             </Pressable>
             <Text style={styles.notificationsHeader}>   Notifications</Text>
-          </SafeAreaView>
+          </View>
           {/* Buttons */}
-          <SafeAreaView style={styles.notificationSettings}>
+          <View style={styles.notificationSettings}>
             <Text style={styles.notificationText}>General notifications</Text>
             <Switch value={notificationsEnabled} onValueChange={setNotificationsEnabled} />
-          </SafeAreaView>
-          <SafeAreaView style={styles.notificationSettings}>
+          </View>
+          <View style={styles.notificationSettings}>
             <Text style={styles.notificationText}>Sound</Text>
             <Switch value={soundEnabled} onValueChange={setSoundEnabled} />
-          </SafeAreaView>
-          <SafeAreaView style={styles.notificationSettings}>
+          </View>
+          <View style={styles.notificationSettings}>
             <Text style={styles.notificationText}>Vibration</Text>
             <Switch value={vibrationEnabled} onValueChange={setVibrationEnabled} />
-          </SafeAreaView>
-        </SafeAreaView>
+          </View>
+        </View>
       </SafeAreaView>
     </Modal>
 
-    </SafeAreaView>
+    </View>
   );
 }
 
