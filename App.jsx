@@ -14,7 +14,7 @@ import AddWorkoutScreen from "./screens/AddWorkoutScreen";
 import AddExerciseScreen from "./screens/AddExerciseScreen";
 import ExerciseModal from "./components/ExerciseModal";
 import ExercisesSearchModal from "./components/ExercisesSearchModal";
-// import StartWorkoutScreen from "./screens/StartWorkoutScreen";
+import StartWorkoutScreen from "./screens/StartWorkoutScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -44,7 +44,7 @@ export default function App() {
             <>
               <Stack.Screen name="OnboardNavigator" component={OnboardNavigator} />
               <Stack.Screen name="HomeNavigator" component={HomeNavigator} options={{ animation: "none" }} />
-              {/* <Stack.Screen name="StartWorkoutScreen" component={StartWorkoutScreen} /> */}
+              <Stack.Screen name="StartWorkoutScreen" component={StartWorkoutScreen} />
               <Stack.Screen name="AddWorkoutScreen" component={AddWorkoutScreen} options={({ route }) => ({ title: route.params.headerTitle, gestureEnabled: false, headerBackVisible: false, headerShown: true })} />
               <Stack.Screen name="AddExerciseScreen" component={AddExerciseScreen} options={{ presentation: "modal" }} />
               <Stack.Screen name="ExercisesSearchModal" component={ExercisesSearchModal} options={{ presentation: "modal" }} />
