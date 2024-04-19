@@ -84,7 +84,8 @@ export default function SettingsScreen() {
             auth().signOut();
           }
         },
-      ]
+      ],
+      { cancelable: true }
     );
   };
 
@@ -93,7 +94,6 @@ export default function SettingsScreen() {
   };
 
   const toggleEditProfileSettings = () => {
-    console.log("Edit Profile")
     setShowEditProfileSettings(!showEditProfileettings);
   };
 

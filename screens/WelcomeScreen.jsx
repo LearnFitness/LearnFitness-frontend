@@ -1,8 +1,9 @@
-import { StyleSheet, View, Text, ImageBackground, TouchableOpacity, Image } from "react-native";
+import { StyleSheet, View, Text, ImageBackground, TouchableOpacity, Image, StatusBar } from "react-native";
 
 export default function WelcomeScreen({ navigation }) {
   return (
     <View style={styles.container}>
+      <StatusBar translucent backgroundColor="transparent" barStyle={"light-content"} />
       <ImageBackground source={require("../assets/welcomeImg.jpg")} resizeMode="cover" style={styles.imgBg}>
         <View style={styles.welcomeTextContainer}>
           <Image source={require("../assets/logo.png")} style={styles.logo} />

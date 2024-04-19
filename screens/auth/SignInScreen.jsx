@@ -14,19 +14,31 @@ export default function SignInScreen({ navigation }) {
   const [password, setPassword] = useState("");
   const [visiblePassword, setVisiblePassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [emailError, setEmailError] = useState(false);
+  const [passwordError, setPasswordError] = useState(false);
 
   async function signInWithEmail() {
+    // Check if email is empty
+    if (!email.trim()) {
+      setEmailError(true);
+      return;
+    }
+
+    // Check if password is empty
+    if (!password.trim()) {
+      setPasswordError(true);
+      return;
+    }
+
     setLoading(true);
 
     try {
       await auth().signInWithEmailAndPassword(email, password);
     } catch (error) {
-      if (error.code === 'auth/invalid-email') {
-        Alert.alert('That email address is invalid!');
-      } else if (error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
-        Alert.alert("Invalid login credentials");
+      if (error.code === 'auth/invalid-email' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
+        Alert.alert('Invalid login credentials.');
       } else {
-        Alert.alert("An error occured", error.code);
+        Alert.alert("An error occured.", error.code);
       }
     }
     setLoading(false);
@@ -39,9 +51,12 @@ export default function SignInScreen({ navigation }) {
 
       <View>
         <Input
-          inputContainerStyle={appStyles.input}
+          inputContainerStyle={[appStyles.input, emailError && styles.errorInput]}
           leftIcon={{ type: "font-awesome", name: "envelope", size: 20 }}
-          onChangeText={(text) => setEmail(text)}
+          onChangeText={(text) => {
+            setEmail(text);
+            setEmailError(false);
+          }}
           value={email}
           placeholder="email@address.com"
           autoCapitalize={"none"}
@@ -49,13 +64,16 @@ export default function SignInScreen({ navigation }) {
           spellCheck={false}
         />
         <Input
-          inputContainerStyle={appStyles.input}
+          inputContainerStyle={[appStyles.input, passwordError && styles.errorInput]}
           leftIcon={{ type: "font-awesome", name: "lock" }}
           rightIcon={visiblePassword ?
             { type: "font-awesome", name: "eye", onPress: () => setVisiblePassword(false) } :
             { type: "font-awesome", name: "eye-slash", onPress: () => setVisiblePassword(true) }
           }
-          onChangeText={(text) => setPassword(text)}
+          onChangeText={(text) => {
+            setPassword(text);
+            setPasswordError(false);
+          }}
           value={password}
           secureTextEntry={!visiblePassword}
           placeholder="Password"
@@ -123,10 +141,15 @@ const styles = StyleSheet.create({
   footer: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center"
+    justifyContent: "center",
+    marginBottom: 20
   },
   footerText: {
     color: "lightgrey",
     fontSize: 17
+  },
+  errorInput: {
+    borderColor: "red",
+    borderWidth: 1.5,
   }
 });

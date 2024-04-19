@@ -45,7 +45,8 @@ export default function AddWorkoutScreen({ route, navigation }) {
             style: "destructive",
             onPress: () => navigation.goBack()
           }
-        ]
+        ],
+        { cancelable: true }
       )
     }
   }

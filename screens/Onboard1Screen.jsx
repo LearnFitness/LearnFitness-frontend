@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect } from "react";
-import { Alert, StyleSheet, Text, TextInput, View, SafeAreaView, ActivityIndicator } from "react-native";
+import { Alert, StyleSheet, Text, TextInput, View, SafeAreaView, ActivityIndicator, StatusBar } from "react-native";
 import { ButtonGroup, Divider } from "@rneui/themed";
 import { OnboardContext } from "../context/OnboardContext";
 import SignUpInput from "../components/SignUpInput";
@@ -59,13 +59,14 @@ export default function Onboard1Screen({ navigation }) {
   } else {
     return (
       <SafeAreaView style={{ flex: 1 }}>
+        <StatusBar translucent backgroundColor="transparent" barStyle={"dark-content"} />
         <KeyboardAvoidView containerStyle={styles.container}>
           <View>
-            <Text style={[appStyles.heading1, { marginBottom: 20 }]}>Complete your signup</Text>
-            <Text style={appStyles.heading4}>Let us know more about you to get your personal workout plans</Text>
+            <Text style={[appStyles.heading1, { marginBottom: 10, marginTop: 10 }]}>Complete your sign up</Text>
+            <Text style={[appStyles.heading4, { fontSize: 20 }]}>Let us know more about you to get your personal workout plans</Text>
           </View>
 
-          <Text style={appStyles.heading2}>Step 1 of 2</Text>
+          <Text style={[appStyles.heading2, { fontSize: 24 }]}>Step 1 of 2</Text>
 
           <AvatarPicker photoObject={onboardData.photoObject} setPhotoObject={(photoObject) => updateOnboardData("photoObject", photoObject)} size={150} />
 

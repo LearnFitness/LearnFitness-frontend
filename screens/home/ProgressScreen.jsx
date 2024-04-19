@@ -19,8 +19,8 @@ export default function ProgressScreen() {
         (
           <ActivityIndicator style={{ flex: 1 }} />
         ) : (
-          <View>
-            <Text>Bezier Line Chart</Text>
+          <View style={{ marginTop: 30 }}>
+            <Text style={{ color: "white" }}>Bezier Line Chart</Text>
             <LineChart
               data={{
                 labels: ["January", "February", "March", "April", "May", "June"],

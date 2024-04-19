@@ -36,7 +36,8 @@ export const WorkoutModal = ({ workout, navigation, isWorkoutModalVisible, handl
           style: "destructive",
           onPress: deleteWorkout
         }
-      ]
+      ],
+      { cancelable: true }
     )
 
     async function deleteWorkout() {
