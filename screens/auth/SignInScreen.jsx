@@ -18,6 +18,13 @@ export default function SignInScreen({ navigation }) {
   const [passwordError, setPasswordError] = useState(false);
 
   async function signInWithEmail() {
+  // Check if both is empty
+  if (!email.trim() && !password.trim()) {
+    setEmailError(true);
+    setPasswordError(true);
+    return;
+  }
+
     // Check if email is empty
     if (!email.trim()) {
       setEmailError(true);

@@ -301,8 +301,8 @@ export default function SettingsScreen() {
             <View style={{ marginTop: 90, backgroundColor: "#007AFF" }}>
               <Button
                 title="Save Changes"
-                color="#fff"
-                onPress={() => Alert.alert("Simple Button pressed")}
+                color=""
+                onPress={() => Alert.alert("Changes saved.")}
                 disabled={
                   editprofileData.expLevel === "" ||
                   editprofileData.weight === "" ||

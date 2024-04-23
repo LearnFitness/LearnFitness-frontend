@@ -59,9 +59,9 @@ export default function Onboard2Screen({ navigation }) {
             </View>);
         })}
       </View>
-
-      <PrimaryButton title="Create Account" handleOnPress={handleSubmitOnboardData} loading={loading} disabled={loading || selectedIndex < 0} />
-
+      <View style={{ marginBottom: 15 }}>
+        <PrimaryButton title="Create Account" handleOnPress={handleSubmitOnboardData} loading={loading} disabled={loading || selectedIndex < 0} />
+      </View>
     </SafeAreaView>
   )
 }

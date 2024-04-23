@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Alert, StyleSheet, Text, View, Pressable } from "react-native";
+import { Alert, StyleSheet, Text, View, Pressable, Platform } from "react-native";
 import { Input } from "@rneui/themed";
 import auth from "@react-native-firebase/auth";
 import LinearBackground from "../../components/LinearBackground";
@@ -7,15 +7,17 @@ import KeyboardAvoidView from "../../components/KeyboardAvoidView";
 import PrimaryButton from "../../components/PrimaryButton"
 import { appStyles } from "../../utils/styles";
 import BackButton from "../../components/BackButton";
+import { useHeaderHeight } from '@react-navigation/elements';
 
 export default function SignUpScreen({ navigation }) {
-  const [email, setEmail] = useState(null);
-  const [password, setPassword] = useState(null);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [visiblePassword, setVisiblePassword] = useState(false);
-  const [confirmPassword, setConfirmPassword] = useState();
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [emailError, setEmailError] = useState(false);
   const [passwordError, setPasswordError] = useState(false);
+  const [isPasswordShort, setIsPasswordShort] = useState(false);
 
   async function handleSignUp() {
     // Check if everything is empty
@@ -37,15 +39,25 @@ export default function SignUpScreen({ navigation }) {
       return;
     }
 
+    // Check password requirements
+    if (password.length < 6) {
+      setPasswordError(true);
+      setIsPasswordShort(true);
+      return;
+    }
+    if (password !== confirmPassword) {
+      Alert.alert('The passwords do not match.');
+      setPasswordError(true);
+      return;
+    }
+
     setLoading(true);
     try {
       await auth().createUserWithEmailAndPassword(email, password);
     } catch (error) {
       if (error.code === 'auth/invalid-email') {
         Alert.alert('Please enter a valid email address.');
-      }
-      else if (password != confirmPassword) {
-        Alert.alert('The passwords do not match.')
+        setEmailError(true);
       }
     } finally {
       setLoading(false);
@@ -57,7 +69,11 @@ export default function SignUpScreen({ navigation }) {
       <View style={styles.backButtonContainer}>
         <BackButton handleOnPress={() => navigation.goBack()} />
       </View>
-      <KeyboardAvoidView containerStyle={styles.container}>
+      <KeyboardAvoidView
+        containerStyle={styles.container}
+        keyboardVerticalOffset={useHeaderHeight}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+      >
         <View style={{ marginTop: "30%" }}>
           <Text style={[appStyles.heading1, { color: "white", marginBottom: "20%"}]}>Create a LearnFitness account</Text>
           <Input
@@ -82,6 +98,7 @@ export default function SignUpScreen({ navigation }) {
             onChangeText={(text) => {
               setPassword(text);
               setPasswordError(false);
+              setIsPasswordShort(text.length < 6);
             }}
             value={password}
             secureTextEntry={!visiblePassword}
@@ -103,6 +120,9 @@ export default function SignUpScreen({ navigation }) {
             autoCorrect={false}
             spellCheck={false}
           />
+          <Text style={[styles.passwordRequirementText, isPasswordShort && styles.redText]}>
+            * Password must be at least 6 characters.
+          </Text>
           <PrimaryButton
             loading={loading}
             disabled={loading}
@@ -147,5 +167,16 @@ const styles = StyleSheet.create({
   errorInput: {
     borderColor: "red",
     borderWidth: 1.5,
-  }
+  },
+  passwordRequirementText: {
+    color: "lightgrey",
+    fontSize: 15,
+    textAlign: 'left',
+    marginBottom: 30,
+    bottom: 10,
+    marginLeft: 15
+  },
+  redText: {
+    color: "red",
+  },
 })
