@@ -3,13 +3,14 @@ import { useEffect, useState } from "react";
 import { getBackendDataWithRetry } from "../../utils/backendAPI";
 import LinearBackground from "../../components/LinearBackground";
 import AvatarDisplay from "../../components/AvatarDisplay";
-import FontAwesome from "react-native-vector-icons/FontAwesome6";
+import Feather from "react-native-vector-icons/Feather";
+import FontAwesome from "react-native-vector-icons/FontAwesome6"
+import auth from "@react-native-firebase/auth";
+import firestore from "@react-native-firebase/firestore";
 
-const rightArrowIcon = "arrow-right";
-
-const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-const currentDayOfWeek = daysOfWeek[new Date().getDay()];
-const motivationalSentences = [
+const DAYS_OF_WEEK = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+const currentDayOfWeek = DAYS_OF_WEEK[new Date().getDay()];
+const MOTIVATIONAL_QUOTES = [
   "Lighten up your day by completing a workout!",
   "Start your day right with a workout!",
   "Push yourself to new limits today!",
@@ -17,47 +18,94 @@ const motivationalSentences = [
   // Add more motivational sentences as needed
 ];
 
-function getRandomSentence() {
-  const randomIndex = Math.floor(Math.random() * motivationalSentences.length);
-  return motivationalSentences[randomIndex];
+function getRandomQuote() {
+  const randomIndex = Math.floor(Math.random() * MOTIVATIONAL_QUOTES.length);
+  return MOTIVATIONAL_QUOTES[randomIndex];
 }
 
-function getGreeting() {
+function Greeting() {
   const hour = new Date().getHours();
-  if (hour < 12) return "Good morning,";
-  if (hour < 18) return "Good afternoon,";
-  return "Good evening,";
+  let iconName = "coffee";
+  let greeting = "Good morning,";
+
+  if (hour > 18) {
+    iconName = "moon";
+    greeting = "Good evening,"
+  } else if (hour > 12) {
+    iconName = "sun",
+    greeting = "Good afternoon,"
+  }
+
+  return (
+    <>
+      <Feather name={iconName} size={20} color="darkgrey" />
+      <Text style={styles.greetingText}>{greeting}</Text>
+    </>
+  )
 }
 
 export default function DashboardScreen({ navigation }) {
   const [userData, setUserData] = useState(null);
+  const [workoutStats, setWorkoutStats] = useState({});
   const [loading, setLoading] = useState(false);
-  const [greeting, setGreeting] = useState(getGreeting());
 
+  // Getting user data
   useEffect(() => {
-    async function fetchData() {
-      try {
-        const userData = await getBackendDataWithRetry("/user");
-        setUserData(userData);
-      } catch (error) {
-        Alert.alert("An error occured", error);
-      } finally {
-        setLoading(false);
+    // Listen for any changes to user document
+    const unsubscribe = firestore().collection("users").doc(auth().currentUser.uid).onSnapshot(
+      () => {
+        async function fetchData() {
+          setLoading(true);
+          try {
+            const userData = await getBackendDataWithRetry("/user");
+            setUserData(userData);
+          } catch (error) {
+            Alert.alert("An error occured", error.message);
+          } finally {
+            setLoading(false);
+          }
+        }
+        fetchData();
       }
-    }
-    fetchData();
-
-    const updateGreeting = () => {
-      const newGreeting = getGreeting();
-      if (newGreeting !== greeting) {
-        setGreeting(newGreeting);
-      }
-    };
-
-    // Call updateGreeting every minute (60000 milliseconds) or every hour (3600000 milliseconds).
-    const intervalId = setInterval(updateGreeting, 3600000);
-    return () => clearInterval(intervalId);
+    );
+    return () => unsubscribe();
   }, []);
+
+  // Getting workout stats
+  useEffect(() => {
+    // Listen for any changes to sessions document
+    const unsubscribe = firestore().collection("users").doc(auth().currentUser.uid).collection("sessions").onSnapshot(
+      () => {
+        async function fetchData() {
+          try {
+            const workoutsCompletedSnapshot = await firestore().collection("users").doc(auth().currentUser.uid).collection("sessions").count().get();
+            const workoutsCompleted = workoutsCompletedSnapshot.data().count;
+            // // Get days since last workout
+            const lastTwoWorkoutsSnapshot = await firestore().collection("users").doc(auth().currentUser.uid).collection("sessions").orderBy("date", "desc").limit(2).get();
+            const lastTwoWorkouts = lastTwoWorkoutsSnapshot ? lastTwoWorkoutsSnapshot.docs : [];
+            const daysSinceLastWorkout = lastTwoWorkouts.length > 0 ? Math.floor((Date.now() / 1000 - lastTwoWorkouts[0].data().date.seconds) / (24 * 60 * 60)) : 0;
+            setWorkoutStats({
+              workoutsCompleted,
+              lastTwoWorkouts,
+              daysSinceLastWorkout
+            })
+          } catch (error) {
+            Alert.alert("An error occured", error.message);
+          }
+        }
+        fetchData();
+      }
+    );
+    return () => unsubscribe();
+  }, []);
+
+  if (loading || !userData) {
+    return (
+      <LinearBackground>
+        <ActivityIndicator style={{ flex: 1 }} />
+      </LinearBackground>
+    )
+  }
 
   return (
     <LinearBackground>
@@ -71,101 +119,94 @@ export default function DashboardScreen({ navigation }) {
             barStyle={"light-content"}
           />
         ) : null}
-        {loading || !userData ? (
-          <ActivityIndicator style={{ flex: 1 }} />
-        ) : (
+
+        <View style={styles.greetingContainer}>
           <View>
-            <View style={styles.greetingContainer}>
-              <View>
-                <FontAwesome name="moon" size={20} color="darkgrey" />
-                <Text style={styles.greetingText}>{greeting}</Text>
-                <Text style={styles.greetingName}>
-                  {userData.name.split(" ")[0]}
-                </Text>
-              </View>
-              <Pressable onPress={() => navigation.navigate("Settings")}>
-                <AvatarDisplay
-                  source={userData.photoURL ? { uri: userData.photoURL } : null}
-                  size={120}
-                  editable={false}
-                  clickable={false}
-                />
-              </Pressable>
-            </View>
-            <View style={styles.finishedWorkoutsContainer}>
-              <Text style={styles.finishedWorkoutsText}>
-                Completed Workouts
-              </Text>
-              <TouchableOpacity onPress={() => navigation.navigate("Progress")}>
-                <Text
-                  style={{
-                    textAlign: "center",
-                    marginTop: 4,
-                    fontSize: 17,
-                    color: "#9E9E9E",
-                  }}
-                >
-                  View All →
-                </Text>
-              </TouchableOpacity>
-            </View>
-            <View style={styles.completedWorkoutsContainer}>
-              <Text style={styles.completedWorkoutsText}>
-                No completed workouts yet.
-                {"\n"}
-                Start a new workout!
-              </Text>
-            </View>
-            <View style={styles.statsContainer}>
-              <View style={styles.statText}>
-                <Text style={styles.statNumber}>32</Text>
-                <Text style={styles.subText}>WORKOUTS COMPLETED</Text>
-              </View>
-              <View style={styles.statText}>
-                <Text style={styles.statNumber}>2</Text>
-                <Text style={styles.subText}>{`DAYS SINCE\nLAST WORKOUT`}</Text>
-              </View>
-              <View style={styles.statText}>
-                <Text style={styles.statNumber}>10</Text>
-                <Text style={styles.subText}>{`PRs ACHIEVED\nTHIS WEEK`}</Text>
-              </View>
-            </View>
-            <View style={styles.lineContainer}>
-              <View style={styles.horizontalLine} />
-            </View>
-            <Text style={styles.dayText}>It's {currentDayOfWeek}!</Text>
-            <Text style={styles.motivationalText}>{getRandomSentence()}</Text>
-            <View style={styles.buttonContainer}>
-              <TouchableOpacity
-                onPress={() => navigation.navigate("Workouts")}
-                style={{
-                  height: 55,
-                  width: 250,
-                  backgroundColor: "#FFFFFF",
-                  borderRadius: 30,
-                  justifyContent: "center",
-                  alignItems: "center",
-                }}
-              >
-                <Text
-                  style={{
-                    color: "#0044AA",
-                    fontWeight: "700",
-                    fontSize: 23,
-                    textAlign: "center",
-                  }}
-                >
-                  View Workouts{" "}
-                  <FontAwesome
-                    name={rightArrowIcon}
-                    size={23}
-                    color="#0044AA"
-                  />{" "}
-                </Text>
-              </TouchableOpacity>
-            </View>
+            <Greeting />
+            <Text style={styles.greetingName}>
+              {userData.name.split(" ")[0]}
+            </Text>
           </View>
-        )}
+          <Pressable onPress={() => navigation.navigate("Settings")}>
+            <AvatarDisplay
+              source={userData.photoURL ? { uri: userData.photoURL } : null}
+              size={120}
+              editable={false}
+              clickable={false}
+            />
+          </Pressable>
+        </View>
+        <View style={styles.finishedWorkoutsContainer}>
+          <Text style={styles.finishedWorkoutsText}>
+            Completed Workouts
+          </Text>
+          <TouchableOpacity onPress={() => navigation.navigate("Progress")}>
+            <Text
+              style={{
+                textAlign: "center",
+                marginTop: 4,
+                fontSize: 17,
+                color: "#9E9E9E",
+              }}
+            >
+              View All →
+            </Text>
+          </TouchableOpacity>
+        </View>
+        <View style={styles.completedWorkoutsContainer}>
+          <Text style={styles.completedWorkoutsText}>
+            {`No completed workouts yet.\nStart a new workout!`}
+          </Text>
+        </View>
+        <View style={styles.statsContainer}>
+          <View style={styles.statText}>
+            <Text style={styles.statNumber}>{workoutStats.workoutsCompleted}</Text>
+            <Text style={styles.subText}>WORKOUTS COMPLETED</Text>
+          </View>
+          <View style={styles.statText}>
+            <Text style={styles.statNumber}>{workoutStats.daysSinceLastWorkout}</Text>
+            <Text style={styles.subText}>{`DAYS SINCE\nLAST WORKOUT`}</Text>
+          </View>
+          <View style={styles.statText}>
+            <Text style={styles.statNumber}>10</Text>
+            <Text style={styles.subText}>{`PRs ACHIEVED\nTHIS WEEK`}</Text>
+          </View>
+        </View>
+        <View style={styles.lineContainer}>
+          <View style={styles.horizontalLine} />
+        </View>
+        <Text style={styles.dayText}>It's {currentDayOfWeek}!</Text>
+        <Text style={styles.motivationalText}>{getRandomQuote()}</Text>
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity
+            onPress={() => navigation.navigate("Workouts")}
+            style={{
+              height: 55,
+              width: 250,
+              backgroundColor: "#FFFFFF",
+              borderRadius: 30,
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <Text
+              style={{
+                color: "#0044AA",
+                fontWeight: "700",
+                fontSize: 23,
+                textAlign: "center",
+              }}
+            >
+              View Workouts{" "}
+              <FontAwesome
+                name="arrow-right"
+                size={23}
+                color="#0044AA"
+              />{" "}
+            </Text>
+          </TouchableOpacity>
+        </View>
+
       </ScrollView>
     </LinearBackground>
   );
