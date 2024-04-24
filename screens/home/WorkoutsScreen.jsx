@@ -107,7 +107,7 @@ export default function WorkoutsScreen({ route, navigation }) {
               <Text style={styles.title}>Your Workouts</Text>
               <View style={styles.workoutsContainer}>
                 {workouts.length === 0 ?
-                  <Text style={{ color: "darkgrey", fontSize: 17 }}>You have no workouts yet</Text>
+                  <Text style={{ color: "darkgrey", fontSize: 17 }}>You have no workouts yet.</Text>
                   :
                   workouts.map((workout, index) => (
                     <WorkoutItem
@@ -120,7 +120,7 @@ export default function WorkoutsScreen({ route, navigation }) {
 
               <Text style={styles.title}>Recommended for you</Text>
               <View style={styles.workoutsContainer}>
-                {recommendedWorkouts.length === 0 ? <Text style={{ color: "darkgrey", fontSize: 17 }}>No recommendations available</Text> :
+                {recommendedWorkouts.length === 0 ? <Text style={{ color: "darkgrey", fontSize: 17 }}>No recommendations available.</Text> :
                   recommendedWorkouts.map((workout, index) => (
                     <WorkoutItem
                       key={index}

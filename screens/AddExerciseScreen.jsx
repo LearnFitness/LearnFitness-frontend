@@ -71,7 +71,7 @@ export default function AddExerciseScreen({ route, navigation }) {
               style={styles.addWorkoutButton}
               onPress={() => {
                 navigation.navigate("HomeNavigator", { screen: "Workouts" });
-                navigation.navigate("AddWorkoutScreen", { exerciseToAdd: exercise })
+                navigation.navigate("AddWorkoutScreen", { exercise, action: "create", headerTitle: "Create workout" })
               }}
             >
               <Text style={styles.addWorkoutButtonText}>Add a workout</Text>
