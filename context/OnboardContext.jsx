@@ -2,7 +2,7 @@ import { createContext, useState } from "react";
 
 export const OnboardContext = createContext(null);
 
-function OnboardContextProvider({ children }) {
+export default function OnboardContextProvider({ children }) {
   const [onboardData, setOnboardData] = useState({});
 
   function updateOnboardData(key, value) {
@@ -18,5 +18,3 @@ function OnboardContextProvider({ children }) {
       {children}
     </OnboardContext.Provider>)
 }
-
-export default OnboardContextProvider;

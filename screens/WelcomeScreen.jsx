@@ -11,6 +11,7 @@ export default function WelcomeScreen({ navigation }) {
           <Text style={styles.subTitle}>A fitness app for everyone</Text>
         </View>
         <TouchableOpacity
+          activeOpacity={0.5}
           onPress={() => navigation.navigate("SignIn")}
           style={styles.signInButton}>
           <Text style={styles.signInButtonText}>GET STARTED</Text>

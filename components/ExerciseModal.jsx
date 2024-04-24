@@ -26,10 +26,14 @@ export default function ExerciseModal({ route, navigation }) {
 
   function handleAddExercise() {
     // Check who called this screen and delegate the add exercise functionality accordingly
-    const parentScreen = navigation.getState().routes.find(route => route.name === "AddWorkoutScreen");
-    if (parentScreen) {
-      const action = parentScreen.params.action;
-      navigation.navigate("AddWorkoutScreen", { exercise, headerTitle: action === "edit" ? "Edit workout" : "Create workout", action })
+    const routes = navigation.getState().routes;
+
+    if (routes.find(route => route.name === "AddWorkoutScreen")) {
+      const parentScreen = routes.find(route => route.name === "AddWorkoutScreen");
+      const action = parentScreen.params.action; // action is either edit or create
+      navigation.navigate("AddWorkoutScreen", { exercise, headerTitle: action === "edit" ? "Edit workout" : "Create workout", action });
+    } else if (routes.find(route => route.name === "StartWorkoutScreen")) {
+      navigation.navigate("StartWorkoutScreen", { exercise });
     } else {
       navigation.navigate("AddExerciseScreen", { exercise });
     };
