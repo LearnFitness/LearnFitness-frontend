@@ -22,9 +22,17 @@ function getRandomSentence() {
   return motivationalSentences[randomIndex];
 }
 
+function getGreeting() {
+  const hour = new Date().getHours();
+  if (hour < 12) return "Good morning";
+  if (hour < 18) return "Good afternoon";
+  return "Good evening";
+}
+
 export default function DashboardScreen({ navigation }) {
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [greeting, setGreeting] = useState(getGreeting());
 
   useEffect(() => {
     async function fetchData() {
@@ -38,6 +46,17 @@ export default function DashboardScreen({ navigation }) {
       }
     }
     fetchData();
+
+    const updateGreeting = () => {
+      const newGreeting = getGreeting();
+      if (newGreeting !== greeting) {
+        setGreeting(newGreeting);
+      }
+    };
+
+    // Call updateGreeting every minute (60000 milliseconds) or every hour (3600000 milliseconds).
+    const intervalId = setInterval(updateGreeting, 3600000);
+    return () => clearInterval(intervalId);
   }, []);
 
   return (
@@ -45,67 +64,111 @@ export default function DashboardScreen({ navigation }) {
       <ScrollView>
         {/* Changes status bar icon color for ALL pages to white
       (use FocusAwareStatusBar as seen in SettingsScreen.jsx for individual screens) */}
-        {Platform.OS === "android" ? <StatusBar translucent backgroundColor="transparent" barStyle={"light-content"} /> : null}
-        {loading || !userData ?
-          (
-            <ActivityIndicator style={{ flex: 1 }} />
-          ) : (
-            <View>
-              <View style={styles.greetingContainer}>
-                <View>
-                  <FontAwesome name="moon" size={20} color="darkgrey" />
-                  <Text style={styles.greetingText} >Good Afternoon,</Text>
-                  <Text style={styles.greetingName} >{userData.name.split(" ")[0]}</Text>
-                </View>
-                <Pressable onPress={() => navigation.navigate("Settings")}>
-                  <AvatarDisplay source={userData.photoURL ? { uri: userData.photoURL } : null} size={120} editable={false} clickable={false} />
-                </Pressable>
-              </View>
-              <View style={styles.finishedWorkoutsContainer}>
-                <Text style={styles.finishedWorkoutsText}>Completed Workouts</Text>
-                <TouchableOpacity
-                  onPress={() => navigation.navigate("Progress")}>
-                  <Text style={{ textAlign: "center", marginTop: 4, fontSize: 17, color: "#9E9E9E" }}>View All →</Text>
-                </TouchableOpacity>
-              </View>
-              <View style={styles.completedWorkoutsContainer}>
-                <Text style={styles.completedWorkoutsText}>
-                  No completed workouts yet.
-                  {'\n'}
-                  Start a new workout!
+        {Platform.OS === "android" ? (
+          <StatusBar
+            translucent
+            backgroundColor="transparent"
+            barStyle={"light-content"}
+          />
+        ) : null}
+        {loading || !userData ? (
+          <ActivityIndicator style={{ flex: 1 }} />
+        ) : (
+          <View>
+            <View style={styles.greetingContainer}>
+              <View>
+                <FontAwesome name="moon" size={20} color="darkgrey" />
+                <Text style={styles.greetingText}>{greeting}</Text>
+                <Text style={styles.greetingName}>
+                  {userData.name.split(" ")[0]}
                 </Text>
               </View>
-              <View style={styles.statsContainer}>
-                <View style={styles.statText}>
-                  <Text style={styles.statNumber}>32</Text>
-                  <Text style={styles.subText}>WORKOUTS COMPLETED</Text>
-                </View>
-                <View style={styles.statText}>
-                  <Text style={styles.statNumber}>2</Text>
-                  <Text style={styles.subText}>{`DAYS SINCE\nLAST WORKOUT`}</Text>
-                </View>
-                <View style={styles.statText}>
-                  <Text style={styles.statNumber}>10</Text>
-                  <Text style={styles.subText}>{`PRs ACHIEVED\nTHIS WEEK`}</Text>
-                </View>
+              <Pressable onPress={() => navigation.navigate("Settings")}>
+                <AvatarDisplay
+                  source={userData.photoURL ? { uri: userData.photoURL } : null}
+                  size={120}
+                  editable={false}
+                  clickable={false}
+                />
+              </Pressable>
+            </View>
+            <View style={styles.finishedWorkoutsContainer}>
+              <Text style={styles.finishedWorkoutsText}>
+                Completed Workouts
+              </Text>
+              <TouchableOpacity onPress={() => navigation.navigate("Progress")}>
+                <Text
+                  style={{
+                    textAlign: "center",
+                    marginTop: 4,
+                    fontSize: 17,
+                    color: "#9E9E9E",
+                  }}
+                >
+                  View All →
+                </Text>
+              </TouchableOpacity>
+            </View>
+            <View style={styles.completedWorkoutsContainer}>
+              <Text style={styles.completedWorkoutsText}>
+                No completed workouts yet.
+                {"\n"}
+                Start a new workout!
+              </Text>
+            </View>
+            <View style={styles.statsContainer}>
+              <View style={styles.statText}>
+                <Text style={styles.statNumber}>32</Text>
+                <Text style={styles.subText}>WORKOUTS COMPLETED</Text>
               </View>
-              <View style={styles.lineContainer}>
-                <View style={styles.horizontalLine} />
+              <View style={styles.statText}>
+                <Text style={styles.statNumber}>2</Text>
+                <Text style={styles.subText}>{`DAYS SINCE\nLAST WORKOUT`}</Text>
               </View>
-              <Text style={styles.dayText}>It's {currentDayOfWeek}!</Text>
-              <Text style={styles.motivationalText}>{getRandomSentence()}</Text>
-              <View style={styles.buttonContainer}>
-                <TouchableOpacity onPress={() => navigation.navigate("Workouts")} style={{ height: 55, width: 250, backgroundColor: "#FFFFFF", borderRadius: 30, justifyContent: "center", alignItems: "center" }}>
-                  <Text style={{ color: "#0044AA", fontWeight: "700", fontSize: 23, textAlign: "center" }}>View Workouts  <FontAwesome name={rightArrowIcon} size={23} color="#0044AA" /> </Text>
-                </TouchableOpacity>
+              <View style={styles.statText}>
+                <Text style={styles.statNumber}>10</Text>
+                <Text style={styles.subText}>{`PRs ACHIEVED\nTHIS WEEK`}</Text>
               </View>
             </View>
-          )
-        }
+            <View style={styles.lineContainer}>
+              <View style={styles.horizontalLine} />
+            </View>
+            <Text style={styles.dayText}>It's {currentDayOfWeek}!</Text>
+            <Text style={styles.motivationalText}>{getRandomSentence()}</Text>
+            <View style={styles.buttonContainer}>
+              <TouchableOpacity
+                onPress={() => navigation.navigate("Workouts")}
+                style={{
+                  height: 55,
+                  width: 250,
+                  backgroundColor: "#FFFFFF",
+                  borderRadius: 30,
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <Text
+                  style={{
+                    color: "#0044AA",
+                    fontWeight: "700",
+                    fontSize: 23,
+                    textAlign: "center",
+                  }}
+                >
+                  View Workouts{" "}
+                  <FontAwesome
+                    name={rightArrowIcon}
+                    size={23}
+                    color="#0044AA"
+                  />{" "}
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        )}
       </ScrollView>
-
     </LinearBackground>
-  )
+  );
 }
 
 const styles = StyleSheet.create({
