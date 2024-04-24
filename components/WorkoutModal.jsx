@@ -60,15 +60,22 @@ export const WorkoutModal = ({ workout, navigation, isWorkoutModalVisible, handl
 
   async function handleDuplicateWorkout() {
     try {
-      await firestore()
-        .collection('users')
-        .doc(auth().currentUser.uid)
-        .collection('workouts')
-        .add({
-          name: workout.name,
-          description: workout.description,
-          exercises: workout.exercises
-        });
+      const userRef = firestore().collection('users').doc(auth().currentUser.uid);
+      const querySnapshot = await userRef.collection('workouts').where('name', '==', workout.name).get();
+  
+      let duplicatedName = workout.name;
+  
+      // Check if the workout name already contains "(copy)"
+      if (!duplicatedName.includes("(copy)")) {
+        duplicatedName += " (copy)";
+      }
+  
+      await userRef.collection('workouts').add({
+        name: duplicatedName,
+        description: workout.description,
+        exercises: workout.exercises
+      });
+  
       toast("Workout duplicated");
     } catch (error) {
       Alert.alert(error.message);

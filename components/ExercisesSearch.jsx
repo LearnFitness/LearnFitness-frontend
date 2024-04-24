@@ -9,6 +9,7 @@ import { searchClient } from "../utils/AlgoliaSearchClient";
 
 export default function ExercisesSearch() {
   const [isFilterModalOpen, setFilterModalOpen] = useState(false);
+  const [isFilterPressed, setFilterPressed] = useState(false);
   const listRef = useRef(null);
 
   function scrollToTop() {
@@ -20,8 +21,12 @@ export default function ExercisesSearch() {
       <View style={styles.searchContainer}>
         <SearchBox onChange={scrollToTop} style={{ width: '90%' }} />
         <Pressable
-          style={styles.filterButton}
-          onPress={() => setFilterModalOpen(!isFilterModalOpen)}
+          style={[styles.filterButton, isFilterPressed && styles.filterButtonPressed]}
+          onPress={() => {
+            setFilterPressed(true);
+            setFilterModalOpen(!isFilterModalOpen);
+          }}
+          onPressOut={() => setFilterPressed(false)}
         >
           <FontAwesome name="filter" size={22} color="white" />
         </Pressable>
@@ -46,5 +51,8 @@ const styles = StyleSheet.create({
   filterButton: {
     padding: 10,
     top: 3,
+  },
+  filterButtonPressed: {
+    opacity: 0.7,
   }
 })
