@@ -11,19 +11,27 @@ import auth from "@react-native-firebase/auth";
 export default function StartWorkoutScreen({ route, navigation }) {
   // This will track the scroll position
   const scrollY = useRef(new Animated.Value(0)).current;
+  // Function to calculate the margin of the time container
   const marginHorizontalAnim = scrollY.interpolate({
-    inputRange: [30, 140], // Define the range of scrollY values
+    inputRange: [30, 140], // Define the range of scrollY values based on experimentation
     outputRange: [20, 0],  // Corresponding margins from 20 to 0
     extrapolate: 'clamp'  // This will clamp the output at 0 so it doesn't go negative
   });
 
-  const sessionDate = new Date();
   const { workout, exercise } = route.params;
+  const sessionDate = new Date();
   const [sessionName, setSessionName] = useState(workout ? workout.name : "");
   const [sessionDescription, setSessionDescription] = useState(workout ? workout.description : "");
-
   const [sessionDuration, setSessionDuration] = useState(0);
+  // Transfrom the exercises array from the workout (sets is a number) to the session (sets is an object)
+  const [exercises, setExercises] = useState(() => {
+    return workout.exercises.map(ex => ({
+      ...ex,
+      sets: Array(ex.sets).fill().map(() => ({ reps: 0, lbs: 0 }))
+    }));
+  });
 
+  // Session duration timer
   useEffect(() => {
     const interval = setInterval(() => {
       setSessionDuration(prevDuration => prevDuration + 1);
@@ -33,18 +41,12 @@ export default function StartWorkoutScreen({ route, navigation }) {
     return () => clearInterval(interval);
   }, []);
 
-  const [exercises, setExercises] = useState(() => {
-    return workout.exercises.map(ex => ({
-      ...ex,
-      sets: Array(ex.sets).fill().map(() => ({ reps: 0, lbs: 0 }))
-    }));
-  });
-
+  // Effects to handle adding an exercise to the session
   useEffect(() => {
     if (exercise) {
       handleAddExercise(exercise);
     }
-  }, [exercise, workout]);
+  }, [exercise]);
 
   function handleAddExercise(exercise) {
     const exerciseExists = exercises.some((ex) => ex.id === exercise.id);
@@ -104,7 +106,7 @@ export default function StartWorkoutScreen({ route, navigation }) {
     const updatedExercises = exercises.map(ex => {
       if (ex.id === exerciseId) {
         const updatedSets = ex.sets.map((set, index) =>
-          index === setIndex ? { ...set, lbs: lbs } : set
+          index === setIndex ? { ...set, lbs } : set
         );
         return { ...ex, sets: updatedSets };
       }
@@ -152,13 +154,13 @@ export default function StartWorkoutScreen({ route, navigation }) {
       };
       await firestore().collection("users").doc(auth().currentUser.uid).collection("sessions").add(newSession);
       toast("Session saved");
-
       navigation.goBack();
     } catch (error) {
       Alert.alert(error.message);
     }
   }
 
+  // Wrap exercise list in useCallback to improve performance
   const ExerciseListView = useCallback(
     () => {
       return (
@@ -194,7 +196,7 @@ export default function StartWorkoutScreen({ route, navigation }) {
           [{ nativeEvent: { contentOffset: { y: scrollY } } }],
           { useNativeDriver: false }  // Set to false because we're animating layout properties
         )}
-        scrollEventThrottle={16}  // Defines how often the scroll event fires
+        scrollEventThrottle={15}  // Defines how often the scroll event fires
       >
         <TextInput
           style={styles.sessionName}
@@ -294,31 +296,9 @@ export default function StartWorkoutScreen({ route, navigation }) {
   }
 }
 
-function SessionTimer() {
-  const [sessionDuration, setSessionDuration] = useState(0);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setSessionDuration(prevDuration => prevDuration + 1);
-    }, 1000);
-
-    // Clear interval on component unmount
-    return () => clearInterval(interval);
-  }, []);
-
-  return (
-    <View>
-      <Text style={styles.sessionDuration}>
-        {padToTwoDigits(Math.floor(sessionDuration / 60))}:{padToTwoDigits(sessionDuration % 60)}
-      </Text>
-    </View>
-  )
-}
-
 function padToTwoDigits(number) {
   return number < 10 ? `0${number}` : number;
 }
-
 
 const styles = StyleSheet.create({
   container: {
@@ -369,8 +349,8 @@ const styles = StyleSheet.create({
     alignItems: "center"
   },
   actionButton: {
-    width: "40%",
-    height: 35,
+    width: "35%",
+    height: 40,
     borderRadius: 10,
     alignItems: "center",
     justifyContent: "center",
@@ -378,7 +358,7 @@ const styles = StyleSheet.create({
   },
   actionButtonText: {
     color: "white",
-    fontSize: 15,
+    fontSize: 16,
     fontWeight: "600"
   },
   addExerciseButton: {
