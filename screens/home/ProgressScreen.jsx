@@ -1,6 +1,23 @@
-import { View, Text, SafeAreaView, ActivityIndicator, Dimensions } from "react-native";
-import { useState } from "react";
+import {
+  View,
+  Text,
+  SafeAreaView,
+  Pressable,
+  Button,
+  Modal,
+  Alert,
+  StyleSheet,
+  ActivityIndicator,
+  Dimensions,
+} from "react-native";
 import LinearBackground from "../../components/LinearBackground";
+import auth from "@react-native-firebase/auth";
+import { Feather } from "@expo/vector-icons";
+import AvatarDisplay from "../../components/AvatarDisplay";
+import firestore from "@react-native-firebase/firestore";
+import { Calendar, CalendarList } from "react-native-calendars";
+import { getBackendDataWithRetry } from "../../utils/backendAPI"
+import { useEffect, useState } from "react";
 import {
   LineChart,
   BarChart,
@@ -10,20 +27,130 @@ import {
   StackedBarChart
 } from "react-native-chart-kit";
 
-export default function ProgressScreen() {
+export default function ProgressScreen({ navigation }) {
   const [loading, setLoading] = useState(false);
+  const [userData, setUserData] = useState(null);
+  const [showHistory, setHistory] = useState(false);
+  const [selected, setSelected] = useState("");
 
+  // Getting user data
+   useEffect(() => {
+     // Listen for any changes to user document
+     const unsubscribe = firestore()
+       .collection("users")
+       .doc(auth().currentUser.uid)
+       .onSnapshot(() => {
+         async function fetchData() {
+           setLoading(true);
+           try {
+             const userData = await getBackendDataWithRetry("/user");
+             setUserData(userData);
+           } catch (error) {
+             Alert.alert("An error occured", error.message);
+           } finally {
+             setLoading(false);
+           }
+         }
+         fetchData();
+       });
+     return () => unsubscribe();
+   }, []);
+
+  const toggleHistory = () => {
+    setHistory(!showHistory);
+  }
   return (
     <LinearBackground>
-      {loading ?
-        (
-          <ActivityIndicator style={{ flex: 1 }} />
-        ) : (
-          <View style={{ marginTop: 30 }}>
+      {loading ? (
+        <ActivityIndicator style={{ flex: 1 }} />
+      ) : (
+        <SafeAreaView>
+          <View>
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "space-between",
+                // gap: 20,
+
+                // margin: 20,
+                margin: 10,
+              }}
+            >
+              <Text style={{ color: "white", fontSize: 24, fontWeight: 600 }}>
+                My Progress
+              </Text>
+              <Pressable onPress={() => navigation.navigate("Settings")}>
+                <AvatarDisplay
+                  source={
+                    userData && userData.photoURL
+                      ? { uri: userData.photoURL }
+                      : null
+                  }
+                  size={60}
+                  editable={false}
+                  clickable={false}
+                />
+              </Pressable>
+            </View>
+            <View
+              style={{
+                backgroundColor: "rgb(34,84,150)",
+                marginHorizontal: 125,
+              }}
+            >
+              <Button
+                title="See History"
+                color="white"
+                onPress={toggleHistory}
+              />
+            </View>
+            <Modal
+              animationType="slide"
+              // transparent={true}
+              visible={showHistory}
+              onRequestClose={toggleHistory}
+            >
+              <SafeAreaView style={styles.modalContainer}>
+                <View style={styles.notificationSettingsContainer}>
+                  <View style={styles.notificationsHeader}>
+                    <Pressable onPress={toggleHistory}>
+                      <Feather name="arrow-left" size={26} color="black" />
+                    </Pressable>
+                    <Text style={styles.notificationsHeader}> History</Text>
+                  </View>
+                  <CalendarList
+                    onDayPress={(day) => {
+                      console.log("selected day", day);
+                    }}
+                    // Mark specific dates as marked
+                    markedDates={{
+                      "2024-04-01": {
+                        selected: true,
+                      },
+                      "2024-04-02": { marked: true },
+                      "2024-04-03": {
+                        selected: true,
+                        marked: true,
+                        selectedColor: "blue",
+                      },
+                    }}
+                  />
+                </View>
+              </SafeAreaView>
+            </Modal>
+
             <Text style={{ color: "white" }}>Bezier Line Chart</Text>
             <LineChart
               data={{
-                labels: ["January", "February", "March", "April", "May", "June"],
+                labels: [
+                  "January",
+                  "February",
+                  "March",
+                  "April",
+                  "May",
+                  "June",
+                ],
                 datasets: [
                   {
                     data: [
@@ -32,10 +159,10 @@ export default function ProgressScreen() {
                       Math.random() * 100,
                       Math.random() * 100,
                       Math.random() * 100,
-                      Math.random() * 100
-                    ]
-                  }
-                ]
+                      Math.random() * 100,
+                    ],
+                  },
+                ],
               }}
               width={Dimensions.get("window").width} // from react-native
               height={220}
@@ -50,23 +177,47 @@ export default function ProgressScreen() {
                 color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
                 labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
                 style: {
-                  borderRadius: 16
+                  borderRadius: 16,
                 },
                 propsForDots: {
                   r: "6",
                   strokeWidth: "2",
-                  stroke: "#ffa726"
-                }
+                  stroke: "#ffa726",
+                },
               }}
               bezier
               style={{
                 marginVertical: 8,
-                borderRadius: 16
+                borderRadius: 16,
               }}
             />
           </View>
-        )
-      }
+        </SafeAreaView>
+      )}
     </LinearBackground>
-  )
+  );
 }
+
+const styles = StyleSheet.create({
+  modalContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  notificationsHeader: {
+    fontSize: 26,
+    fontWeight: "bold",
+    flexDirection: "row",
+    alignItems: "baseline",
+    marginTop: 10,
+    marginBottom: 20,
+  },
+  
+  notificationSettingsContainer: {
+    backgroundColor: "white",
+    width: "100%",
+    height: "100%",
+    paddingHorizontal: 30,
+  },
+
+});
