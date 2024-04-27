@@ -32,29 +32,53 @@ export default function ProgressScreen({ navigation }) {
   const [userData, setUserData] = useState(null);
   const [showHistory, setHistory] = useState(false);
   const [selected, setSelected] = useState("");
+  const [completedWorkoutDates, setCompletedWorkoutDates] = useState({});
+  const [modalVisible, setModalVisible] = useState(false);
 
   // Getting user data
-   useEffect(() => {
-     // Listen for any changes to user document
-     const unsubscribe = firestore()
-       .collection("users")
-       .doc(auth().currentUser.uid)
-       .onSnapshot(() => {
-         async function fetchData() {
-           setLoading(true);
-           try {
-             const userData = await getBackendDataWithRetry("/user");
-             setUserData(userData);
-           } catch (error) {
-             Alert.alert("An error occured", error.message);
-           } finally {
-             setLoading(false);
-           }
-         }
-         fetchData();
-       });
-     return () => unsubscribe();
-   }, []);
+  useEffect(() => {
+    // Listen for any changes to user document
+    const unsubscribe = firestore()
+      .collection("users")
+      .doc(auth().currentUser.uid)
+      .onSnapshot(() => {
+        async function fetchData() {
+          setLoading(true);
+          try {
+            const userData = await getBackendDataWithRetry("/user");
+            setUserData(userData);
+          } catch (error) {
+            Alert.alert("An error occurred", error.message);
+          } finally {
+            setLoading(false);
+          }
+        }
+        fetchData();
+      });
+    return () => unsubscribe();
+  }, []);
+
+  // Getting completed workout dates
+  useEffect(() => {
+    const unsubscribe = firestore()
+      .collection("users")
+      .doc(auth().currentUser.uid)
+      .collection("sessions")
+      .onSnapshot(snapshot => {
+        const dates = {};
+        snapshot.forEach(doc => {
+          const session = doc.data();
+          const sessionDate = new Date(session.date.seconds * 1000); 
+          const year = sessionDate.getFullYear();
+          const month = String(sessionDate.getMonth() + 1).padStart(2, '0');
+          const day = String(sessionDate.getDate()).padStart(2, '0');
+          const pstDateString = `${year}-${month}-${day}`;
+          dates[pstDateString] = { marked: true };
+        });
+        setCompletedWorkoutDates(dates);
+      });
+    return () => unsubscribe();
+  }, []);
 
   const toggleHistory = () => {
     setHistory(!showHistory);
@@ -124,17 +148,7 @@ export default function ProgressScreen({ navigation }) {
                       console.log("selected day", day);
                     }}
                     // Mark specific dates as marked
-                    markedDates={{
-                      "2024-04-01": {
-                        selected: true,
-                      },
-                      "2024-04-02": { marked: true },
-                      "2024-04-03": {
-                        selected: true,
-                        marked: true,
-                        selectedColor: "blue",
-                      },
-                    }}
+                    markedDates={completedWorkoutDates}
                   />
                 </View>
               </SafeAreaView>
@@ -217,7 +231,6 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     width: "100%",
     height: "100%",
-    paddingHorizontal: 30,
   },
 
 });
