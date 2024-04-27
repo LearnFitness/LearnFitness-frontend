@@ -1,23 +1,14 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Alert, Text, View, TouchableOpacity, StyleSheet, ScrollView, TextInput, Animated } from 'react-native';
 import LinearBackground from '../components/LinearBackground';
-import Ionicon from "react-native-vector-icons/Ionicons";
-import FontAwesome from "react-native-vector-icons/FontAwesome6";
+import { FontAwesome6, Ionicons } from '@expo/vector-icons';
 import RestTimer from '../components/RestTimer';
 import toast from '../utils/toast';
 import firestore from "@react-native-firebase/firestore";
 import auth from "@react-native-firebase/auth";
+import { useHeaderHeight } from "@react-navigation/elements";
 
 export default function StartWorkoutScreen({ route, navigation }) {
-  // This will track the scroll position
-  const scrollY = useRef(new Animated.Value(0)).current;
-  // Function to calculate the margin of the time container
-  const marginHorizontalAnim = scrollY.interpolate({
-    inputRange: [30, 140], // Define the range of scrollY values based on experimentation
-    outputRange: [20, 0],  // Corresponding margins from 20 to 0
-    extrapolate: 'clamp'  // This will clamp the output at 0 so it doesn't go negative
-  });
-
   const { workout, exercise } = route.params;
   const sessionDate = new Date();
   const [sessionName, setSessionName] = useState(workout ? workout.name : "");
@@ -29,6 +20,19 @@ export default function StartWorkoutScreen({ route, navigation }) {
       ...ex,
       sets: Array(ex.sets).fill().map(() => ({ reps: 0, lbs: 0 }))
     }));
+  });
+
+  // Height of header
+  const headerHeight = useHeaderHeight();
+  // Animated value to track scroll position
+  const scrollY = useRef(new Animated.Value(0)).current;
+  // Ref to store the current scroll position
+  const scrollYRef = useRef(0);
+  // Function to calculate the margin of the time container
+  const marginHorizontalAnim = scrollY.interpolate({
+    inputRange: [30, 160], // Define the range of scrollY values based on experimentation
+    outputRange: [20, 0],  // Corresponding margins from 20 to 0
+    extrapolate: 'clamp'  // This will clamp the output at 0 so it doesn't go negative
   });
 
   // Session duration timer
@@ -47,6 +51,26 @@ export default function StartWorkoutScreen({ route, navigation }) {
       handleAddExercise(exercise);
     }
   }, [exercise]);
+
+  function handleScroll(event) {
+    const newY = event.nativeEvent.contentOffset.y;
+    scrollYRef.current = newY;  // Update ref value with new scroll position
+
+    // Update title based on current scroll position without causing re-renders
+    if (newY > 130) { 
+      navigation.setOptions({
+        title: sessionName.trim() ? sessionName : "Start workout",
+        headerLeft: () => <Ionicons name="chevron-back" color="lightblue" size={23} onPress={handleGoBack} />,
+        headerRight: () => (
+          <TouchableOpacity style={{ backgroundColor: "rgba(0,135,214,1)", paddingVertical: 5, paddingHorizontal: 15, borderRadius: 5 }} onPress={handleSaveSession}>
+            <Text style={{ color: "white", fontSize: 16, fontWeight: "500" }}>Finish</Text>
+          </TouchableOpacity>
+        )
+      });
+    } else {
+      navigation.setOptions({ title: "Start workout", headerLeft: null, headerRight: null });
+    }
+  };
 
   function handleAddExercise(exercise) {
     const exerciseExists = exercises.some((ex) => ex.id === exercise.id);
@@ -167,7 +191,7 @@ export default function StartWorkoutScreen({ route, navigation }) {
         <View style={{ paddingHorizontal: "5%" }}>
           {exercises.map(exercise => (
             <View key={exercise.id}>
-              <Ionicon
+              <Ionicons
                 name="close-circle-outline"
                 color="#aa3155"
                 size={23}
@@ -178,8 +202,8 @@ export default function StartWorkoutScreen({ route, navigation }) {
             </View>
           ))}
 
-          <TouchableOpacity style={styles.addExerciseButton} onPress={() => navigation.navigate("ExercisesSearchModal")}>
-            <FontAwesome name="plus" color="white" size={23} />
+          <TouchableOpacity style={[styles.addExerciseButton, { marginBottom: headerHeight + 30 }]} onPress={() => navigation.navigate("ExercisesSearchModal")}>
+            <FontAwesome6 name="plus" color="darkgrey" size={23} />
             <Text style={styles.addExerciseButtonText}>Add Exercise</Text>
           </TouchableOpacity>
         </View>
@@ -191,12 +215,17 @@ export default function StartWorkoutScreen({ route, navigation }) {
   return (
     <LinearBackground containerStyle={styles.container} safeAreaView={false}>
       <ScrollView
+        // contentInsetAdjustmentBehavior="scrollableAxes"
         stickyHeaderIndices={[3]}
         onScroll={Animated.event(
           [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-          { useNativeDriver: false }  // Set to false because we're animating layout properties
+          {
+            listener: (event) => handleScroll(event),
+            useNativeDriver: false // Set to false because we're animating layout properties
+          }
         )}
         scrollEventThrottle={15}  // Defines how often the scroll event fires
+        style={{ paddingTop: headerHeight }}
       >
         <TextInput
           style={styles.sessionName}
@@ -225,11 +254,9 @@ export default function StartWorkoutScreen({ route, navigation }) {
         <View>
           <Animated.View style={[styles.timeContainer, { marginHorizontal: marginHorizontalAnim }]}>
             <RestTimer />
-            <View>
-              <Text style={styles.sessionDuration}>
-                {padToTwoDigits(Math.floor(sessionDuration / 60))}:{padToTwoDigits(sessionDuration % 60)}
-              </Text>
-            </View>
+            <Text style={styles.sessionDuration}>
+              {padToTwoDigits(Math.floor(sessionDuration / 60))}:{padToTwoDigits(sessionDuration % 60)}
+            </Text>
           </Animated.View>
         </View>
 
@@ -266,7 +293,7 @@ export default function StartWorkoutScreen({ route, navigation }) {
   function Set({ set, setIndex, exercise }) {
     return (
       <View style={styles.exerciseSet}>
-        <Ionicon
+        <Ionicons
           name="remove-circle-outline"
           color="#aa3155"
           size={17}
@@ -302,7 +329,6 @@ function padToTwoDigits(number) {
 
 const styles = StyleSheet.create({
   container: {
-    paddingTop: "12%"
   },
   sessionName: {
     color: "white",
@@ -323,6 +349,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: "#05406b",
     marginHorizontal: 20,
+    paddingHorizontal: 5,
     borderRadius: 10,
 
     shadowColor: "#000",
@@ -365,9 +392,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     marginTop: 15,
-    marginBottom: 30,
     padding: 10,
-    backgroundColor: "rgba(255, 255, 255, 0.2)",
+    backgroundColor: "rgba(255, 255, 255, 0.1)",
     borderRadius: 10
   },
   addExerciseButtonText: {

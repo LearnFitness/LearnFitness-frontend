@@ -2,8 +2,9 @@ import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
 import { useState } from "react";
 import { CountdownCircleTimer } from "react-native-countdown-circle-timer";
 import toast from "../utils/toast";
+import { MaterialCommunityIcons, Feather } from '@expo/vector-icons';
 
-export default function RestTimer({ initialDuration = 15 }) {
+export default function RestTimer({ initialDuration = 90 }) {
   const [isComplete, setIsComplete] = useState(true);
   const [duration, setDuration] = useState(0);
 
@@ -21,6 +22,7 @@ export default function RestTimer({ initialDuration = 15 }) {
     <View style={styles.container}>
       {isComplete ?
         <TouchableOpacity onPress={handleStartRest} style={styles.restButton}>
+          <MaterialCommunityIcons name="timer-outline" size={27} color="white" />
           <Text style={styles.restButtonText}>Rest</Text>
         </TouchableOpacity>
         :
@@ -46,16 +48,16 @@ export default function RestTimer({ initialDuration = 15 }) {
             }
           </CountdownCircleTimer>
 
-          <View>
+          <View style={{ marginHorizontal: 5 }}>
             <TouchableOpacity onPress={() => setDuration(duration + 30)} style={styles.timerActionButton}>
-              <Text style={styles.timerActionButtonText}>Add 30s</Text>
+              <Feather name="plus" size={18} color="white" />
+              <Text style={styles.timerActionButtonText}>30s</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={handleStopRest} style={styles.timerActionButton}>
-              <Text style={styles.timerActionButtonText}>Cancel rest</Text>
+              <Feather name="x" size={18} color="white" />
+              <Text style={styles.timerActionButtonText}>Stop</Text>
             </TouchableOpacity>
           </View>
-
-
         </View>
 
       }
@@ -72,14 +74,17 @@ const styles = StyleSheet.create({
     margin: 5
   },
   restButton: {
-    backgroundColor: "#005f72",
-    padding: 10,
-    borderRadius: 10
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "rgba(0,0,0,0.2)",
+    padding: 5,
+    borderRadius: 5,
   },
   restButtonText: {
     color: "white",
-    fontSize: 15,
-    fontWeight: "500"
+    fontSize: 16,
+    fontWeight: "600",
+    marginLeft: 5
   },
   remainingTime: {
     color: "white"
@@ -88,11 +93,13 @@ const styles = StyleSheet.create({
     padding: 8,
     margin: 5,
     backgroundColor: "#005f72",
-    borderRadius: 10
-
+    borderRadius: 10,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center"
   },
   timerActionButtonText: {
-    color: "white", 
+    color: "white",
     textAlign: "center",
     fontSize: 15,
     fontWeight: "500"

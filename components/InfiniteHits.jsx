@@ -34,14 +34,15 @@ export default InfiniteHits = forwardRef(
 const styles = StyleSheet.create({
   exerciseContainer: {
     flexDirection: "row",
+    alignItems: "center",
     padding: 10,
-    margin: 5,
-    backgroundColor: "rgba(255, 255, 255, 0.2)",
+    margin: 3,
+    backgroundColor: "rgba(255, 255, 255, 0.1)",
     borderRadius: 5,
   },
   exerciseGif: {
-    width: 50,
-    height: 50,
+    width: 55,
+    height: 55,
     borderRadius: 5,
     marginRight: 10
   },
@@ -49,7 +50,7 @@ const styles = StyleSheet.create({
     color: "white",
     fontSize: 18,
     paddingBottom: 5,
-    fontWeight: "600",
+    fontWeight: "500",
     textTransform: "capitalize",
   },
   exerciseBodyPart: {
