@@ -6,7 +6,7 @@ import Feather from "react-native-vector-icons/Feather";
 import FontAwesome from "react-native-vector-icons/FontAwesome6"
 import auth from "@react-native-firebase/auth";
 import firestore from "@react-native-firebase/firestore";
-import YoutubePlayer from "react-native-youtube-iframe";
+import News from "../../components/News";
 
 const DAYS_OF_WEEK = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 const currentDayOfWeek = DAYS_OF_WEEK[new Date().getDay()];
@@ -59,6 +59,16 @@ export default function DashboardScreen({ navigation }) {
     return () => unsubscribe();
   }, []);
 
+  function handleViewSession(session) {
+    const sessionData = session.data();
+    navigation.navigate("SessionModal", {
+      session: {
+        id: session.id,
+        data: { ...sessionData }
+      }
+    });
+  }
+
   if (loading || !userData) {
     return (
       <LinearBackground>
@@ -79,18 +89,23 @@ export default function DashboardScreen({ navigation }) {
         />
       ) : null}
 
-      <LinearBackground containerStyle={styles.container}>
+      <LinearBackground>
         <ScrollView>
-          <View style={styles.greetingContainer}>
-            <UserGreeting />
-            <UserAvatar />
+          <View style={styles.container}>
+            <View style={styles.greetingContainer}>
+              <UserGreeting />
+              <UserAvatar />
+            </View>
+            <CompletedWorkouts />
+            <WorkoutStats />
+            <View style={styles.lineContainer}>
+              <View style={styles.horizontalLine} />
+            </View>
+            <BottomQuotes />
           </View>
-          <CompletedWorkouts />
-          <WorkoutStats />
-          <View style={styles.lineContainer}>
-            <View style={styles.horizontalLine} />
-          </View>
-          <BottomQuotes />
+
+
+          <News />
         </ScrollView>
       </LinearBackground>
     </>
@@ -98,15 +113,18 @@ export default function DashboardScreen({ navigation }) {
 
   function UserGreeting() {
     const hour = new Date().getHours();
-    let iconName = "coffee";
-    let greeting = "Good morning,";
+    let iconName = "moon";
+    let greeting = "Good night,";
 
-    if (hour > 18) {
+    if (hour < 6) {
       iconName = "moon";
-      greeting = "Good evening,"
-    } else if (hour > 12) {
-      iconName = "sun",
-        greeting = "Good afternoon,"
+      greeting = "Good night,"
+    } else if (hour < 12) {
+      iconName = "sunrise",
+        greeting = "Good morning,"
+    } else if (hour < 18) {
+      iconName = "sunset",
+        greeting = "Good evening,"
     }
     return (
       <View>
@@ -124,7 +142,7 @@ export default function DashboardScreen({ navigation }) {
       <Pressable onPress={() => navigation.navigate("Settings")}>
         <AvatarDisplay
           source={userData.photoURL ? { uri: userData.photoURL } : null}
-          size={120}
+          size={110}
           editable={false}
         />
       </Pressable>
@@ -143,15 +161,15 @@ export default function DashboardScreen({ navigation }) {
         {sessions.length > 0 ?
           <>
             {sessions.slice(0, sessions.length === 1 ? 1 : 2).map((session, index) => { // Map a maximum of 2 sessions only
-              session = session.data();
-              const sessionDurationMinutes = Math.ceil(session.duration / 60);
-              const exercisesCount = session.exercises.length;
-              const sessionDate = new Date(session.date.seconds * 1000);
+              sessionData = session.data();
+              const sessionDurationMinutes = Math.ceil(sessionData.duration / 60);
+              const exercisesCount = sessionData.exercises.length;
+              const sessionDate = new Date(sessionData.date.seconds * 1000);
               return (
-                <TouchableOpacity activeOpacity={0.6} key={index} style={styles.completedWorkout}>
+                <TouchableOpacity activeOpacity={0.6} key={index} style={styles.completedWorkout} onPress={() => handleViewSession(session)}>
                   <Image source={require("./../../assets/workout_plans_images/leg1.jpg")} style={styles.workoutImage} />
                   <View style={styles.completedWorkoutDetails}>
-                    <Text style={styles.workoutName}>{session.name}</Text>
+                    <Text style={styles.workoutName}>{sessionData.name}</Text>
                     <Text style={styles.workoutDate}>{sessionDate.toDateString()} at {sessionDate.toLocaleTimeString()}</Text>
                     <Text style={styles.workoutExercisesCount}>
                       {`${exercisesCount} ${exercisesCount > 1 ? "exercises" : "exercise"} - ${sessionDurationMinutes} ${sessionDurationMinutes > 1 ? "minutes" : "minute"}`}
@@ -222,14 +240,14 @@ export default function DashboardScreen({ navigation }) {
 
 const styles = StyleSheet.create({
   container: {
-    marginHorizontal: "8%",
+    marginHorizontal: "7%",
     marginTop: "3%"
   },
   greetingContainer: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    gap: 20,
+    gap: 30,
     flexWrap: "wrap",
     margin: 20,
   },
@@ -242,7 +260,7 @@ const styles = StyleSheet.create({
   },
   greetingName: {
     color: "white",
-    fontSize: 38,
+    fontSize: 30,
     fontWeight: "900",
   },
   completedWorkoutsContainer: {
@@ -314,7 +332,7 @@ const styles = StyleSheet.create({
   statNumber: {
     color: "white",
     fontSize: 30,
-    fontWeight: "800",
+    fontWeight: "700",
   },
   subText: {
     color: "white",
@@ -348,7 +366,8 @@ const styles = StyleSheet.create({
     fontSize: 16,
     textAlign: "center",
     fontStyle: "italic",
-    marginVertical: 10,
+    marginTop: 5,
+    marginBottom: 10
   },
   buttonContainer: {
     marginTop: 10,
@@ -356,8 +375,8 @@ const styles = StyleSheet.create({
     alignItems: "center"
   },
   viewWorkoutsButton: {
-    height: 55,
-    width: 250,
+    paddingHorizontal: 30,
+    paddingVertical: 12,
     backgroundColor: "#FFFFFF",
     borderRadius: 30,
     flexDirection: "row",
@@ -367,7 +386,7 @@ const styles = StyleSheet.create({
   viewWorkoutsButtonText: {
     color: "#0044AA",
     fontWeight: "700",
-    fontSize: 23,
+    fontSize: 20,
     textAlign: "center",
     marginRight: 8
   }
