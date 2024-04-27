@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { View, ScrollView, Text, StyleSheet, Alert, TextInput, TouchableOpacity } from "react-native";
 import LinearBackground from "../components/LinearBackground";
 import FontAwesome from "react-native-vector-icons/FontAwesome6";
@@ -6,6 +6,7 @@ import firestore from "@react-native-firebase/firestore";
 import auth from "@react-native-firebase/auth";
 import Ionicon from "react-native-vector-icons/Ionicons";
 import toast from "../utils/toast";
+import { useHeaderHeight } from "@react-navigation/elements";
 
 export default function AddWorkoutScreen({ route, navigation }) {
   const { workout, exercise, action } = route.params ? route.params : {};
@@ -13,6 +14,29 @@ export default function AddWorkoutScreen({ route, navigation }) {
   const [workoutName, setWorkoutName] = useState("");
   const [workoutDescription, setWorkoutDescription] = useState("");
   const [exercises, setExercises] = useState([]);
+  const scrollYRef = useRef(0);  // Using useRef to hold the current scroll position
+  const headerHeight = useHeaderHeight();
+
+  const handleScroll = (event) => {
+    const newY = event.nativeEvent.contentOffset.y;
+    scrollYRef.current = newY;  // Update ref value with new scroll position
+
+    const headerTitle = action === "edit" ? "Edit workout" : "Create workout";
+    // Update title based on current scroll position without causing re-renders
+    if (newY > 130) {
+      navigation.setOptions({
+        title: workoutName.trim() ? workoutName : headerTitle,
+        headerLeft: () => <Ionicon name="chevron-back" color="lightblue" size={23} onPress={handleGoBack} />,
+        headerRight: () => (
+          <TouchableOpacity style={{ backgroundColor: "rgb(0,135,214)", paddingVertical: 5, paddingHorizontal: 15, borderRadius: 5 }} onPress={handleSaveWorkout}>
+            <Text style={{ color: "white", fontSize: 16, fontWeight: "500" }}>Save</Text>
+          </TouchableOpacity>
+        )
+      });
+    } else {
+      navigation.setOptions({ title: headerTitle, headerLeft: null, headerRight: null });
+    }
+  };
 
   useEffect(() => {
     if (exercise) {
@@ -53,7 +77,7 @@ export default function AddWorkoutScreen({ route, navigation }) {
   function handleAddExercise(exercise) {
     const exerciseExists = exercises.some((ex) => ex.id === exercise.id);
     if (!exerciseExists) {
-      const sets = workout ? exercise.sets : 1; // If modifying, use the existing sets value
+      const sets = exercise.sets ? exercise.sets : 1; // If modifying, use the existing sets value
       setExercises(prevExercises => [...prevExercises, { ...exercise, sets }]);
     } else {
       Alert.alert("Exercise already added to the workout.");
@@ -117,8 +141,9 @@ export default function AddWorkoutScreen({ route, navigation }) {
   }
 
   return (
-    <LinearBackground containerStyle={styles.container}>
-      <ScrollView>
+    <LinearBackground containerStyle={{ paddingHorizontal: "5%" }} safeAreaView={false}>
+      <ScrollView onScroll={handleScroll} scrollEventThrottle={15} style={{ paddingTop: headerHeight }}
+      >
         <TextInput
           style={styles.workoutName}
           placeholder="Workout name"
@@ -158,8 +183,8 @@ export default function AddWorkoutScreen({ route, navigation }) {
           ))
           : null}
 
-        <TouchableOpacity style={styles.addExerciseButton} onPress={() => navigation.navigate("ExercisesSearchModal")}>
-          <FontAwesome name="plus" color="white" size={23} />
+        <TouchableOpacity style={[styles.addExerciseButton, { marginBottom: headerHeight + 30 }]} onPress={() => navigation.navigate("ExercisesSearchModal")}>
+          <FontAwesome name="plus" color="darkgrey" size={23} />
           <Text style={styles.addExerciseButtonText}>Add Exercise</Text>
         </TouchableOpacity>
       </ScrollView>
@@ -209,9 +234,6 @@ export default function AddWorkoutScreen({ route, navigation }) {
 
 const styles = StyleSheet.create({
   // AddWorkoutScreen
-  container: {
-    marginHorizontal: "5%"
-  },
   workoutName: {
     color: "white",
     textAlign: "center",
@@ -220,7 +242,7 @@ const styles = StyleSheet.create({
     marginTop: 20
   },
   workoutDescription: {
-    color: "lightgrey",
+    color: "grey",
     textAlign: "center",
     fontSize: 18,
     marginVertical: 10
@@ -247,14 +269,15 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     marginVertical: 15,
+    marginBottom: 30,
     padding: 10,
-    backgroundColor: "rgba(255, 255, 255, 0.2)",
+    backgroundColor: "rgba(255, 255, 255, 0.1)",
     borderRadius: 10
   },
   addExerciseButtonText: {
     color: "darkgrey",
     fontSize: 17,
-    margin: 5
+    margin: 5,
   },
 
   // Sets
