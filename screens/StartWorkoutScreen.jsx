@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { Alert, Text, View, TouchableOpacity, StyleSheet, ScrollView, TextInput, Animated } from 'react-native';
+import { Alert, Text, View, TouchableOpacity, StyleSheet, ScrollView, TextInput, Animated, Platform } from 'react-native';
 import LinearBackground from '../components/LinearBackground';
 import { FontAwesome6, Ionicons } from '@expo/vector-icons';
 import RestTimer from '../components/RestTimer';
@@ -57,7 +57,7 @@ export default function StartWorkoutScreen({ route, navigation }) {
     scrollYRef.current = newY;  // Update ref value with new scroll position
 
     // Update title based on current scroll position without causing re-renders
-    if (newY > 130) { 
+    if (newY > 130) {
       navigation.setOptions({
         title: sessionName.trim() ? sessionName : "Start workout",
         headerLeft: () => <Ionicons name="chevron-back" color="lightblue" size={23} onPress={handleGoBack} />,
@@ -225,7 +225,7 @@ export default function StartWorkoutScreen({ route, navigation }) {
           }
         )}
         scrollEventThrottle={15}  // Defines how often the scroll event fires
-        style={{ paddingTop: headerHeight }}
+        style={{ paddingTop: Platform.OS === 'ios' ? headerHeight : 0 }}
       >
         <TextInput
           style={styles.sessionName}
