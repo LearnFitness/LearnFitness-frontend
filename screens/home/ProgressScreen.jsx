@@ -31,13 +31,12 @@ export default function ProgressScreen({ navigation }) {
   const [loading, setLoading] = useState(false);
   const [userData, setUserData] = useState(null);
   const [showHistory, setHistory] = useState(false);
-  const [selected, setSelected] = useState("");
   const [completedWorkoutDates, setCompletedWorkoutDates] = useState({});
-  const [modalVisible, setModalVisible] = useState(false);
+  const [totalWorkouts, setTotalWorkouts] = useState(0);
+  const [avgWorkoutsPerWeek, setAvgWorkoutsPerWeek] = useState(0);
+  const [avgWorkoutDuration, setAvgWorkoutDuration] = useState(0); 
 
-  // Getting user data
   useEffect(() => {
-    // Listen for any changes to user document
     const unsubscribe = firestore()
       .collection("users")
       .doc(auth().currentUser.uid)
@@ -58,7 +57,6 @@ export default function ProgressScreen({ navigation }) {
     return () => unsubscribe();
   }, []);
 
-  // Getting completed workout dates
   useEffect(() => {
     const unsubscribe = firestore()
       .collection("users")
@@ -66,6 +64,8 @@ export default function ProgressScreen({ navigation }) {
       .collection("sessions")
       .onSnapshot(snapshot => {
         const dates = {};
+        let totalWorkouts = 0;
+        let totalDuration = 0;
         snapshot.forEach(doc => {
           const session = doc.data();
           const sessionDate = new Date(session.date.seconds * 1000); 
@@ -74,8 +74,20 @@ export default function ProgressScreen({ navigation }) {
           const day = String(sessionDate.getDate()).padStart(2, '0');
           const pstDateString = `${year}-${month}-${day}`;
           dates[pstDateString] = { marked: true };
+          totalWorkouts++;
+          totalDuration += session.duration;
         });
         setCompletedWorkoutDates(dates);
+        setTotalWorkouts(totalWorkouts);
+
+        const firstSessionDate = Object.keys(dates).length > 0 ? new Date(Object.keys(dates)[0]) : new Date();
+        const daysBetween = Math.ceil((new Date() - firstSessionDate) / (1000 * 60 * 60 * 24));
+        const weeksBetween = Math.ceil(daysBetween / 7);
+        const avgWorkoutsPerWeek = totalWorkouts / weeksBetween;
+        setAvgWorkoutsPerWeek(avgWorkoutsPerWeek.toFixed(2));
+
+        const avgDuration = totalDuration / totalWorkouts;
+        setAvgWorkoutDuration(avgDuration / 60); 
       });
     return () => unsubscribe();
   }, []);
@@ -95,9 +107,6 @@ export default function ProgressScreen({ navigation }) {
                 flexDirection: "row",
                 alignItems: "center",
                 justifyContent: "space-between",
-                // gap: 20,
-
-                // margin: 20,
                 margin: 10,
               }}
             >
@@ -147,64 +156,23 @@ export default function ProgressScreen({ navigation }) {
                     onDayPress={(day) => {
                       console.log("selected day", day);
                     }}
-                    // Mark specific dates as marked
                     markedDates={completedWorkoutDates}
                   />
                 </View>
               </SafeAreaView>
             </Modal>
 
-            <Text style={{ color: "white" }}>Bezier Line Chart</Text>
-            <LineChart
-              data={{
-                labels: [
-                  "January",
-                  "February",
-                  "March",
-                  "April",
-                  "May",
-                  "June",
-                ],
-                datasets: [
-                  {
-                    data: [
-                      Math.random() * 100,
-                      Math.random() * 100,
-                      Math.random() * 100,
-                      Math.random() * 100,
-                      Math.random() * 100,
-                      Math.random() * 100,
-                    ],
-                  },
-                ],
-              }}
-              width={Dimensions.get("window").width} // from react-native
-              height={220}
-              yAxisLabel="$"
-              yAxisSuffix="k"
-              yAxisInterval={1} // optional, defaults to 1
-              chartConfig={{
-                backgroundColor: "#e26a00",
-                backgroundGradientFrom: "#fb8c00",
-                backgroundGradientTo: "#ffa726",
-                decimalPlaces: 2, // optional, defaults to 2dp
-                color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-                labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-                style: {
-                  borderRadius: 16,
-                },
-                propsForDots: {
-                  r: "6",
-                  strokeWidth: "2",
-                  stroke: "#ffa726",
-                },
-              }}
-              bezier
-              style={{
-                marginVertical: 8,
-                borderRadius: 16,
-              }}
-            />
+            <View style={{ alignItems: "center", marginTop: 20 }}>
+              <Text style={{ color: "white" }}>
+                Total Workouts Completed: {totalWorkouts}
+              </Text>
+              <Text style={{ color: "white" }}>
+                Average Workouts Per Week: {avgWorkoutsPerWeek}
+              </Text>
+              <Text style={{ color: "white" }}>
+                Average Workout Duration: {avgWorkoutDuration.toFixed(2)} min/workout
+              </Text>
+            </View>
           </View>
         </SafeAreaView>
       )}
@@ -232,5 +200,4 @@ const styles = StyleSheet.create({
     width: "100%",
     height: "100%",
   },
-
 });
