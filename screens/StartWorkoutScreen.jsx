@@ -179,6 +179,16 @@ export default function StartWorkoutScreen({ route, navigation }) {
       await firestore().collection("users").doc(auth().currentUser.uid).collection("sessions").add(newSession);
       toast("Session saved");
       navigation.goBack();
+      // Show a success message using Alert
+      Alert.alert(
+        "Workout Finished!",
+        "You finished your workout.",
+        [
+          {
+            text: "OK",
+          }
+        ]
+      );
     } catch (error) {
       Alert.alert(error.message);
     }
