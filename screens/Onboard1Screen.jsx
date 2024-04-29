@@ -92,7 +92,7 @@ export default function Onboard1Screen({ navigation }) {
               title="Age"
               InputComponent={TextInput}
               value={onboardData.age}
-              onChange={(text) => updateOnboardData("age", text)}
+              onChangeText={(text) => updateOnboardData("age", text)}
               keyboardType="numeric"
               style={{ fontSize: 17 }}
             />

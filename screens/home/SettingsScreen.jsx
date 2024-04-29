@@ -23,6 +23,7 @@ export default function SettingsScreen() {
     gender: "",
     expLevel: "",
   });
+  
   const [selectedGender,  setSelectedGender] = useState(0);
   const genders = ["Male", "Female", "Other"]
   const [selectedLevel, setSelectedLevel] = useState(0);
@@ -301,7 +302,7 @@ export default function SettingsScreen() {
             <View style={{ marginTop: 90, backgroundColor: "#007AFF" }}>
               <Button
                 title="Save Changes"
-                color="white"
+                color="#0094FF"
                 onPress={() => Alert.alert("Changes saved.")}
                 disabled={
                   editprofileData.expLevel === "" ||

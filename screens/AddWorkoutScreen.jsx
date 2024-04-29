@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { View, ScrollView, Text, StyleSheet, Alert, TextInput, TouchableOpacity } from "react-native";
+import { View, ScrollView, Text, StyleSheet, Alert, TextInput, TouchableOpacity, Platform } from "react-native";
 import LinearBackground from "../components/LinearBackground";
 import FontAwesome from "react-native-vector-icons/FontAwesome6";
 import firestore from "@react-native-firebase/firestore";
@@ -142,7 +142,7 @@ export default function AddWorkoutScreen({ route, navigation }) {
 
   return (
     <LinearBackground containerStyle={{ paddingHorizontal: "5%" }} safeAreaView={false}>
-      <ScrollView onScroll={handleScroll} scrollEventThrottle={15} style={{ paddingTop: headerHeight }}
+      <ScrollView onScroll={handleScroll} scrollEventThrottle={15} style={{ paddingTop: Platform.OS === 'ios' ? headerHeight : 0 }}
       >
         <TextInput
           style={styles.workoutName}

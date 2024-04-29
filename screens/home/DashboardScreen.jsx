@@ -241,7 +241,7 @@ export default function DashboardScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     marginHorizontal: "7%",
-    marginTop: "3%"
+    marginTop: "5%"
   },
   greetingContainer: {
     flexDirection: "row",

@@ -68,7 +68,7 @@ export default function ProgressScreen({ navigation }) {
         let totalDuration = 0;
         snapshot.forEach(doc => {
           const session = doc.data();
-          const sessionDate = new Date(session.date.seconds * 1000); 
+          const sessionDate = new Date(session.date.seconds * 1000);
           const year = sessionDate.getFullYear();
           const month = String(sessionDate.getMonth() + 1).padStart(2, '0');
           const day = String(sessionDate.getDate()).padStart(2, '0');
@@ -107,7 +107,10 @@ export default function ProgressScreen({ navigation }) {
                 flexDirection: "row",
                 alignItems: "center",
                 justifyContent: "space-between",
-                margin: 10,
+                // gap: 20,
+
+                margin: 20,
+                marginTop: 40
               }}
             >
               <Text style={{ color: "white", fontSize: 24, fontWeight: 600 }}>
@@ -134,7 +137,7 @@ export default function ProgressScreen({ navigation }) {
             >
               <Button
                 title="See History"
-                color="white"
+                color="#0094FF"
                 onPress={toggleHistory}
               />
             </View>
@@ -194,7 +197,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
     marginBottom: 20,
   },
-  
+
   notificationSettingsContainer: {
     backgroundColor: "white",
     width: "100%",
