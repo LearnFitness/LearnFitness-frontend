@@ -8,6 +8,7 @@ import PrimaryButton from "../../components/PrimaryButton"
 import { appStyles } from "../../utils/styles";
 import BackButton from "../../components/BackButton";
 import { useHeaderHeight } from '@react-navigation/elements';
+//import validate from "deep-email-validator"
 
 export default function SignUpScreen({ navigation }) {
   const [email, setEmail] = useState('');
@@ -17,7 +18,7 @@ export default function SignUpScreen({ navigation }) {
   const [loading, setLoading] = useState(false);
   const [emailError, setEmailError] = useState(false);
   const [passwordError, setPasswordError] = useState(false);
-  const [isPasswordShort, setIsPasswordShort] = useState(false);
+  const [isPasswordLong, setIsPasswordLong] = useState(false);
 
   async function handleSignUp() {
     // Check if everything is empty
@@ -39,10 +40,29 @@ export default function SignUpScreen({ navigation }) {
       return;
     }
 
+    // Check if the email is valid with deep-email-validator (once we are done testing) (i have no idea if this works)
+    // try {
+    //   const { valid } = await validate({
+    //     email,
+    //     validateRegex: true,
+    //     validateMX: true,
+    //     validateTypo: false,
+    //   });
+
+    //   if (!valid) {
+    //     setEmailError(true);
+    //     throw new Error('Please enter a valid email address.');
+    //   }
+    // } catch (error) {
+    //   Alert.alert("An error occured.");
+    //   setEmailError(true);
+    //   return;
+    // }
+
     // Check password requirements
     if (password.length < 6) {
       setPasswordError(true);
-      setIsPasswordShort(true);
+      setIsPasswordLong(false);
       return;
     }
     if (password !== confirmPassword) {
@@ -98,7 +118,7 @@ export default function SignUpScreen({ navigation }) {
             onChangeText={(text) => {
               setPassword(text);
               setPasswordError(false);
-              setIsPasswordShort(text.length < 6);
+              setIsPasswordLong(text.length >= 6);
             }}
             value={password}
             secureTextEntry={!visiblePassword}
@@ -120,7 +140,7 @@ export default function SignUpScreen({ navigation }) {
             autoCorrect={false}
             spellCheck={false}
           />
-          <Text style={[styles.passwordRequirementText, isPasswordShort && styles.redText]}>
+          <Text style={[styles.passwordRequirementText, isPasswordLong && styles.lightGreyText]}>
             * Password must be at least 6 characters.
           </Text>
           <PrimaryButton
@@ -169,14 +189,14 @@ const styles = StyleSheet.create({
     borderWidth: 1.5,
   },
   passwordRequirementText: {
-    color: "lightgrey",
+    color: "red",
     fontSize: 15,
     textAlign: 'left',
     marginBottom: 30,
     bottom: 10,
     marginLeft: 15
   },
-  redText: {
-    color: "red",
+  lightGreyText: {
+    color: "lightgrey",
   },
 })
