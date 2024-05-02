@@ -38,9 +38,28 @@ export default function Onboard1Screen({ navigation }) {
   }, []);
 
   function handleNext() {
-    setLoading(true);
+    // Check if age is an integer
+    const ageRegex = /^\d+$/;
+    if (!ageRegex.test(onboardData.age)) {
+      Alert.alert("Invalid Age", "Please enter a valid age.");
+      return;
+    }
 
-    // TODO: Check for valid inputs
+    // Check if height is a float (optimal decimal point)
+    const heightRegex = /^[0-9]+(\.[0-9]+)?$/;
+    if (!heightRegex.test(onboardData.height)) {
+      Alert.alert("Invalid Height", "Please enter a valid height.");
+      return;
+    }
+
+    // Check if weight is an integer
+    const weightRegex = /^\d+$/;
+    if (!weightRegex.test(onboardData.weight)) {
+      Alert.alert("Invalid Weight", "Please enter a valid weight.");
+      return;
+    }
+
+    setLoading(true);
 
     // Navigate to next screen
     setLoading(false);

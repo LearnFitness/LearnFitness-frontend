@@ -79,6 +79,10 @@ export default function SignUpScreen({ navigation }) {
         Alert.alert('Please enter a valid email address.');
         setEmailError(true);
       }
+      else if (error.code === 'auth/email-already-in-use') {
+        Alert.alert('This email already exists.');
+        setEmailError(true);
+      }
     } finally {
       setLoading(false);
     }

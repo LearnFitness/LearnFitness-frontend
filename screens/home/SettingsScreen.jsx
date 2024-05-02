@@ -23,7 +23,7 @@ export default function SettingsScreen() {
     gender: "",
     expLevel: "",
   });
-  
+
   const [selectedGender,  setSelectedGender] = useState(0);
   const genders = ["Male", "Female", "Other"]
   const [selectedLevel, setSelectedLevel] = useState(0);
@@ -178,7 +178,7 @@ export default function SettingsScreen() {
               <Pressable onPress={toggleNotificationSettings}>
                 <Feather name="arrow-left" size={26} color="black" />
               </Pressable>
-              <Text style={styles.notificationsHeader}> Notifications</Text>
+              <Text style={styles.notificationsHeader}>  Notifications</Text>
             </View>
             {/* Buttons */}
             <View style={styles.notificationSettings}>
@@ -205,7 +205,7 @@ export default function SettingsScreen() {
 
       <Modal
         animationType="slide"
-        // transparent={true}
+        //transparent={true}
         visible={showEditProfileettings}
         onRequestClose={toggleEditProfileSettings}
       >
@@ -215,7 +215,7 @@ export default function SettingsScreen() {
               <Pressable onPress={toggleEditProfileSettings}>
                 <Feather name="arrow-left" size={26} color="black" />
               </Pressable>
-              <Text style={styles.notificationsHeader}> Edit Profile</Text>
+              <Text style={styles.notificationsHeader}>  Edit Profile</Text>
             </View>
             <View>
               <View style={[styles.editcontainer, { flexDirection: "row" }]}>
@@ -399,7 +399,7 @@ const styles = StyleSheet.create({
   edittitle: {
     fontWeight: "600",
     fontSize: 20,
-    margin: 5,
+    margin: 10,
   },
   notificationSettingsContainer: {
     backgroundColor: "white",
