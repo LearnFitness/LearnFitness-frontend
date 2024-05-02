@@ -34,20 +34,21 @@ export default function ProgressScreen({ navigation }) {
   const [completedWorkoutDates, setCompletedWorkoutDates] = useState({});
   const [totalWorkouts, setTotalWorkouts] = useState(0);
   const [avgWorkoutsPerWeek, setAvgWorkoutsPerWeek] = useState(0);
-  const [avgWorkoutDuration, setAvgWorkoutDuration] = useState(0); 
+  const [avgWorkoutDuration, setAvgWorkoutDuration] = useState(0);
+  const [caloriesBurnedPerWeek, setCaloriesBurnedPerWeek] = useState(0);
 
   useEffect(() => {
     const unsubscribe = firestore()
-      .collection("users")
+      .collection('users')
       .doc(auth().currentUser.uid)
       .onSnapshot(() => {
         async function fetchData() {
           setLoading(true);
           try {
-            const userData = await getBackendDataWithRetry("/user");
+            const userData = await getBackendDataWithRetry('/user');
             setUserData(userData);
           } catch (error) {
-            Alert.alert("An error occurred", error.message);
+            Alert.alert('An error occurred', error.message);
           } finally {
             setLoading(false);
           }
@@ -59,9 +60,9 @@ export default function ProgressScreen({ navigation }) {
 
   useEffect(() => {
     const unsubscribe = firestore()
-      .collection("users")
+      .collection('users')
       .doc(auth().currentUser.uid)
-      .collection("sessions")
+      .collection('sessions')
       .onSnapshot(snapshot => {
         const dates = {};
         let totalWorkouts = 0;
@@ -87,14 +88,19 @@ export default function ProgressScreen({ navigation }) {
         setAvgWorkoutsPerWeek(avgWorkoutsPerWeek.toFixed(2));
 
         const avgDuration = totalDuration / totalWorkouts;
-        setAvgWorkoutDuration(avgDuration / 60); 
+        setAvgWorkoutDuration(avgDuration / 60);
+
+        // Calculate calories burned per week
+        const caloriesBurned = (totalWorkouts * 400)/ weeksBetween;
+        setCaloriesBurnedPerWeek(caloriesBurned);
       });
     return () => unsubscribe();
   }, []);
 
   const toggleHistory = () => {
     setHistory(!showHistory);
-  }
+  };
+
   return (
     <LinearBackground>
       {loading ? (
@@ -102,79 +108,70 @@ export default function ProgressScreen({ navigation }) {
       ) : (
         <SafeAreaView>
           <View>
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "space-between",
-                // gap: 20,
-
-                margin: 20,
-                marginTop: 40
-              }}
-            >
-              <Text style={{ color: "white", fontSize: 24, fontWeight: 600 }}>
-                My Progress
-              </Text>
-              <Pressable onPress={() => navigation.navigate("Settings")}>
-                <AvatarDisplay
-                  source={
-                    userData && userData.photoURL
-                      ? { uri: userData.photoURL }
-                      : null
-                  }
-                  size={60}
-                  editable={false}
-                  clickable={false}
-                />
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', margin: 20, marginTop: 40 }}>
+              <Text style={{ color: 'white', fontSize: 24, fontWeight: '600' }}>My Progress</Text>
+              <Pressable onPress={() => navigation.navigate('Settings')}>
+                <AvatarDisplay source={userData && userData.photoURL ? { uri: userData.photoURL } : null} size={60} editable={false} clickable={false} />
               </Pressable>
             </View>
-            <View
-              style={{
-                backgroundColor: "rgb(34,84,150)",
-                marginHorizontal: 125,
-              }}
-            >
-              <Button
-                title="See History"
-                color="#0094FF"
-                onPress={toggleHistory}
-              />
+            <View style={{ backgroundColor: 'rgb(34,84,150)', marginHorizontal: 125 }}>
+              <Button title="See History" color="#0094FF" onPress={toggleHistory} />
             </View>
-            <Modal
-              animationType="slide"
-              // transparent={true}
-              visible={showHistory}
-              onRequestClose={toggleHistory}
-            >
+            <Modal animationType="slide" visible={showHistory} onRequestClose={toggleHistory}>
               <SafeAreaView style={styles.modalContainer}>
                 <View style={styles.notificationSettingsContainer}>
                   <View style={styles.notificationsHeader}>
                     <Pressable onPress={toggleHistory}>
                       <Feather name="arrow-left" size={26} color="black" />
                     </Pressable>
-                    <Text style={styles.notificationsHeader}> History</Text>
+                    <Text style={styles.notificationsHeaderText}>History</Text>
                   </View>
                   <CalendarList
-                    onDayPress={(day) => {
-                      console.log("selected day", day);
-                    }}
+                    onDayPress={day => console.log('selected day', day)}
                     markedDates={completedWorkoutDates}
                   />
                 </View>
               </SafeAreaView>
             </Modal>
 
-            <View style={{ alignItems: "center", marginTop: 20 }}>
-              <Text style={{ color: "white" }}>
-                Total Workouts Completed: {totalWorkouts}
-              </Text>
-              <Text style={{ color: "white" }}>
-                Average Workouts Per Week: {avgWorkoutsPerWeek}
-              </Text>
-              <Text style={{ color: "white" }}>
-                Average Workout Duration: {avgWorkoutDuration.toFixed(2)} min/workout
-              </Text>
+            <View style={{ alignItems: 'center', marginTop: 20 }}>
+              <Text style={styles.statText}>Total Workouts Completed: {totalWorkouts}</Text>
+              <Text style={styles.statText}>Average Workouts Per Week: {avgWorkoutsPerWeek}</Text>
+              <Text style={styles.statText}>Average Workout Duration: {avgWorkoutDuration.toFixed(2)} min/workout</Text>
+              <Text style={styles.statText}>Calories Burned Per Week: {caloriesBurnedPerWeek} cal</Text>
+            </View>
+
+            {/* Display Bar Chart */}
+            <View style={styles.chartContainer}>
+              <Text style={styles.chartTitle}>Weekly Workout Summary</Text>
+              <BarChart
+                data={{
+                  labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                  datasets: [{ data: [30, 40, 35, 45, 50, 55, 40] }], // Example data for time spent (in minutes) per day
+                }}
+                width={350}
+                height={220}
+                yAxisSuffix=" min"
+                chartConfig={{
+                  backgroundColor: '#1cc910',
+                  backgroundGradientFrom: '#eff3ff',
+                  backgroundGradientTo: '#efefef',
+                  decimalPlaces: 0,
+                  color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+                  style: { borderRadius: 15 },
+                  propsForLabels: {
+                    fontFamily: 'Arial',
+                    fontSize: 12,
+                  },
+                  barPercentage: 0.6,
+                }}
+                fromZero
+                bezier
+                style={{
+                  marginVertical: 8,
+                  borderRadius: 16,
+                }}
+              />
             </View>
           </View>
         </SafeAreaView>
@@ -186,21 +183,39 @@ export default function ProgressScreen({ navigation }) {
 const styles = StyleSheet.create({
   modalContainer: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   notificationsHeader: {
     fontSize: 26,
-    fontWeight: "bold",
-    flexDirection: "row",
-    alignItems: "baseline",
+    fontWeight: 'bold',
+    flexDirection: 'row',
+    alignItems: 'baseline',
     marginTop: 10,
     marginBottom: 20,
   },
-
+  notificationsHeaderText: {
+    fontSize: 26,
+    fontWeight: 'bold',
+    marginLeft: 10,
+  },
   notificationSettingsContainer: {
-    backgroundColor: "white",
-    width: "100%",
-    height: "100%",
+    backgroundColor: 'white',
+    width: '100%',
+    height: '100%',
+  },
+  statText: {
+    color: 'white',
+    fontSize: 18,
+    marginBottom: 10,
+  },
+  chartContainer: {
+    alignItems: 'center',
+    marginTop: 20,
+  },
+  chartTitle: {
+    color: 'white',
+    fontSize: 20,
+    marginBottom: 10,
   },
 });
