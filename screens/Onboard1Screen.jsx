@@ -50,6 +50,9 @@ export default function Onboard1Screen({ navigation }) {
     if (!heightRegex.test(onboardData.height)) {
       Alert.alert("Invalid Height", "Please enter a valid height.");
       return;
+    } else if (!onboardData.height.includes('.')) {
+      // Convert height from integer to float with one decimal point
+      onboardData.height = parseFloat(onboardData.height).toFixed(1);
     }
 
     // Check if weight is an integer
@@ -113,7 +116,7 @@ export default function Onboard1Screen({ navigation }) {
               value={onboardData.age}
               onChangeText={(text) => updateOnboardData("age", text)}
               keyboardType="numeric"
-              style={{ fontSize: 17 }}
+              style={{ fontSize: 17, textAlign: 'right' }}
             />
             <Divider />
             <SignUpInput
@@ -122,7 +125,7 @@ export default function Onboard1Screen({ navigation }) {
               value={onboardData.height}
               onChangeText={(text) => updateOnboardData("height", text)}
               keyboardType="numeric"
-              style={{ fontSize: 17 }}
+              style={{ fontSize: 17, textAlign: 'right' }}
             />
             <Divider />
             <SignUpInput
@@ -131,7 +134,7 @@ export default function Onboard1Screen({ navigation }) {
               value={onboardData.weight}
               onChangeText={(text) => updateOnboardData("weight", text)}
               keyboardType="numeric"
-              style={{ fontSize: 17 }}
+              style={{ fontSize: 17, textAlign: 'right' }}
             />
             <Divider />
             <SignUpInput
