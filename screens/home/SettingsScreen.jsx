@@ -67,7 +67,7 @@ export default function SettingsScreen() {
         await doc.ref.update(editprofileData);
         Alert.alert("Changes saved.");
       } else {
-        Alert.alert("An error occuied.");
+        Alert.alert("An error occured.");
       }
     } catch (error) {
       console.error("Error updating profile:", error);

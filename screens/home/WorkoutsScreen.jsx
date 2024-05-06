@@ -154,8 +154,8 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: "bold",
     color: "white",
-    marginTop: 40,
-    marginBottom: 10
+    marginTop: 50,
+    marginBottom: 10,
   },
   workoutsContainer: {
     flexDirection: "row",

@@ -81,18 +81,24 @@ export default function ProgressScreen({ navigation }) {
         setCompletedWorkoutDates(dates);
         setTotalWorkouts(totalWorkouts);
 
-        const firstSessionDate = Object.keys(dates).length > 0 ? new Date(Object.keys(dates)[0]) : new Date();
-        const daysBetween = Math.ceil((new Date() - firstSessionDate) / (1000 * 60 * 60 * 24));
-        const weeksBetween = Math.ceil(daysBetween / 7);
-        const avgWorkoutsPerWeek = totalWorkouts / weeksBetween;
-        setAvgWorkoutsPerWeek(avgWorkoutsPerWeek.toFixed(2));
+        if (totalWorkouts > 0) {
+          const firstSessionDate = Object.keys(dates).length > 0 ? new Date(Object.keys(dates)[0]) : new Date();
+          const daysBetween = Math.ceil((new Date() - firstSessionDate) / (1000 * 60 * 60 * 24));
+          const weeksBetween = Math.ceil(daysBetween / 7);
+          const avgWorkoutsPerWeek = totalWorkouts / weeksBetween;
+          setAvgWorkoutsPerWeek(avgWorkoutsPerWeek.toFixed(2));
 
-        const avgDuration = totalDuration / totalWorkouts;
-        setAvgWorkoutDuration(avgDuration / 60);
+          const avgDuration = totalDuration / totalWorkouts;
+          setAvgWorkoutDuration(avgDuration / 60);
 
-        // Calculate calories burned per week
-        const caloriesBurned = (totalWorkouts * 400)/ weeksBetween;
-        setCaloriesBurnedPerWeek(caloriesBurned);
+          // Calculate calories burned per week
+          const caloriesBurned = (totalWorkouts * 400)/ weeksBetween;
+          setCaloriesBurnedPerWeek(caloriesBurned);
+        } else {
+          setAvgWorkoutsPerWeek(0);
+          setAvgWorkoutDuration(0);
+          setCaloriesBurnedPerWeek(0);
+        }
       });
     return () => unsubscribe();
   }, []);
@@ -109,7 +115,7 @@ export default function ProgressScreen({ navigation }) {
         <SafeAreaView>
           <View>
             <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', margin: 20, marginTop: 40 }}>
-              <Text style={{ color: 'white', fontSize: 24, fontWeight: '600' }}>My Progress</Text>
+              <Text style={{ color: 'white', fontSize: 24, fontWeight: 'bold', marginLeft: 10 }}>My Progress</Text>
               <Pressable onPress={() => navigation.navigate('Settings')}>
                 <AvatarDisplay source={userData && userData.photoURL ? { uri: userData.photoURL } : null} size={60} editable={false} clickable={false} />
               </Pressable>
@@ -122,7 +128,7 @@ export default function ProgressScreen({ navigation }) {
                 <View style={styles.notificationSettingsContainer}>
                   <View style={styles.notificationsHeader}>
                     <Pressable onPress={toggleHistory}>
-                      <Feather name="arrow-left" size={26} color="black" />
+                      <Feather name="arrow-left" size={26} color="black" marginLeft={15} />
                     </Pressable>
                     <Text style={styles.notificationsHeaderText}>History</Text>
                   </View>
