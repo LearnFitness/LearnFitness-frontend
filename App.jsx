@@ -49,8 +49,8 @@ export default function App() {
               <Stack.Screen
                 name="StartWorkoutScreen"
                 component={StartWorkoutScreen}
-                options={{
-                  title: "Start workout",
+                options={({ route }) => ({
+                  title: route.params.headerTitle,
                   gestureEnabled: false,
                   headerBackVisible: false,
                   headerShown: true,
@@ -60,7 +60,7 @@ export default function App() {
                   headerStyle: Platform.OS === "ios" ? null : { backgroundColor: "#002328" },
                   headerTitleAlign: "center",
                   autoHideHomeIndicator: true,
-                }} />
+                })} />
               <Stack.Screen
                 name="AddWorkoutScreen"
                 component={AddWorkoutScreen}

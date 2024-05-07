@@ -7,19 +7,24 @@ import toast from '../utils/toast';
 import firestore from "@react-native-firebase/firestore";
 import auth from "@react-native-firebase/auth";
 import { useHeaderHeight } from "@react-navigation/elements";
+import { AntDesign } from "@expo/vector-icons";
 
 export default function StartWorkoutScreen({ route, navigation }) {
-  const { workout, exercise } = route.params;
+  const { workout, exercise, action } = route.params;
   const sessionDate = new Date();
+  const [sessionId, setSessionId] = useState("");
   const [sessionName, setSessionName] = useState(workout ? workout.name : "");
   const [sessionDescription, setSessionDescription] = useState(workout ? workout.description : "");
-  const [sessionDuration, setSessionDuration] = useState(0);
+  const [sessionDuration, setSessionDuration] = useState(workout ? (workout.duration ? workout.duration : 0) : 0);
   // Transfrom the exercises array from the workout (sets is a number) to the session (sets is an object)
   const [exercises, setExercises] = useState(() => {
-    return workout.exercises.map(ex => ({
-      ...ex,
-      sets: Array(ex.sets).fill().map(() => ({ reps: 0, lbs: 0 }))
-    }));
+    if (!isNaN(workout.exercises[0].sets)) { // If set is a number
+      return workout.exercises.map(ex => ({
+        ...ex,
+        sets: Array(ex.sets).fill().map(() => ({ reps: 0, lbs: 0 }))
+      }));
+    }
+    return workout.exercises;
   });
 
   // Height of header
@@ -37,12 +42,14 @@ export default function StartWorkoutScreen({ route, navigation }) {
 
   // Session duration timer
   useEffect(() => {
-    const interval = setInterval(() => {
-      setSessionDuration(prevDuration => prevDuration + 1);
-    }, 1000);
+    if (action === "start") {
+      const interval = setInterval(() => {
+        setSessionDuration(prevDuration => prevDuration + 1);
+      }, 1000);
 
-    // Clear interval on component unmount
-    return () => clearInterval(interval);
+      // Clear interval on component unmount
+      return () => clearInterval(interval);
+    }
   }, []);
 
   // Effects to handle adding an exercise to the session
@@ -50,7 +57,10 @@ export default function StartWorkoutScreen({ route, navigation }) {
     if (exercise) {
       handleAddExercise(exercise);
     }
-  }, [exercise]);
+    if (workout && workout.id) {
+      setSessionId(workout.id);
+    }
+  }, [exercise, workout]);
 
   function handleScroll(event) {
     const newY = event.nativeEvent.contentOffset.y;
@@ -59,16 +69,16 @@ export default function StartWorkoutScreen({ route, navigation }) {
     // Update title based on current scroll position without causing re-renders
     if (newY > 130) {
       navigation.setOptions({
-        title: sessionName.trim() ? sessionName : "Start workout",
+        title: sessionName.trim() ? sessionName : (action === "edit" ? "Edit completed workout" : "Start workout"),
         headerLeft: () => <Ionicons name="chevron-back" color="lightblue" size={23} onPress={handleGoBack} />,
         headerRight: () => (
           <TouchableOpacity style={{ backgroundColor: "rgba(0,135,214,1)", paddingVertical: 5, paddingHorizontal: 15, borderRadius: 5 }} onPress={handleSaveSession}>
-            <Text style={{ color: "white", fontSize: 16, fontWeight: "500" }}>Finish</Text>
+            <Text style={{ color: "white", fontSize: 16, fontWeight: "500" }}>{action === "edit" ? "Save" : "Finish"}</Text>
           </TouchableOpacity>
         )
       });
     } else {
-      navigation.setOptions({ title: "Start workout", headerLeft: null, headerRight: null });
+      navigation.setOptions({ title: action === "edit" ? "Edit completed workout" : "Start workout", headerLeft: null, headerRight: null });
     }
   };
 
@@ -158,6 +168,11 @@ export default function StartWorkoutScreen({ route, navigation }) {
     )
   }
 
+  function handleEditDuration(event) {
+    console.log("Update duration:", event.nativeEvent.text);
+    setSessionDuration(parseInt(event.nativeEvent.text, 10))
+  }
+
   async function handleSaveSession() {
     if (!sessionName.trim()) {
       Alert.alert("Session name is required.");
@@ -176,21 +191,27 @@ export default function StartWorkoutScreen({ route, navigation }) {
         date: sessionDate,
         duration: sessionDuration
       };
-      await firestore().collection("users").doc(auth().currentUser.uid).collection("sessions").add(newSession);
-      toast("Session saved");
-      navigation.goBack();
-      // Show a success message using Alert
-      Alert.alert(
-        "Workout Finished!",
-        "You finished your workout.",
-        [
-          {
-            text: "OK",
-          }
-        ]
-      );
+
+      if (action === "edit") {
+        await firestore().collection("users").doc(auth().currentUser.uid).collection("sessions").doc(sessionId).update(newSession);
+        toast("Workout saved");
+      } else if (action === "start") {
+        await firestore().collection("users").doc(auth().currentUser.uid).collection("sessions").add(newSession);
+        // Show a success message using Alert
+        Alert.alert(
+          "Workout Finished!",
+          "You finished your workout.",
+          [
+            {
+              text: "OK",
+            }
+          ]
+        );
+      }
     } catch (error) {
       Alert.alert(error.message);
+    } finally {
+      navigation.goBack();
     }
   }
 
@@ -225,8 +246,7 @@ export default function StartWorkoutScreen({ route, navigation }) {
   return (
     <LinearBackground containerStyle={styles.container} safeAreaView={false}>
       <ScrollView
-        // contentInsetAdjustmentBehavior="scrollableAxes"
-        stickyHeaderIndices={[3]}
+        stickyHeaderIndices={action === "edit" ? [] : [3]}
         onScroll={Animated.event(
           [{ nativeEvent: { contentOffset: { y: scrollY } } }],
           {
@@ -257,18 +277,33 @@ export default function StartWorkoutScreen({ route, navigation }) {
             <Text style={styles.actionButtonText}>Cancel</Text>
           </TouchableOpacity>
           <TouchableOpacity style={[styles.actionButton, { backgroundColor: "#0087d6" }]} onPress={handleSaveSession}>
-            <Text style={styles.actionButtonText}>Finish</Text>
+            <Text style={styles.actionButtonText}>{action === "edit" ? "Save" : "Finish"}</Text>
           </TouchableOpacity>
         </View>
 
-        <View>
-          <Animated.View style={[styles.timeContainer, { marginHorizontal: marginHorizontalAnim }]}>
-            <RestTimer />
-            <Text style={styles.sessionDuration}>
-              {padToTwoDigits(Math.floor(sessionDuration / 60))}:{padToTwoDigits(sessionDuration % 60)}
-            </Text>
-          </Animated.View>
-        </View>
+        {action === "edit" ?
+          <View style={{ flexDirection: "row", alignSelf: "center", alignItems: "center", marginVertical: 5 }}>
+            <AntDesign name="clockcircle" color="white" size={20} />
+            <TextInput
+              value={sessionDuration.toString()}
+              onEndEditing={handleEditDuration}
+              style={{ backgroundColor: "grey", borderRadius: 5, color: "white", fontSize: 20, fontWeight: "600", marginHorizontal: 10, padding: 5 }}
+            />
+            <Text style={{color: "white", fontSize: 17}}>seconds</Text>
+          </View>
+          :
+          <View>
+            <Animated.View style={[styles.timeContainer, { marginHorizontal: marginHorizontalAnim }]}>
+              <RestTimer />
+              <View style={{ flexDirection: "row", alignItems: "center" }}>
+                <AntDesign name="clockcircle" color="white" size={20} />
+                <Text style={styles.sessionDuration}>
+                  {padToTwoDigits(Math.floor(sessionDuration / 60))}:{padToTwoDigits(sessionDuration % 60)}
+                </Text>
+              </View>
+            </Animated.View>
+          </View>
+        }
 
         <ExerciseListView />
 

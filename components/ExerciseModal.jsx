@@ -41,7 +41,9 @@ export default function ExerciseModal({ route, navigation }) {
       const action = parentScreen.params.action; // action is either edit or create
       navigation.navigate("AddWorkoutScreen", { exercise, headerTitle: action === "edit" ? "Edit workout" : "Create workout", action });
     } else if (routes.find(route => route.name === "StartWorkoutScreen")) {
-      navigation.navigate("StartWorkoutScreen", { exercise });
+      const parentScreen = routes.find(route => route.name === "StartWorkoutScreen");
+      const action = parentScreen.params.action; // action is either edit or start
+      navigation.navigate("StartWorkoutScreen", { exercise, headerTitle: action === "edit" ? "Edit completed workout" : "Start workout", action });
     } else {
       navigation.navigate("AddExerciseScreen", { exercise });
     };

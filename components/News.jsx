@@ -57,6 +57,7 @@ const styles = StyleSheet.create({
     fontWeight: "500"
   },
   article: {
+    overflow: "hidden",
     backgroundColor: "rgba(255,255,255,1)",
     margin: 10,
     marginLeft: 10,

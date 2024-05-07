@@ -1,5 +1,5 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
+import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import FontAwesome from "@expo/vector-icons/FontAwesome6";
 
 import DashboardScreen from "../screens/home/DashboardScreen";
@@ -18,13 +18,13 @@ function ProgressScreen() {
       <TopTab.Screen name="Charts" component={ChartsScreen} />
       <TopTab.Screen name="History" component={HistoryScreen} />
     </TopTab.Navigator>
-  );
+  )
 }
 
 export default function HomeNavigator() {
   return (
-    <BottomTab.Navigator
-      screenOptions={({ route }) => ({
+    <BottomTab.Navigator screenOptions={
+      ({ route }) => ({
         tabBarIcon: ({ focused, color, size }) => {
           let iconName;
 
@@ -40,17 +40,13 @@ export default function HomeNavigator() {
         tabBarActiveTintColor: "teal",
         tabBarInactiveTintColor: "gray",
         headerShown: false,
-      })}
-    >
+      })
+    }>
       <BottomTab.Screen name="Dashboard" component={DashboardScreen} />
       <BottomTab.Screen name="Workouts" component={WorkoutsScreen} />
       <BottomTab.Screen name="Exercises" component={ExercisesScreen} />
-      <BottomTab.Screen
-        name="Progress"
-        component={ProgressScreen}
-        options={{ headerShown: true }}
-      />
+      <BottomTab.Screen name="Progress" component={ProgressScreen} options={{ headerShown: true }} />
       <BottomTab.Screen name="Settings" component={SettingsScreen} />
     </BottomTab.Navigator>
-  );
+  )
 }
