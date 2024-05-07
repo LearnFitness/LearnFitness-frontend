@@ -44,6 +44,7 @@ export default function ChartsScreen({ navigation }) {
   ]);
   const [maxWorkoutTime, setMaxWorkoutTime] = useState(0);
   const [weeklyWorkouts, setWeeklyWorkouts] = useState([]);
+  const [maxVolumePerExercise, setMaxVolumePerExercise] = useState({});
 
   useEffect(() => {
     const unsubscribe = firestore()
@@ -76,6 +77,7 @@ export default function ChartsScreen({ navigation }) {
         let totalWorkouts = 0;
         let totalDuration = 0;
         let workoutTimePerDayCopy = [0, 0, 0, 0, 0, 0, 0];
+        const maxVolumeData = {};
         snapshot.forEach((doc) => {
           const session = doc.data();
           const sessionDate = new Date(session.date.seconds * 1000);
@@ -90,9 +92,18 @@ export default function ChartsScreen({ navigation }) {
           totalWorkouts++;
           totalDuration += session.duration;
           workoutTimePerDayCopy[dayIndex] += session.duration / 60;
+          session.exercises.forEach(exercise => {
+            exercise.sets.forEach(set => {
+              const volume = set.lbs * set.reps;
+              if (volume > 0 && (!maxVolumeData[exercise.id] || volume > maxVolumeData[exercise.id].volume)) {
+                maxVolumeData[exercise.id] = { volume, reps: set.reps, lbs: set.lbs };
+              }
+            });
+          });
         });
         setCompletedWorkoutDates(dates);
         setTotalWorkouts(totalWorkouts);
+        setMaxVolumePerExercise(maxVolumeData);
 
         if (totalWorkouts > 0) {
           const firstSessionDate =
@@ -116,6 +127,32 @@ export default function ChartsScreen({ navigation }) {
           setCaloriesBurnedPerWeek(0);
         }
       });
+    return () => unsubscribe();
+  }, []);
+
+  useEffect(() => {
+    const unsubscribe = firestore()
+      .collection('exercises')
+      .onSnapshot(snapshot => {
+        const exerciseNames = {};
+        snapshot.forEach(doc => {
+          const exerciseData = doc.data();
+          exerciseNames[doc.id] = exerciseData.name;
+        });
+
+        // Map the exercise IDs to their names and update the state
+        setMaxVolumePerExercise(prevMaxVolumes => {
+          const updatedMaxVolumes = {};
+          for (const exerciseId in prevMaxVolumes) {
+            updatedMaxVolumes[exerciseId] = {
+              ...prevMaxVolumes[exerciseId],
+              name: exerciseNames[exerciseId] || '', // Assign exercise name if found
+            };
+          }
+          return updatedMaxVolumes;
+        });
+      });
+
     return () => unsubscribe();
   }, []);
 
@@ -148,6 +185,10 @@ export default function ChartsScreen({ navigation }) {
 
   const toggleHistory = () => {
     setHistory(!showHistory);
+  };
+
+  const capitalizeFirstLetter = (string) => {
+    return string.toLowerCase().split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
   };
 
   return (
@@ -258,6 +299,21 @@ export default function ChartsScreen({ navigation }) {
                   Calories Burned Per Week: {caloriesBurnedPerWeek} cal
                 </Text>
               </View>
+              <View style={styles.sectionTitleContainer}>
+                <Text style={styles.chartTitle}>Your Personal Records (PR):</Text>
+              </View>
+              {/* PRs horizontally scrollable */}
+              <ScrollView horizontal>
+                <View style={styles.prContainer}>
+                  {/* Display max volume with exercise name */}
+                  {Object.keys(maxVolumePerExercise).map((exerciseId, index, array) => (
+                  <Text key={exerciseId} style={styles.prText}>
+                    <Text style={{ fontWeight: 'bold' }}>{maxVolumePerExercise[exerciseId].name ? capitalizeFirstLetter(maxVolumePerExercise[exerciseId].name) : ''}</Text> - {maxVolumePerExercise[exerciseId].reps} reps x {maxVolumePerExercise[exerciseId].lbs} lbs.
+                    {index !== array.length - 1 && ' | '}
+                  </Text>
+                ))}
+                </View>
+              </ScrollView>
             </View>
           </SafeAreaView>
         )}
@@ -317,5 +373,27 @@ const styles = StyleSheet.create({
     color: "#0044AA",
     fontSize: 16,
     fontWeight: "bold",
+  },
+  sectionTitleContainer: {
+    borderTopWidth: 1,
+    borderTopColor: '#FFFFFF', 
+    paddingTop: 10,
+    paddingBottom: 5,
+    marginBottom: 10,
+    alignItems: 'center',
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  prContainer: {
+    flexDirection: 'row', 
+    alignItems: 'center',
+    paddingHorizontal: 10,
+  },
+  prText: {
+    fontSize: 16,
+    marginHorizontal: 5,
+    color: 'white',
   },
 });
