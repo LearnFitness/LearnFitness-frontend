@@ -16,7 +16,7 @@ export default function StartWorkoutScreen({ route, navigation }) {
   const [sessionName, setSessionName] = useState(workout ? workout.name : "");
   const [sessionDescription, setSessionDescription] = useState(workout ? workout.description : "");
   const [sessionDuration, setSessionDuration] = useState(workout ? (workout.duration ? workout.duration : 0) : 0);
-  // Transfrom the exercises array from the workout (sets is a number) to the session (sets is an object)
+  // Transfrom the exercises array from the workout (where sets is a number) to the session (where sets is an object)
   const [exercises, setExercises] = useState(() => {
     if (!isNaN(workout.exercises[0].sets)) { // If set is a number
       return workout.exercises.map(ex => ({
@@ -133,6 +133,7 @@ export default function StartWorkoutScreen({ route, navigation }) {
       }
       return ex;
     });
+    console.log("Updated exercises:", updatedExercises[0].sets);
     setExercises(updatedExercises);
   };
 
@@ -146,6 +147,7 @@ export default function StartWorkoutScreen({ route, navigation }) {
       }
       return ex;
     });
+    console.log("Updated exercises:", updatedExercises[0].sets);
     setExercises(updatedExercises);
   };
 
@@ -168,50 +170,64 @@ export default function StartWorkoutScreen({ route, navigation }) {
     )
   }
 
-  function handleEditDuration(event) {
-    console.log("Update duration:", event.nativeEvent.text);
-    setSessionDuration(parseInt(event.nativeEvent.text, 10))
-  }
-
   async function handleSaveSession() {
     if (!sessionName.trim()) {
       Alert.alert("Session name is required.");
       return;
     }
-    if (exercises.length === 0) {
-      Alert.alert("Please add exercises to your session.");
-      return;
-    }
 
-    try {
-      const newSession = {
-        name: sessionName,
-        description: sessionDescription,
-        exercises: exercises,
-        date: sessionDate,
-        duration: sessionDuration
-      };
+    // Check for exercises and sets with 0 lbs or 0 reps
+    const anyEmptySets = exercises.some(exercise =>
+      exercise.sets.some(set => set.reps === 0 || set.lbs === 0));
 
-      if (action === "edit") {
-        await firestore().collection("users").doc(auth().currentUser.uid).collection("sessions").doc(sessionId).update(newSession);
-        toast("Workout saved");
-      } else if (action === "start") {
-        await firestore().collection("users").doc(auth().currentUser.uid).collection("sessions").add(newSession);
-        // Show a success message using Alert
-        Alert.alert(
-          "Workout Finished!",
-          "You finished your workout.",
-          [
-            {
-              text: "OK",
-            }
-          ]
-        );
+    const proceedWithSave = async () => {
+      // Filter out sets with 0 lbs or 0 reps
+      const filteredExercises = exercises.map(exercise => {
+        const filteredSets = exercise.sets.filter(set => set.reps !== 0 && set.lbs !== 0);
+        return { ...exercise, sets: filteredSets };
+      }).filter(exercise => exercise.sets.length > 0); // Also make sure we don't have exercises without sets
+
+      // Check if there are no valid exercises left after filtering
+      if (filteredExercises.length === 0) {
+        Alert.alert("No valid exercises", "Please add valid exercises to your workout before saving.");
+        return;
       }
-    } catch (error) {
-      Alert.alert(error.message);
-    } finally {
-      navigation.goBack();
+
+      try {
+        const newSession = {
+          name: sessionName,
+          description: sessionDescription,
+          exercises: filteredExercises,
+          date: sessionDate,
+          duration: sessionDuration
+        };
+
+        if (action === "edit") {
+          await firestore().collection("users").doc(auth().currentUser.uid).collection("sessions").doc(sessionId).update(newSession);
+          toast("Workout saved");
+        } else if (action === "start") {
+          await firestore().collection("users").doc(auth().currentUser.uid).collection("sessions").add(newSession);
+          Alert.alert("Workout Finished!", "You finished your workout.", [{ text: "OK" }]);
+        }
+      } catch (error) {
+        Alert.alert(error.message);
+      } finally {
+        navigation.goBack();
+      }
+    };
+
+    if (anyEmptySets) {
+      // Alert the user that sets with 0 lbs or 0 reps will be removed
+      Alert.alert(
+        "Empty Sets Detected",
+        "All sets with 0 lbs or 0 reps will be removed. Do you want to proceed?",
+        [
+          { text: "Cancel", style: "cancel" },
+          { text: "Proceed", onPress: proceedWithSave }
+        ]
+      );
+    } else {
+      proceedWithSave();
     }
   }
 
@@ -284,12 +300,9 @@ export default function StartWorkoutScreen({ route, navigation }) {
         {action === "edit" ?
           <View style={{ flexDirection: "row", alignSelf: "center", alignItems: "center", marginVertical: 5 }}>
             <AntDesign name="clockcircle" color="white" size={20} />
-            <TextInput
-              value={sessionDuration.toString()}
-              onEndEditing={handleEditDuration}
-              style={{ backgroundColor: "grey", borderRadius: 5, color: "white", fontSize: 20, fontWeight: "600", marginHorizontal: 10, padding: 5 }}
-            />
-            <Text style={{color: "white", fontSize: 17}}>seconds</Text>
+            <Text style={{ color: "white", fontSize: 20, fontWeight: 600, marginHorizontal: 10 }}>
+              {padToTwoDigits(Math.floor(sessionDuration / 60))}:{padToTwoDigits(sessionDuration % 60)}
+            </Text>
           </View>
           :
           <View>
@@ -336,6 +349,35 @@ export default function StartWorkoutScreen({ route, navigation }) {
   }
 
   function Set({ set, setIndex, exercise }) {
+    const [lbs, setLbs] = useState(set.lbs.toString());
+    const [reps, setReps] = useState(set.reps.toString());
+
+    // Convert state to empty string if value is 0, otherwise show the number
+    const displayLbs = lbs === "0" ? "" : lbs;
+    const displayReps = reps === "0" ? "" : reps;
+
+    const handleLbsChange = (text) => {
+      setLbs(text);  // Update local state immediately
+    };
+
+    const handleRepsChange = (text) => {
+      setReps(text);  // Update local state immediately
+    };
+
+    const handleLbsEndEditing = () => {
+      // Convert back to 0 if empty string, otherwise parse integer
+      const newLbs = lbs === "" ? 0 : parseInt(lbs, 10);
+      handleUpdateLbs(exercise.id, setIndex, newLbs);
+      setLbs(newLbs.toString());  // Reset the local state to ensure consistency
+    };
+
+    const handleRepsEndEditing = () => {
+      // Convert back to 0 if empty string, otherwise parse integer
+      const newReps = reps === "" ? 0 : parseInt(reps, 10);
+      handleUpdateReps(exercise.id, setIndex, newReps);
+      setReps(newReps.toString());  // Reset the local state to ensure consistency
+    };
+
     return (
       <View style={styles.exerciseSet}>
         <Ionicons
@@ -348,24 +390,22 @@ export default function StartWorkoutScreen({ route, navigation }) {
         <TextInput
           keyboardType="numeric"
           style={[{ flex: 2 }, styles.exerciseInput]}
-          value={set.lbs ? set.lbs.toString() : null}
-          onEndEditing={e => {
-            const lbs = e.nativeEvent.text ? parseInt(e.nativeEvent.text, 10) : 0;
-            handleUpdateLbs(exercise.id, setIndex, lbs);
-          }}
+          value={displayLbs}
+          onChangeText={handleLbsChange}
+          onEndEditing={handleLbsEndEditing}
         />
         <TextInput
           keyboardType="numeric"
           style={[{ flex: 2 }, styles.exerciseInput]}
-          value={set.reps ? set.reps.toString() : null}
-          onEndEditing={e => {
-            const reps = e.nativeEvent.text ? parseInt(e.nativeEvent.text, 10) : 0;
-            handleUpdateReps(exercise.id, setIndex, reps);
-          }}
+          value={displayReps}
+          onChangeText={handleRepsChange}
+          onEndEditing={handleRepsEndEditing}
         />
       </View>
-    )
+    );
   }
+
+
 }
 
 function padToTwoDigits(number) {
