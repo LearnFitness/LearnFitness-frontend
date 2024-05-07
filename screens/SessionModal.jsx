@@ -39,18 +39,18 @@ export default function SessionModal({ route, navigation }) {
 
     const marginTop = interpolate(
       scrollOffset.value,
-      [0, 150],  // Input range: from 0 to the difference between max and min sizes
-      [60, 15],  // Output range: from max size to min size
-      Extrapolation.CLAMP  // Clamps the output to the min and max sizes
+      [0, 150], // Input range: from 0 to the difference between max and min sizes
+      [60, 15], // Output range: from max size to min size
+      Extrapolation.CLAMP // Clamps the output to the min and max sizes
     );
     console.log(scrollOffset.value);
 
     return {
       width: size,
       height: size,
-      marginTop: marginTop
-    }
-  })
+      marginTop: marginTop,
+    };
+  });
 
   const animatedProp = useAnimatedProps(() => {
     const location = interpolate(
@@ -58,12 +58,12 @@ export default function SessionModal({ route, navigation }) {
       [0, 150],
       [0.4, 0.1],
       Extrapolation.CLAMP
-    )
+    );
 
     return {
-      locations: [0, location]
-    }
-  })
+      locations: [0, location],
+    };
+  });
 
   // const scrollHandler = useAnimatedScrollHandler({
   //   onScroll: (event) => {
@@ -116,23 +116,35 @@ export default function SessionModal({ route, navigation }) {
     // const img = require("./../assets/workout_plans_images/leg1.jpg");
 
     getColors(img, {
-      fallback: '#228B22',
+      fallback: "#228B22",
       cache: true,
       key: img,
-    }).then(colors => {
+    }).then((colors) => {
       setColors(colors);
     });
   }, []);
 
   return (
-
     <>
-      <View style={[{ flex: 1}]} >
-        <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "center" }}>
+      <View style={[{ flex: 1 }]}>
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
           <Text style={styles.titleText}>Completed workout</Text>
-          <AntDesign name="close" color="grey" size={22} style={{position: "absolute", right: 20}}/>
+          <AntDesign
+            name="close"
+            color="grey"
+            size={22}
+            style={{ position: "absolute", right: 20 }}
+            onPress={() => {
+              navigation.goBack();
+            }}
+          />
         </View>
-
 
         <Divider />
 
@@ -144,18 +156,23 @@ export default function SessionModal({ route, navigation }) {
 
         <View style={styles.sessionDetails}>
           <Text style={styles.sessionName}>{session.data.name}</Text>
-          <Text style={styles.sessionDate}>{sessionDate.toDateString()} at {sessionDate.toLocaleTimeString()}</Text>
+          <Text style={styles.sessionDate}>
+            {sessionDate.toDateString()} at {sessionDate.toLocaleTimeString()}
+          </Text>
           <View style={{ flexDirection: "row", alignItems: "center" }}>
             <View style={styles.sessionDuration}>
               <FontAwesome6 name="dumbbell" color="grey" size={15} />
-              <Text style={styles.sessionDurationText}>{session.data.exercises.length} exercises</Text>
+              <Text style={styles.sessionDurationText}>
+                {session.data.exercises.length} exercises
+              </Text>
             </View>
             <View style={styles.sessionDuration}>
               <AntDesign name="clockcircle" color="grey" size={15} />
-              <Text style={styles.sessionDurationText}>{Math.ceil(session.data.duration / 60)}m</Text>
+              <Text style={styles.sessionDurationText}>
+                {Math.ceil(session.data.duration / 60)}m
+              </Text>
             </View>
           </View>
-
         </View>
         <Animated.ScrollView
           contentInsetAdjustmentBehavior="automatic"
@@ -163,19 +180,20 @@ export default function SessionModal({ route, navigation }) {
           ref={animatedRef}
           scrollEventThrottle={15}
         >
-
           <View style={styles.sessionExercises}>
-            {session.data.exercises.map(exercise => {
+            {session.data.exercises.map((exercise) => {
               return (
                 <View key={exercise.id} style={styles.exerciseContainer}>
                   <Text style={styles.exerciseName}>{exercise.name}</Text>
                   {exercise.sets.map((value, index) => {
                     return (
-                      <Text style={styles.exerciseSet} key={index}>{index + 1}. {value.lbs} lbs x {value.reps}</Text>
-                    )
+                      <Text style={styles.exerciseSet} key={index}>
+                        {index + 1}. {value.lbs} lbs x {value.reps}
+                      </Text>
+                    );
                   })}
                 </View>
-              )
+              );
             })}
           </View>
 
@@ -185,32 +203,37 @@ export default function SessionModal({ route, navigation }) {
         </Animated.ScrollView>
         <SpeedDial
           isOpen={open}
-          icon={{ name: 'edit', color: '#fff' }}
-          openIcon={{ name: 'close', color: '#fff' }}
+          icon={{ name: "edit", color: "#fff" }}
+          openIcon={{ name: "close", color: "#fff" }}
           onOpen={() => setOpen(!open)}
           onClose={() => setOpen(!open)}
           buttonStyle={{ backgroundColor: "teal" }}
         >
           <SpeedDial.Action
-            icon={{ name: 'edit', color: '#fff' }}
+            icon={{ name: "edit", color: "#fff" }}
             title="Edit"
-            onPress={() => console.log('Add Something')}
+            onPress={() => console.log("Add Something")}
             buttonStyle={{ backgroundColor: "teal" }}
           />
           <SpeedDial.Action
-            icon={{ name: 'delete', color: '#fff' }}
+            icon={{ name: "delete", color: "#fff" }}
             title="Delete"
-            onPress={() => console.log('Delete Something')}
+            onPress={() => {
+              const unsubscribe = firestore()
+                .collection("users")
+                .doc(auth().currentUser.uid)
+                .collection("sessions")
+                .doc(session.id)
+                .delete()
+
+              navigation.goBack();
+            }}
             buttonStyle={{ backgroundColor: "teal" }}
-
           />
+
         </SpeedDial>
-
       </View>
-
     </>
-
-
   );
 }
 
