@@ -113,16 +113,16 @@ export default function DashboardScreen({ navigation }) {
 
   function UserGreeting() {
     const hour = new Date().getHours();
-    let iconName = "moon";
-    let greeting = "Good night,";
+    //let iconName = "moon";
+    //let greeting = "Good night,";
 
-    if (hour < 6) {
-      iconName = "moon";
-      greeting = "Good night,"
-    } else if (hour < 12) {
-      iconName = "sunrise",
-        greeting = "Good morning,"
-    } else if (hour < 18) {
+    if (hour < 12) {
+      iconName = "sunrise";
+      greeting = "Good morning,,"
+    } else if (hour >= 12 & hour < 18) {
+      iconName = "sun",
+        greeting = "Good afternoon,"
+    } else {
       iconName = "sunset",
         greeting = "Good evening,"
     }

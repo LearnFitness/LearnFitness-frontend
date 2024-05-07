@@ -35,7 +35,7 @@ export default function News() {
         {articles.map((value, index) => {
           return (
             <TouchableOpacity activeOpacity={0.7} key={index} style={[styles.article]} onPress={() => openURL(value.url)}>
-              <Image style={styles.articleImage} source={{ uri: value.image.thumbnail.contentUrl }} />
+              <Image style={styles.articleImage} source={{ uri: value.image?.thumbnail.contentUrl }} />
               <Text style={styles.articleName}>{value.name}</Text>
               <Text></Text>
             </TouchableOpacity>

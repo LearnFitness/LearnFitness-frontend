@@ -6,6 +6,7 @@ import { getBackendDataWithRetry, postBackendDataWithPhoto } from "../../utils/b
 import { useIsFocused } from '@react-navigation/native';
 import AvatarPicker from "../../components/AvatarPicker";
 import { ButtonGroup, Divider } from "@rneui/themed";
+import firestore from "@react-native-firebase/firestore";
 
 export default function SettingsScreen() {
   const [userData, setUserData] = useState(null);
@@ -23,11 +24,58 @@ export default function SettingsScreen() {
     gender: "",
     expLevel: "",
   });
-  
+
   const [selectedGender,  setSelectedGender] = useState(0);
   const genders = ["Male", "Female", "Other"]
   const [selectedLevel, setSelectedLevel] = useState(0);
   const levels = ["Beginner", "Intermediate", "Expert"];
+
+  const updateUserProfile = async () => {
+    try {
+      setLoading(true);
+
+      // Check if age is an integer
+      const ageRegex = /^\d+$/;
+      if (!ageRegex.test(editprofileData.age)) {
+        Alert.alert("Invalid Age", "Please enter a valid age.");
+        return;
+      }
+
+      // Check if height is a float (optimal decimal point)
+      const heightRegex = /^[0-9]+(\.[0-9]+)?$/;
+      if (!heightRegex.test(editprofileData.height)) {
+        Alert.alert("Invalid Height", "Please enter a valid height.");
+        return;
+      } else if (!editprofileData.height.includes('.')) {
+        // Convert height from integer to float with one decimal point
+        editprofileData.height = parseFloat(editprofileData.height).toFixed(1);
+      }
+
+      // Check if weight is an integer
+      const weightRegex = /^\d+$/;
+      if (!weightRegex.test(editprofileData.weight)) {
+        Alert.alert("Invalid Weight", "Please enter a valid weight.");
+        return;
+      }
+
+      // Query firestore and see if there is a document that matches the user's email.
+      // Then, make changes to that document.
+      const userRef = firestore().collection("users").where("email", "==", userData.email);
+      const snapshot = await userRef.get();
+      if (!snapshot.empty) {
+        const doc = snapshot.docs[0];
+        await doc.ref.update(editprofileData);
+        Alert.alert("Changes saved.");
+      } else {
+        Alert.alert("An error occured.");
+      }
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      Alert.alert("An error occured.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Modifies status bar color ONLY on Settings screen
   function FocusAwareStatusBar(props) {
@@ -43,6 +91,8 @@ export default function SettingsScreen() {
         setUserData(userData);
         setPhotoObject({ uri: userData.photoURL })
         setEditProfileData({
+          name: userData.name,
+          age: userData.age,
           height: userData.height,
           weight: userData.weight,
           gender: userData.gender,
@@ -178,7 +228,7 @@ export default function SettingsScreen() {
               <Pressable onPress={toggleNotificationSettings}>
                 <Feather name="arrow-left" size={26} color="black" />
               </Pressable>
-              <Text style={styles.notificationsHeader}> Notifications</Text>
+              <Text style={styles.notificationsHeader}>  Notifications</Text>
             </View>
             {/* Buttons */}
             <View style={styles.notificationSettings}>
@@ -205,7 +255,7 @@ export default function SettingsScreen() {
 
       <Modal
         animationType="slide"
-        // transparent={true}
+        //transparent={true}
         visible={showEditProfileettings}
         onRequestClose={toggleEditProfileSettings}
       >
@@ -215,24 +265,28 @@ export default function SettingsScreen() {
               <Pressable onPress={toggleEditProfileSettings}>
                 <Feather name="arrow-left" size={26} color="black" />
               </Pressable>
-              <Text style={styles.notificationsHeader}> Edit Profile</Text>
+              <Text style={styles.notificationsHeader}>  Edit Profile</Text>
             </View>
             <View>
               <View style={[styles.editcontainer, { flexDirection: "row" }]}>
                 <Text style={styles.edittitle}>Name</Text>
                 <TextInput
-                  editable={false}
+                  onChangeText={(e) => {
+                    setEditProfileData({ ...editprofileData, name: e });
+                  }}
                   style={styles.inputComponent}
-                  value={userData && userData.name ? userData.name : ""}
+                  value={editprofileData.name || ""}
                 />
               </View>
               <Divider />
               <View style={[styles.editcontainer, { flexDirection: "row" }]}>
                 <Text style={styles.edittitle}>Age</Text>
                 <TextInput
-                  editable={false}
+                  onChangeText={(e) => {
+                    setEditProfileData({ ...editprofileData, age: e });
+                  }}
                   style={styles.inputComponent}
-                  value={userData && userData.age ? userData.age : ""}
+                  value={editprofileData.age || ""}
                 />
               </View>
               <Divider />
@@ -303,7 +357,7 @@ export default function SettingsScreen() {
               <Button
                 title="Save Changes"
                 color="#0094FF"
-                onPress={() => Alert.alert("Changes saved.")}
+                onPress={() => updateUserProfile()}
                 disabled={
                   editprofileData.expLevel === "" ||
                   editprofileData.weight === "" ||
@@ -399,7 +453,7 @@ const styles = StyleSheet.create({
   edittitle: {
     fontWeight: "600",
     fontSize: 20,
-    margin: 5,
+    margin: 10,
   },
   notificationSettingsContainer: {
     backgroundColor: "white",
