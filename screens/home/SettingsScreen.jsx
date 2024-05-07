@@ -7,6 +7,7 @@ import { useIsFocused } from '@react-navigation/native';
 import AvatarPicker from "../../components/AvatarPicker";
 import { ButtonGroup, Divider } from "@rneui/themed";
 import firestore from "@react-native-firebase/firestore";
+import PrimaryButton from "../../components/PrimaryButton";
 
 export default function SettingsScreen() {
   const [userData, setUserData] = useState(null);
@@ -74,6 +75,7 @@ export default function SettingsScreen() {
       Alert.alert("An error occured.");
     } finally {
       setLoading(false);
+      setShowEditProfileSettings(false);
     }
   };
 
@@ -353,11 +355,10 @@ export default function SettingsScreen() {
                 />
               </View>
             </View>
-            <View style={{ marginTop: 90, backgroundColor: "#007AFF" }}>
-              <Button
+            <View style={{ marginTop: 90 }}>
+              <PrimaryButton
                 title="Save Changes"
-                color="#0094FF"
-                onPress={() => updateUserProfile()}
+                handleOnPress={() => updateUserProfile()}
                 disabled={
                   editprofileData.expLevel === "" ||
                   editprofileData.weight === "" ||
