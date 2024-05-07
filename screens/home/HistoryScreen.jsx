@@ -24,7 +24,7 @@ import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 
 const HistoryScreen = ({ navigation }) => {
   const [loading, setLoading] = useState(true);
-  const [sections, setSections] = useState([]);
+  const [sessions, setSessions] = useState([]);
   const [showCalendar, setShowCalendar] = useState(false);
   const [markedDates, setMarkedDates] = useState({});
   const sectionListRef = useRef(null);
@@ -32,25 +32,25 @@ const HistoryScreen = ({ navigation }) => {
   const scale = useSharedValue(0.8); // Start smaller to create an unfolding effect
   const calendarHeight = useSharedValue(0); // Manage calendar height for animation
 
-  const[selectedDate, setSelectedDate] = useState("");
+  const [selectedDate, setSelectedDate] = useState("");
 
   const onDayPress = (day) => {
     scrollToDate(day.dateString);
     setSelectedDate(day.dateString);
   }
-  
-  useEffect(()=>{
-    if(markedDates[selectedDate]){
+
+  useEffect(() => {
+    if (markedDates[selectedDate]) {
       let newMarkedDates = {}
 
-      for(const key of Object.keys(markedDates)){
-        if(key === selectedDate){
+      for (const key of Object.keys(markedDates)) {
+        if (key === selectedDate) {
           newMarkedDates[key] = {
-              selected: true,
-              disableTouchEvent: true,
-              selectedColor: "blue",
-              marked: true,
-              dotColor: "white",
+            selected: true,
+            disableTouchEvent: true,
+            selectedColor: "blue",
+            marked: true,
+            dotColor: "white",
           };
         } else {
           newMarkedDates[key] = { dotColor: "blue", marked: true };
@@ -58,54 +58,54 @@ const HistoryScreen = ({ navigation }) => {
       }
       setMarkedDates(newMarkedDates);
     }
-  },[selectedDate]);
+  }, [selectedDate]);
 
   useEffect(() => {
-  const unsubscribe = firestore()
-    .collection("users")
-    .doc(auth().currentUser.uid)
-    .collection("sessions")
-    .orderBy("date", "asc")
-    .onSnapshot(snapshot => {
-      const groupedByMonth = {};
-      let newMarkedDates = {};  // Initialize newMarkedDates here to ensure it's reset on each snapshot.
+    const unsubscribe = firestore()
+      .collection("users")
+      .doc(auth().currentUser.uid)
+      .collection("sessions")
+      .orderBy("date", "asc")
+      .onSnapshot(snapshot => {
+        const groupedByMonth = {};
+        let newMarkedDates = {};  // Initialize newMarkedDates here to ensure it's reset on each snapshot.
 
-      snapshot.forEach(doc => {
-        const session = doc.data();
-        const sessionDate = new Date((session.date.seconds * 1000) + (session.date.nanoseconds / 1000000));
-        // const formattedDate = sessionDate.toISOString().split("T")[0]
-        const dateArray = sessionDate.toLocaleString().split(',')[0].split("/");
-        const formattedDate =
-          dateArray[2] +
-          "-" +
-          (dateArray[0].length === 1 ? "0" + dateArray[0] : dateArray[0]) +
-          "-" +
-          (dateArray[1].length === 1 ? "0" + dateArray[1] : dateArray[1]);
+        snapshot.forEach(doc => {
+          const session = doc.data();
+          const sessionDate = new Date((session.date.seconds * 1000) + (session.date.nanoseconds / 1000000));
+          // const formattedDate = sessionDate.toISOString().split("T")[0]
+          const dateArray = sessionDate.toLocaleString().split(',')[0].split("/");
+          const formattedDate =
+            dateArray[2] +
+            "-" +
+            (dateArray[0].length === 1 ? "0" + dateArray[0] : dateArray[0]) +
+            "-" +
+            (dateArray[1].length === 1 ? "0" + dateArray[1] : dateArray[1]);
 
-        // Group by month for sections
-        const yearMonth = formattedDate.substring(0, 7);
-        if (!groupedByMonth[yearMonth]) {
-          groupedByMonth[yearMonth] = [];
-        }
-        groupedByMonth[yearMonth].push({ ...session, id: doc.id, formattedDate });
+          // Group by month for sections
+          const yearMonth = formattedDate.substring(0, 7);
+          if (!groupedByMonth[yearMonth]) {
+            groupedByMonth[yearMonth] = [];
+          }
+          groupedByMonth[yearMonth].push({ ...session, id: doc.id, formattedDate });
 
-        // Prepare marked dates
-        if (!newMarkedDates[formattedDate]) {
-          newMarkedDates[formattedDate] = { marked: true, dotColor: 'blue' };
-        }
+          // Prepare marked dates
+          if (!newMarkedDates[formattedDate]) {
+            newMarkedDates[formattedDate] = { marked: true, dotColor: 'blue' };
+          }
+        });
+
+        setMarkedDates(newMarkedDates);  // Update the state only once after processing all documents
+
+        const sectionsArray = Object.keys(groupedByMonth).map(key => ({
+          title: formatDate(key),
+          data: groupedByMonth[key]
+        }));
+        setSessions(sectionsArray);
+        setLoading(false);
       });
-
-      setMarkedDates(newMarkedDates);  // Update the state only once after processing all documents
-
-      const sectionsArray = Object.keys(groupedByMonth).map(key => ({
-        title: formatDate(key),
-        data: groupedByMonth[key]
-      }));
-      setSections(sectionsArray);
-      setLoading(false);
-    });
-  return () => unsubscribe();
-}, []);
+    return () => unsubscribe();
+  }, []);
 
 
   const formatDate = (yearMonth) => {
@@ -155,9 +155,8 @@ const HistoryScreen = ({ navigation }) => {
           {new Date(item.date.seconds * 1000).toLocaleTimeString()}
         </Text>
         <Text style={styles.workoutExercisesCount}>
-          {`${item.exercises.length} ${
-            item.exercises.length > 1 ? "exercises" : "exercise"
-          } - ${Math.ceil(item.duration / 60)} minutes`}
+          {`${item.exercises.length} ${item.exercises.length > 1 ? "exercises" : "exercise"
+            } - ${Math.ceil(item.duration / 60)} minutes`}
         </Text>
       </View>
     </TouchableOpacity>
@@ -177,7 +176,7 @@ const HistoryScreen = ({ navigation }) => {
 
   const scrollToDate = (date) => {
     const yearMonth = date.substring(0, 7); // Get 'YYYY-MM' from 'YYYY-MM-DD'
-    const sectionIndex = sections.findIndex(
+    const sectionIndex = sessions.findIndex(
       (section) => section.title === formatDate(yearMonth)
     );
 
@@ -187,7 +186,7 @@ const HistoryScreen = ({ navigation }) => {
     }
 
     // Attempt to find the item index for the exact date
-    const itemIndex = sections[sectionIndex].data.findIndex(
+    const itemIndex = sessions[sectionIndex].data.findIndex(
       (item) => item.formattedDate === date
     );
 
@@ -219,10 +218,10 @@ const HistoryScreen = ({ navigation }) => {
             <Calendar
               onDayPress={onDayPress}
               // onDayPress={(day) => scrollToDate(day.dateString)}
-              
+
               markingType={"simple"}
               markedDates={markedDates}
-          
+
             />
           </Animated.View>
           <TouchableOpacity style={styles.fab} onPress={toggleCalendar}>
@@ -232,13 +231,20 @@ const HistoryScreen = ({ navigation }) => {
               color="#fff"
             />
           </TouchableOpacity>
-          <SectionList
-            ref={sectionListRef}
-            sections={sections}
-            keyExtractor={(item) => item.id}
-            renderItem={renderItem}
-            renderSectionHeader={renderSectionHeader}
-          />
+
+          {sessions.length === 0 ?
+            <View>
+              <Text style={{ color: "grey", fontSize: 18, textAlign: "center", margin: 20 }}>No completed workouts yet</Text>
+            </View>
+            :
+            <SectionList
+              ref={sectionListRef}
+              sections={sessions}
+              keyExtractor={(item) => item.id}
+              renderItem={renderItem}
+              renderSectionHeader={renderSectionHeader}
+            />
+          }
         </SafeAreaView>
       )}
     </LinearBackground>

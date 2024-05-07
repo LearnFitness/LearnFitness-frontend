@@ -94,12 +94,12 @@ export const WorkoutModal = ({ workout, navigation, isWorkoutModalVisible, handl
           description: workout.description,
           exercises: workout.exercises
         });
+      handleCloseModal();
       await handleRemoveRecommendation(toastShown = false);
       toast("Workout added");
     } catch (error) {
-      Alert.alert(error.message);
-    } finally {
       handleCloseModal();
+      Alert.alert(error.message);
     }
   }
 
