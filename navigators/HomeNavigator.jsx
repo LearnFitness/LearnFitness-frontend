@@ -45,7 +45,7 @@ export default function HomeNavigator() {
       <BottomTab.Screen name="Dashboard" component={DashboardScreen} />
       <BottomTab.Screen name="Workouts" component={WorkoutsScreen} />
       <BottomTab.Screen name="Exercises" component={ExercisesScreen} />
-      <BottomTab.Screen name="Progress" component={ProgressScreen} options={{ headerShown: true }} />
+      <BottomTab.Screen name="Progress" component={ProgressScreen} options={{ headerShown: true, headerTitleStyle: { fontSize: 22 } }} />
       <BottomTab.Screen name="Settings" component={SettingsScreen} />
     </BottomTab.Navigator>
   )

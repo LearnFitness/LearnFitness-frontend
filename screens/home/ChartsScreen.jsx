@@ -24,16 +24,13 @@ import { useEffect, useState } from "react";
 import FontAwesome from "react-native-vector-icons/FontAwesome6";
 import moment from "moment";
 import {
-  LineChart,
   BarChart,
-  PieChart,
-  ProgressChart,
-  ContributionGraph,
-  StackedBarChart,
-  ChartTitle,
 } from "react-native-chart-kit";
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { FontAwesome6 } from '@expo/vector-icons';
+
 export default function ChartsScreen({ navigation }) {
-// export default function ProgressScreen({ navigation }) {
+  // export default function ProgressScreen({ navigation }) {
   const [loading, setLoading] = useState(false);
   const [userData, setUserData] = useState(null);
   const [showHistory, setHistory] = useState(false);
@@ -69,7 +66,7 @@ export default function ChartsScreen({ navigation }) {
       });
     return () => unsubscribe();
   }, []);
-  
+
   useEffect(() => {
     const unsubscribe = firestore()
       .collection("users")
@@ -107,7 +104,7 @@ export default function ChartsScreen({ navigation }) {
         setCompletedWorkoutDates(dates);
         setTotalWorkouts(totalWorkouts);
         setMaxVolumePerExercise(maxVolumeData);
-  
+
         if (totalWorkouts > 0) {
           const firstSessionDate =
             Object.keys(dates).length > 0
@@ -117,13 +114,13 @@ export default function ChartsScreen({ navigation }) {
             (new Date() - firstSessionDate) / (1000 * 60 * 60 * 24)
           );
           const weeksBetween = Math.ceil(daysBetween / 7);
-  
+
           const avgDuration = totalDuration / totalWorkouts;
           setAvgWorkoutDuration(avgDuration / 60);
-  
+
           const caloriesBurned = (totalWorkouts * 400) / weeksBetween;
           setCaloriesBurnedPerWeek(caloriesBurned);
-  
+
           setWorkoutTimePerDay(workoutTimePerDayCopy);
         } else {
           setAvgWorkoutDuration(0);
@@ -132,7 +129,7 @@ export default function ChartsScreen({ navigation }) {
       });
     return () => unsubscribe();
   }, []);
-  
+
   useEffect(() => {
     const unsubscribe = firestore()
       .collection('exercises')
@@ -146,7 +143,7 @@ export default function ChartsScreen({ navigation }) {
       });
     return () => unsubscribe();
   }, []);
-  
+
   useEffect(() => {
     const weeklyData = [];
     const firstSessionDate =
@@ -173,11 +170,7 @@ export default function ChartsScreen({ navigation }) {
     }
     setWeeklyWorkouts(weeklyData);
   }, [completedWorkoutDates]);
-  
-  const toggleHistory = () => {
-    setHistory(!showHistory);
-  };
-  
+
   const capitalizeFirstLetter = (string) => {
     return string.toLowerCase().split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
   };
@@ -188,137 +181,59 @@ export default function ChartsScreen({ navigation }) {
   }
 
   return (
-    <LinearBackground>
+    <LinearBackground containerStyle={{ flex: 1, paddingHorizontal: "3%", alignItems: "center", justifyContent: "center" }}>
       <FocusAwareStatusBar
         translucent
         backgroundColor="transparent"
         barStyle={"dark-content"}
       />
-      <ScrollView>
+      <ScrollView contentContainerStyle={styles.scrollViewContainer}>
         {loading ? (
-          <ActivityIndicator style={{ flex: 1 }} />
+          <ActivityIndicator size="large" color="#FFFFFF" style={styles.loading} />
         ) : (
-          <SafeAreaView>
-            <View>
-              {/* <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', margin: 20, marginTop: 40 }}>
-              <Text style={{ color: 'white', fontSize: 24, fontWeight: 'bold', marginLeft: 10 }}>My Progress</Text>
-                <Pressable onPress={() => navigation.navigate('Settings')}>
-                  <AvatarDisplay source={userData && userData.photoURL ? { uri: userData.photoURL } : null} size={60} editable={false} clickable={false} />
-                </Pressable>
-              </View> */}
+          <SafeAreaView style={styles.contentContainer}>
+            <Text style={styles.sectionTitle}>Workout Intensity Over the Week</Text>
+            <BarChart
+              data={{
+                labels: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
+                datasets: [{ data: workoutTimePerDay }],
+              }}
+              width={Dimensions.get("window").width - 40}
+              height={220}
+              chartConfig={styles.chartConfig}
+              fromZero
+              style={styles.chartStyle}
+            />
 
-              <ScrollView horizontal>
-                <View style={styles.chartContainer}>
-                  <Text style={styles.chartTitle}>
-                    Total Workout Duration Per Day
-                  </Text>
-                  <BarChart
-                    data={{
-                      labels: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
-                      datasets: [{ data: workoutTimePerDay }],
-                    }}
-                    width={350}
-                    height={220}
-                    yAxisSuffix={maxWorkoutTime <= 1 ? " min" : " min"}
-                    chartConfig={{
-                      backgroundColor: "#1cc910",
-                      backgroundGradientFrom: "#eff3ff",
-                      backgroundGradientTo: "#efefef",
-                      decimalPlaces: 0,
-                      color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-                      style: { borderRadius: 15 },
-                      propsForLabels: {
-                        fontFamily: "Arial",
-                        fontSize: 12,
-                      },
-                      barPercentage: 0.6,
-                    }}
-                    fromZero
-                    bezier
-                    style={{
-                      marginVertical: 8,
-                      borderRadius: 16,
-                    }}
-                  />
-                </View>
-                <View style={styles.chartContainer}>
-                  <Text style={styles.chartTitle}>Total Workouts Per Week</Text>
-                  <BarChart
-                    data={{
-                      labels: weeklyWorkouts.map((data) => data.weekLabel),
-                      datasets: [
-                        {
-                          data: weeklyWorkouts.map(
-                            (data) => data.weeklyWorkoutCount
-                          ),
-                        },
-                      ],
-                    }}
-                    width={Dimensions.get("window").width - 40}
-                    height={220}
-                    chartConfig={{
-                      backgroundColor: "#1cc910",
-                      backgroundGradientFrom: "#eff3ff",
-                      backgroundGradientTo: "#efefef",
-                      decimalPlaces: 0,
-                      color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-                      style: { borderRadius: 15 },
-                      propsForLabels: {
-                        fontFamily: "Arial",
-                        fontSize: 12,
-                      },
-                      barPercentage: 0.6,
-                    }}
-                    fromZero
-                    bezier
-                    style={{
-                      marginVertical: 8,
-                      borderRadius: 16,
-                    }}
-                  />
-                </View>
-              </ScrollView>
-              <View style={{ alignItems: "center" }}>
-                <Text
-                  style={[
-                    styles.chartTitle,
-                    { marginBottom: 10, marginTop: 10 },
-                  ]}
-                >
-                  Progress Statistics{" "}
-                </Text>
-              </View>
-              <View style={{ alignItems: "center", marginTop: 20 }}>
-                <Text style={styles.statText}>
-                  Total Workouts Completed: {totalWorkouts}
-                </Text>
-                <Text style={styles.statText}>
-                  Average Workout Duration: {avgWorkoutDuration.toFixed(2)}{" "}
-                  min/workout
-                </Text>
-                <Text style={styles.statText}>
-                  Calories Burned Per Week: {caloriesBurnedPerWeek} cal
-                </Text>
-              </View>
-              <View style={styles.sectionTitleContainer}>
-                <Text style={styles.chartTitle}>Your Personal Records (PR):</Text>
-              </View>
-              {/* PRs horizontally scrollable */}
-              <ScrollView horizontal>
-              <View style={styles.prContainer}>
-              {/* Display max volume with exercise name */}
-              {Object.keys(maxVolumePerExercise).map((exerciseId, index, array) => {
-                const exerciseName = exerciseNames[exerciseId]; // Fetch exercise name from exerciseNames
-                return (
-                  <Text key={exerciseId} style={styles.prText}>
-                    <Text style={{ fontWeight: 'bold' }}>{exerciseName ? capitalizeFirstLetter(exerciseName) : ''}</Text> - {maxVolumePerExercise[exerciseId].reps} reps x {maxVolumePerExercise[exerciseId].lbs} lbs.
-                    {index !== array.length - 1 && ' | '}
-                  </Text>
-                );
-              })}
+            <Text style={styles.sectionTitle}>Total Workouts Per Week</Text>
+            <BarChart
+              data={{
+                labels: weeklyWorkouts.map(data => data.weekLabel),
+                datasets: [{ data: weeklyWorkouts.map(data => data.weeklyWorkoutCount) }],
+              }}
+              width={Dimensions.get("window").width - 40}
+              height={220}
+              chartConfig={styles.chartConfig}
+              fromZero
+              style={styles.chartStyle}
+            />
+
+            <View style={styles.statsContainer}>
+              <Text style={styles.sectionTitle}><MaterialCommunityIcons name="calendar-week" size={24} color="white" />  Weekly Summary</Text>
+              <Text style={styles.statText}>Total Workouts: {totalWorkouts}</Text>
+              <Text style={styles.statText}>Average Duration: {avgWorkoutDuration.toFixed(2)} min</Text>
+              <Text style={styles.statText}>Calories Burned: {caloriesBurnedPerWeek.toFixed(0)} cal/week</Text>
             </View>
-              </ScrollView>
-            </View>
+
+            <Text style={styles.sectionTitle}><FontAwesome6 name="trophy" size={22} color="white" />  Personal Records</Text>
+            <ScrollView style={styles.prScroll}>
+              {Object.entries(maxVolumePerExercise).map(([id, { reps, lbs }]) => (
+                <View key={id} style={styles.prItem}>
+                  <Text style={[styles.prText, { textTransform: "capitalize", fontWeight: "500" }]}>{exerciseNames[id] || 'Unknown'}</Text>
+                  <Text style={styles.prText}>{lbs} lbs x {reps} reps</Text>
+                </View>
+              ))}
+            </ScrollView>
           </SafeAreaView>
         )}
       </ScrollView>
@@ -326,78 +241,70 @@ export default function ChartsScreen({ navigation }) {
   );
 }
 
+
 const styles = StyleSheet.create({
-  modalContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
+  scrollViewContainer: {
+    flexGrow: 1,
+    paddingBottom: 20,
   },
-  notificationsHeader: {
-    fontSize: 26,
-    fontWeight: "bold",
-    flexDirection: "row",
-    alignItems: "baseline",
-    marginTop: 10,
-    marginBottom: 20,
+  contentContainer: {
+    padding: 10,
   },
-  notificationsHeaderText: {
-    fontSize: 26,
-    fontWeight: "bold",
-    marginLeft: 10,
-  },
-  notificationSettingsContainer: {
-    backgroundColor: "white",
-    width: "100%",
-    height: "100%",
-  },
-  statText: {
-    color: "white",
-    fontSize: 15,
-    marginBottom: 10,
-  },
-  chartContainer: {
-    alignItems: "center",
-    marginTop: 20,
-    marginLeft: 10,
-    marginRight: 10,
-  },
-  chartTitle: {
-    color: "white",
-    fontSize: 20,
-    marginBottom: 10,
-  },
-  button: {
-    backgroundColor: "#FFFFFF",
-    borderRadius: 20,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    flexDirection: "row",
-  },
-  buttonText: {
-    color: "#0044AA",
-    fontSize: 16,
-    fontWeight: "bold",
-  },
-  sectionTitleContainer: {
-    borderTopWidth: 1,
-    borderTopColor: '#FFFFFF',
-    paddingTop: 10,
-    paddingBottom: 5,
-    marginBottom: 10,
-    alignItems: 'center',
+  loading: {
+    marginTop: 50,
   },
   sectionTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
+    fontSize: 20,
+    color: "white",
+    fontWeight: "bold",
+    marginTop: 20,
+    marginBottom: 10
   },
-  prContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 10,
+  chartStyle: {
+    borderRadius: 8,
+  },
+  chartConfig: {
+    backgroundColor: "#1cc910",
+    backgroundGradientFrom: "#eff3ff",
+    backgroundGradientTo: "#efefef",
+    decimalPlaces: 0,
+    color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+    style: { borderRadius: 15 },
+    propsForLabels: {
+      fontFamily: "Arial",
+      fontSize: 11,
+    },
+    barPercentage: 0.6,
+  },
+  statsContainer: {
+    marginVertical: 10
+  },
+  statTitle: {
+    fontSize: 18,
+    color: "white",
+    fontWeight: "bold",
+    marginBottom: 5,
+  },
+  statText: {
+    fontSize: 16,
+    color: "white",
+    marginBottom: 5,
+  },
+  prScroll: {
+    marginBottom: 20,
+  },
+  prItem: {
+    backgroundColor: "rgba(255, 255, 255, 0.1)",
+    borderRadius: 5,
+    padding: 10,
+    marginTop: 7,
+
+    flexDirection: "row",
+    justifyContent: "space-between",
+    flexWrap: "wrap"
   },
   prText: {
-    fontSize: 16,
-    marginHorizontal: 5,
-    color: 'white',
-  },
+    fontSize: 14,
+    color: "white",
+  }
 });

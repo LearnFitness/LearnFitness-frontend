@@ -151,13 +151,13 @@ export default function WorkoutsScreen({ route, navigation }) {
 
 const styles = StyleSheet.create({
   container: {
-    marginHorizontal: "6%"
+    marginHorizontal: "6%",
   },
   title: {
     fontSize: 24,
     fontWeight: "bold",
     color: "white",
-    marginTop: 10,
+    marginTop: 20,
     marginBottom: 10,
   },
   workoutsContainer: {
