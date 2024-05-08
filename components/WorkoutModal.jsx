@@ -72,7 +72,8 @@ export const WorkoutModal = ({ workout, navigation, isWorkoutModalVisible, handl
       await userRef.collection('workouts').add({
         name: duplicatedName,
         description: workout.description,
-        exercises: workout.exercises
+        exercises: workout.exercises,
+        imgUrl: workout.imgUrl
       });
 
       toast("Workout duplicated");
