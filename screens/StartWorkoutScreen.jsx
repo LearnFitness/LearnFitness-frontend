@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { Alert, Text, View, TouchableOpacity, StyleSheet, ScrollView, TextInput, Animated, Platform } from 'react-native';
+import { Alert, Text, View, TouchableOpacity, StyleSheet, ScrollView, TextInput, Animated, Platform, KeyboardAvoidingView } from 'react-native';
 import LinearBackground from '../components/LinearBackground';
 import { FontAwesome6, Ionicons } from '@expo/vector-icons';
 import RestTimer from '../components/RestTimer';
@@ -260,67 +260,74 @@ export default function StartWorkoutScreen({ route, navigation }) {
   );
 
   return (
-    <LinearBackground containerStyle={styles.container} safeAreaView={false}>
-      <ScrollView
-        stickyHeaderIndices={action === "edit" ? [] : [3]}
-        onScroll={Animated.event(
-          [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-          {
-            listener: (event) => handleScroll(event),
-            useNativeDriver: false // Set to false because we're animating layout properties
-          }
-        )}
-        scrollEventThrottle={15}  // Defines how often the scroll event fires
-        style={{ paddingTop: Platform.OS === 'ios' ? headerHeight : 0 }}
+    <LinearBackground safeAreaView={false}>
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}  // Ensures that KeyboardAvoidingView takes up the full screen
+        behavior={Platform.OS === "ios" ? "padding" : "height"}  // 'padding' for iOS, 'height' for Android
       >
-        <TextInput
-          style={styles.sessionName}
-          placeholder="Workout name"
-          placeholderTextColor="darkgrey"
-          value={sessionName}
-          onChangeText={text => setSessionName(text)}
-        />
-        <TextInput
-          style={styles.sessionDescription}
-          placeholder="Workout description"
-          placeholderTextColor="darkgrey"
-          value={sessionDescription}
-          onChangeText={text => setSessionDescription(text)}
-        />
+        <ScrollView
+          stickyHeaderIndices={action === "edit" ? [] : [3]}
+          onScroll={Animated.event(
+            [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+            {
+              listener: (event) => handleScroll(event),
+              useNativeDriver: false // Set to false because we're animating layout properties
+            }
+          )}
+          scrollEventThrottle={15}  // Defines how often the scroll event fires
+          style={{ paddingTop: Platform.OS === 'ios' ? headerHeight : 0 }}
+        >
+          <TextInput
+            style={styles.sessionName}
+            placeholder="Workout name"
+            placeholderTextColor="darkgrey"
+            value={sessionName}
+            onChangeText={text => setSessionName(text)}
+          />
+          <TextInput
+            style={styles.sessionDescription}
+            placeholder="Workout description"
+            placeholderTextColor="darkgrey"
+            value={sessionDescription}
+            onChangeText={text => setSessionDescription(text)}
+          />
 
-        <View style={styles.actionButtonsContainer}>
-          <TouchableOpacity style={[styles.actionButton, { backgroundColor: "#aa3155" }]} onPress={handleGoBack}>
-            <Text style={styles.actionButtonText}>Cancel</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={[styles.actionButton, { backgroundColor: "#0087d6" }]} onPress={handleSaveSession}>
-            <Text style={styles.actionButtonText}>{action === "edit" ? "Save" : "Finish"}</Text>
-          </TouchableOpacity>
-        </View>
-
-        {action === "edit" ?
-          <View style={{ flexDirection: "row", alignSelf: "center", alignItems: "center", marginVertical: 5 }}>
-            <AntDesign name="clockcircle" color="white" size={20} />
-            <Text style={{ color: "white", fontSize: 20, fontWeight: 600, marginHorizontal: 10 }}>
-              {padToTwoDigits(Math.floor(sessionDuration / 60))}:{padToTwoDigits(sessionDuration % 60)}
-            </Text>
+          <View style={styles.actionButtonsContainer}>
+            <TouchableOpacity style={[styles.actionButton, { backgroundColor: "#aa3155" }]} onPress={handleGoBack}>
+              <Text style={styles.actionButtonText}>Cancel</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={[styles.actionButton, { backgroundColor: "#0087d6" }]} onPress={handleSaveSession}>
+              <Text style={styles.actionButtonText}>{action === "edit" ? "Save" : "Finish"}</Text>
+            </TouchableOpacity>
           </View>
-          :
-          <View>
-            <Animated.View style={[styles.timeContainer, { marginHorizontal: marginHorizontalAnim }]}>
-              <RestTimer />
-              <View style={{ flexDirection: "row", alignItems: "center" }}>
-                <AntDesign name="clockcircle" color="white" size={20} />
-                <Text style={styles.sessionDuration}>
-                  {padToTwoDigits(Math.floor(sessionDuration / 60))}:{padToTwoDigits(sessionDuration % 60)}
-                </Text>
-              </View>
-            </Animated.View>
-          </View>
-        }
 
-        <ExerciseListView />
+          {action === "edit" ?
+            <View style={{ flexDirection: "row", alignSelf: "center", alignItems: "center", marginVertical: 5 }}>
+              <AntDesign name="clockcircle" color="white" size={20} />
+              <Text style={{ color: "white", fontSize: 20, fontWeight: 600, marginHorizontal: 10 }}>
+                {padToTwoDigits(Math.floor(sessionDuration / 60))}:{padToTwoDigits(sessionDuration % 60)}
+              </Text>
+            </View>
+            :
+            <View>
+              <Animated.View style={[styles.timeContainer, { marginHorizontal: marginHorizontalAnim }]}>
+                <RestTimer />
+                <View style={{ flexDirection: "row", alignItems: "center" }}>
+                  <AntDesign name="clockcircle" color="white" size={20} />
+                  <Text style={styles.sessionDuration}>
+                    {padToTwoDigits(Math.floor(sessionDuration / 60))}:{padToTwoDigits(sessionDuration % 60)}
+                  </Text>
+                </View>
+              </Animated.View>
+            </View>
+          }
 
-      </ScrollView>
+          <ExerciseListView />
+
+        </ScrollView>
+
+      </KeyboardAvoidingView>
+
     </LinearBackground>
   )
 
@@ -412,6 +419,7 @@ function padToTwoDigits(number) {
 
 const styles = StyleSheet.create({
   container: {
+
   },
   sessionName: {
     color: "white",
