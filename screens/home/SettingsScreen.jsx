@@ -8,6 +8,10 @@ import AvatarPicker from "../../components/AvatarPicker";
 import { ButtonGroup, Divider } from "@rneui/themed";
 import firestore from "@react-native-firebase/firestore";
 import PrimaryButton from "../../components/PrimaryButton";
+import {
+  schedulePushNotification,
+  registerForPushNotificationsAsync,
+} from "../../utils/notificationManager";
 
 export default function SettingsScreen() {
   const [userData, setUserData] = useState(null);
@@ -15,9 +19,30 @@ export default function SettingsScreen() {
   const [loading, setLoading] = useState(false);
   const [showNotificationSettings, setShowNotificationSettings] = useState(false);
   const [showEditProfileettings, setShowEditProfileSettings] = useState(false);
-  const [notificationsEnabled, setNotificationsEnabled] = useState(true);
+  const [notificationsEnabled, setNotificationsEnabled] = useState(false);
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [vibrationEnabled, setVibrationEnabled] = useState(true);
+  
+
+  const handleToggle = async (newValue) => {
+    setNotificationsEnabled(newValue);
+    if (newValue) {
+      console.log("Notifications have been enabled");
+      await registerForPushNotificationsAsync();
+      await schedulePushNotification();
+      // Add any other actions you want to perform when enabled
+    } else {
+      console.log("Notifications have been disabled");
+      // Add any other actions you want to perform when disabled
+    }
+  };
+  // const handleNotificationToggle = async () => {
+  //   setNotificationsEnabled(!notificationsEnabled);
+  //   if (!notificationsEnabled) {
+  //     await registerForPushNotificationsAsync();
+  //     await schedulePushNotification();
+  //   }
+  // };
 
   const [editProfileData, setEditProfileData] = useState({
     height: "",
@@ -88,6 +113,8 @@ export default function SettingsScreen() {
     const isFocused = useIsFocused();
     return isFocused ? <StatusBar {...props} /> : null;
   }
+
+  
 
   useEffect(() => {
     async function fetchData() {
@@ -248,25 +275,14 @@ export default function SettingsScreen() {
               <Pressable onPress={toggleNotificationSettings}>
                 <Feather name="arrow-left" size={26} color="black" />
               </Pressable>
-              <Text style={styles.notificationsHeader}>  Notifications</Text>
+              <Text style={styles.notificationsHeader}> Notifications</Text>
             </View>
             {/* Buttons */}
             <View style={styles.notificationSettings}>
               <Text style={styles.notificationText}>General notifications</Text>
               <Switch
                 value={notificationsEnabled}
-                onValueChange={setNotificationsEnabled}
-              />
-            </View>
-            <View style={styles.notificationSettings}>
-              <Text style={styles.notificationText}>Sound</Text>
-              <Switch value={soundEnabled} onValueChange={setSoundEnabled} />
-            </View>
-            <View style={styles.notificationSettings}>
-              <Text style={styles.notificationText}>Vibration</Text>
-              <Switch
-                value={vibrationEnabled}
-                onValueChange={setVibrationEnabled}
+                onValueChange={handleToggle}
               />
             </View>
           </View>
@@ -285,7 +301,7 @@ export default function SettingsScreen() {
               <Pressable onPress={toggleEditProfileSettings}>
                 <Feather name="arrow-left" size={26} color="black" />
               </Pressable>
-              <Text style={styles.notificationsHeader}>  Edit Profile</Text>
+              <Text style={styles.notificationsHeader}> Edit Profile</Text>
             </View>
             <View>
               <View style={[styles.editcontainer, { flexDirection: "row" }]}>

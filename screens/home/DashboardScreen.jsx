@@ -7,6 +7,7 @@ import FontAwesome from "react-native-vector-icons/FontAwesome6"
 import auth from "@react-native-firebase/auth";
 import firestore from "@react-native-firebase/firestore";
 import News from "../../components/News";
+import * as Notifications from "expo-notifications";
 
 const statusBarHeight = Platform.OS === 'android' ? StatusBar.currentHeight + 10 : 0;
 
@@ -36,6 +37,15 @@ export default function DashboardScreen({ navigation }) {
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [sessions, setSessions] = useState([]);
+  useEffect(() => {
+    const subscription = Notifications.addNotificationResponseReceivedListener(
+      (response) => {
+        navigation.navigate("Dashboard"); // Navigate to Dashboard when a notification is tapped
+      }
+    );
+
+    return () => subscription.remove();
+  }, []);
 
   // Getting real time user data
   useEffect(() => {
