@@ -17,14 +17,16 @@ export default function ResetPasswordScreen({ navigation }) {
       await auth().sendPasswordResetEmail(email);
       setRequestSent(true);
     } catch (error) {
-      Alert.alert(error.message);
+      Alert.alert("Invalid email.");
     }
     setLoading(false);
   }
 
   return (
     <LinearBackground>
-      <BackButton handleOnPress={() => navigation.goBack()}/>
+      <View style={styles.backButtonContainer}>
+        <BackButton handleOnPress={() => navigation.goBack()} />
+      </View>
       {requestSent ?
         (
           <View style={styles.container}>
@@ -44,7 +46,7 @@ export default function ResetPasswordScreen({ navigation }) {
                 leftIcon={{ type: "font-awesome", name: "envelope", size: 20 }}
                 onChangeText={(text) => setEmail(text)}
                 value={email}
-                placeholder="Enter your email to continue"
+                placeholder="email@address.com"
                 autoCapitalize={"none"}
               />
               <PrimaryButton
@@ -70,6 +72,7 @@ const styles = StyleSheet.create({
     fontWeight: "500",
     textAlign: "center",
     marginBottom: 20,
+    marginTop: "30%",
     fontSize: 34,
     color: "white"
   },
@@ -87,5 +90,11 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     paddingHorizontal: 15,
     borderRadius: 10,
+  },
+  backButtonContainer: {
+    position: 'relative',
+    top: 50,
+    left: 30,
+    zIndex: 1,
   },
 })

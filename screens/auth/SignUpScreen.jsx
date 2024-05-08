@@ -1,24 +1,88 @@
 import React, { useState } from "react";
-import { Alert, StyleSheet, Text, View, Pressable } from "react-native";
+import { Alert, StyleSheet, Text, View, Pressable, Platform } from "react-native";
 import { Input } from "@rneui/themed";
 import auth from "@react-native-firebase/auth";
 import LinearBackground from "../../components/LinearBackground";
 import KeyboardAvoidView from "../../components/KeyboardAvoidView";
 import PrimaryButton from "../../components/PrimaryButton"
 import { appStyles } from "../../utils/styles";
+import BackButton from "../../components/BackButton";
+import { useHeaderHeight } from '@react-navigation/elements';
+//import validate from "deep-email-validator"
 
 export default function SignUpScreen({ navigation }) {
-  const [email, setEmail] = useState(null);
-  const [password, setPassword] = useState(null);
-  const [confirmPassword, setConfirmPassword] = useState();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [visiblePassword, setVisiblePassword] = useState(false);
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [emailError, setEmailError] = useState(false);
+  const [passwordError, setPasswordError] = useState(false);
+  const [isPasswordLong, setIsPasswordLong] = useState(false);
 
   async function handleSignUp() {
+    // Check if everything is empty
+    if (!email.trim() && !password.trim() && !confirmPassword.trim()) {
+      setEmailError(true);
+      setPasswordError(true);
+      return;
+    }
+
+    // Check if email is empty
+    if (!email.trim()) {
+      setEmailError(true);
+      return;
+    }
+
+    // Check if password/confirm password is empty
+    if (!password.trim() || !confirmPassword.trim()) {
+      setPasswordError(true);
+      return;
+    }
+
+    // Check if the email is valid with deep-email-validator (once we are done testing) (i have no idea if this works)
+    // try {
+    //   const { valid } = await validate({
+    //     email,
+    //     validateRegex: true,
+    //     validateMX: true,
+    //     validateTypo: false,
+    //   });
+
+    //   if (!valid) {
+    //     setEmailError(true);
+    //     throw new Error('Please enter a valid email address.');
+    //   }
+    // } catch (error) {
+    //   Alert.alert("An error occured.");
+    //   setEmailError(true);
+    //   return;
+    // }
+
+    // Check password requirements
+    if (password.length < 6) {
+      setPasswordError(true);
+      setIsPasswordLong(false);
+      return;
+    }
+    if (password !== confirmPassword) {
+      Alert.alert('The passwords do not match.');
+      setPasswordError(true);
+      return;
+    }
+
     setLoading(true);
     try {
       await auth().createUserWithEmailAndPassword(email, password);
     } catch (error) {
-      Alert.alert(error.message);
+      if (error.code === 'auth/invalid-email') {
+        Alert.alert('Please enter a valid email address.');
+        setEmailError(true);
+      }
+      else if (error.code === 'auth/email-already-in-use') {
+        Alert.alert('This email already exists.');
+        setEmailError(true);
+      }
     } finally {
       setLoading(false);
     }
@@ -26,38 +90,63 @@ export default function SignUpScreen({ navigation }) {
 
   return (
     <LinearBackground>
-      <KeyboardAvoidView containerStyle={styles.container}>
-        <View style={{ marginTop: "50%" }}>
+      <View style={styles.backButtonContainer}>
+        <BackButton handleOnPress={() => navigation.goBack()} />
+      </View>
+      <KeyboardAvoidView
+        containerStyle={styles.container}
+        keyboardVerticalOffset={useHeaderHeight}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+      >
+        <View style={{ marginTop: "30%" }}>
           <Text style={[appStyles.heading1, { color: "white", marginBottom: "20%"}]}>Create a LearnFitness account</Text>
           <Input
-            inputContainerStyle={appStyles.input}
-            onChangeText={(text) => setEmail(text)}
+            inputContainerStyle={[appStyles.input, emailError && styles.errorInput]}
+            leftIcon={{ type: "font-awesome", name: "envelope", size: 20 }}
+            onChangeText={(text) => {
+              setEmail(text);
+              setEmailError(false);
+            }}
             value={email}
-            placeholder="Email"
+            placeholder="email@address.com"
             autoCapitalize={"none"}
             autoCorrect={false}
             spellCheck={false}
           />
           <Input
-            inputContainerStyle={appStyles.input}
-            onChangeText={(text) => setPassword(text)}
+            inputContainerStyle={[appStyles.input, passwordError && styles.errorInput]}
+            rightIcon={visiblePassword ?
+              { type: "font-awesome", name: "eye", onPress: () => setVisiblePassword(false) } :
+              { type: "font-awesome", name: "eye-slash", onPress: () => setVisiblePassword(true) }
+            }
+            onChangeText={(text) => {
+              setPassword(text);
+              setPasswordError(false);
+              setIsPasswordLong(text.length >= 6);
+            }}
             value={password}
-            secureTextEntry={true}
+            secureTextEntry={!visiblePassword}
             placeholder="Password"
             autoCapitalize={"none"}
             autoCorrect={false}
             spellCheck={false}
           />
           <Input
-            inputContainerStyle={appStyles.input}
-            onChangeText={(text) => setConfirmPassword(text)}
+            inputContainerStyle={[appStyles.input, passwordError && styles.errorInput]}
+            onChangeText={(text) => {
+              setConfirmPassword(text);
+              setPasswordError(false);
+            }}
             value={confirmPassword}
-            secureTextEntry={true}
+            secureTextEntry={!visiblePassword}
             placeholder="Confirm Password"
             autoCapitalize={"none"}
             autoCorrect={false}
             spellCheck={false}
           />
+          <Text style={[styles.passwordRequirementText, isPasswordLong && styles.lightGreyText]}>
+            * Password must be at least 6 characters.
+          </Text>
           <PrimaryButton
             loading={loading}
             disabled={loading}
@@ -74,7 +163,6 @@ export default function SignUpScreen({ navigation }) {
         </View>
       </KeyboardAvoidView>
     </LinearBackground>
-
   )
 }
 
@@ -87,10 +175,32 @@ const styles = StyleSheet.create({
   footer: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center"
+    justifyContent: "center",
+    marginBottom: 20
   },
   footerText: {
     color: "lightgrey",
     fontSize: 17
-  }
+  },
+  backButtonContainer: {
+    position: 'relative',
+    top: 50,
+    left: 30,
+    zIndex: 1,
+  },
+  errorInput: {
+    borderColor: "red",
+    borderWidth: 1.5,
+  },
+  passwordRequirementText: {
+    color: "red",
+    fontSize: 15,
+    textAlign: 'left',
+    marginBottom: 30,
+    bottom: 10,
+    marginLeft: 15
+  },
+  lightGreyText: {
+    color: "lightgrey",
+  },
 })

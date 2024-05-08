@@ -1,14 +1,14 @@
 import { GoogleSignin, statusCodes } from "@react-native-google-signin/google-signin";
 import auth from "@react-native-firebase/auth";
-import { Alert, Pressable, View, Text } from "react-native";
+import { Alert, TouchableOpacity, View, Text } from "react-native";
 import FontAwesome from "react-native-vector-icons/FontAwesome6";
 
 function GoogleButton({ handlePress }) {
   return (
-    <Pressable style={{ width: 300, height: 40, borderRadius: 50, backgroundColor: "#a03e3e", flexDirection: "row", justifyContent: "center", alignItems: "center"}} onPress={handlePress}>
+    <TouchableOpacity style={{ width: 300, height: 40, borderRadius: 50, backgroundColor: "#a03e3e", flexDirection: "row", justifyContent: "center", alignItems: "center"}} onPress={handlePress}>
       <FontAwesome name="google" color="white"/>
       <Text style={{color: "white", marginLeft: 5, fontSize: 15, fontWeight: "500"}}>Sign in with Google</Text>
-    </Pressable>
+    </TouchableOpacity>
   )
 }
 

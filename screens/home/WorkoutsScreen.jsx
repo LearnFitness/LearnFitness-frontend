@@ -1,7 +1,7 @@
 import firestore from "@react-native-firebase/firestore";
 import auth from "@react-native-firebase/auth";
-import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet, ScrollView, Image, Pressable, Alert, ActivityIndicator, Modal, TouchableOpacity } from "react-native";
+import React, { useEffect, useState, useCallback } from "react";
+import { View, Text, StyleSheet, ScrollView, Image, Pressable, Alert, ActivityIndicator, Modal, TouchableOpacity, Platform, StatusBar } from "react-native";
 import LinearBackground from "../../components/LinearBackground";
 import { getBackendData } from "./../../utils/backendAPI";
 import { WorkoutModal } from "../../components/WorkoutModal";
@@ -38,6 +38,7 @@ export default function WorkoutsScreen({ route, navigation }) {
     return () => unsubscribe();
   }, []);
 
+  // Get recommended workouts
   useEffect(() => {
     const unsubscribe = firestore()
       .collection('users')
@@ -72,7 +73,7 @@ export default function WorkoutsScreen({ route, navigation }) {
   };
 
 
-  const WorkoutItem = ({ workout }) => {
+  const WorkoutItem = useCallback(({ workout }) => {
     const handleQuickView = () => {
       setSelectedWorkout(workout);
       setWorkoutModalVisible(true);
@@ -89,25 +90,27 @@ export default function WorkoutsScreen({ route, navigation }) {
 
     return (
       <TouchableOpacity activeOpacity={0.7} style={styles.workoutItemContainer} onPress={handleQuickView}>
-        <Image source={require("./../../assets/workout_plans_images/leg1.jpg")} style={styles.workoutImage} />
+        <Image source={{uri: workout.imgUrl}} style={styles.workoutImage} />
         <View style={styles.workoutDetailsContainer}>
           <Text style={styles.workoutName}>{workout.name}</Text>
           <Text style={styles.workoutDescription}>{generateBriefDescription()}</Text>
         </View>
       </TouchableOpacity>
     );
-  };
+  }, []);
+
+  const statusBarHeight = Platform.OS === 'android' ? StatusBar.currentHeight + 10 : 0;
 
   return (
     <LinearBackground containerStyle={styles.container}>
       {loading ? <ActivityIndicator style={{ flex: 1 }} />
         : (
           <>
-            <ScrollView contentContainerStyle={{ paddingBottom: 80 }}>
+            <ScrollView style={{ marginTop: statusBarHeight }} contentContainerStyle={{ paddingBottom: 90 }}>
               <Text style={styles.title}>Your Workouts</Text>
               <View style={styles.workoutsContainer}>
                 {workouts.length === 0 ?
-                  <Text style={{ color: "darkgrey", fontSize: 17 }}>You have no workouts yet</Text>
+                  <Text style={{ color: "darkgrey", fontSize: 17 }}>You have no workouts yet.</Text>
                   :
                   workouts.map((workout, index) => (
                     <WorkoutItem
@@ -120,7 +123,7 @@ export default function WorkoutsScreen({ route, navigation }) {
 
               <Text style={styles.title}>Recommended for you</Text>
               <View style={styles.workoutsContainer}>
-                {recommendedWorkouts.length === 0 ? <Text style={{ color: "darkgrey", fontSize: 17 }}>No recommendations available</Text> :
+                {recommendedWorkouts.length === 0 ? <Text style={{ color: "darkgrey", fontSize: 17 }}>No recommendations available.</Text> :
                   recommendedWorkouts.map((workout, index) => (
                     <WorkoutItem
                       key={index}
@@ -154,8 +157,8 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: "bold",
     color: "white",
-    marginTop: 25,
-    marginBottom: 10
+    marginTop: 10,
+    marginBottom: 10,
   },
   workoutsContainer: {
     flexDirection: "row",

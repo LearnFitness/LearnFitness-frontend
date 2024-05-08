@@ -36,12 +36,12 @@ export const WorkoutModal = ({ workout, navigation, isWorkoutModalVisible, handl
           style: "destructive",
           onPress: deleteWorkout
         }
-      ]
+      ],
+      { cancelable: true }
     )
 
     async function deleteWorkout() {
       try {
-        console.log("deleting workout id", workout.id)
         await firestore()
           .collection('users')
           .doc(auth().currentUser.uid)
@@ -59,15 +59,23 @@ export const WorkoutModal = ({ workout, navigation, isWorkoutModalVisible, handl
 
   async function handleDuplicateWorkout() {
     try {
-      await firestore()
-        .collection('users')
-        .doc(auth().currentUser.uid)
-        .collection('workouts')
-        .add({
-          name: workout.name,
-          description: workout.description,
-          exercises: workout.exercises
-        });
+      const userRef = firestore().collection('users').doc(auth().currentUser.uid);
+      const querySnapshot = await userRef.collection('workouts').where('name', '==', workout.name).get();
+
+      let duplicatedName = workout.name;
+
+      // Check if the workout name already contains "(copy)"
+      if (!duplicatedName.includes("(copy)")) {
+        duplicatedName += " (copy)";
+      }
+
+      await userRef.collection('workouts').add({
+        name: duplicatedName,
+        description: workout.description,
+        exercises: workout.exercises,
+        imgUrl: workout.imgUrl
+      });
+
       toast("Workout duplicated");
     } catch (error) {
       Alert.alert(error.message);
@@ -85,20 +93,21 @@ export const WorkoutModal = ({ workout, navigation, isWorkoutModalVisible, handl
         .add({
           name: workout.name,
           description: workout.description,
-          exercises: workout.exercises
+          exercises: workout.exercises,
+          imgUrl: workout.imgUrl
         });
+      handleCloseModal();
       await handleRemoveRecommendation(toastShown = false);
       toast("Workout added");
     } catch (error) {
-      Alert.alert(error.message);
-    } finally {
       handleCloseModal();
+      Alert.alert(error.message);
     }
   }
 
   async function handleRemoveRecommendation(toastShown) {
     const userDocRef = await firestore().collection('users').doc(auth().currentUser.uid).get();
-    const prevRecommendedWorkouts =  userDocRef.data().recommendedWorkouts;
+    const prevRecommendedWorkouts = userDocRef.data().recommendedWorkouts;
 
     try {
       await firestore()
@@ -116,7 +125,8 @@ export const WorkoutModal = ({ workout, navigation, isWorkoutModalVisible, handl
   }
 
   function handleStartWorkout() {
-    navigation.navigate("StartWorkoutScreen", { workout });
+    closeModal();
+    navigation.navigate("StartWorkoutScreen", { workout, action: "start", headerTitle: "Start workout" });
   }
 
   return (

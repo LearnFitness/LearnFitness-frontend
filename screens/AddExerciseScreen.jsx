@@ -2,6 +2,9 @@ import { StyleSheet, ScrollView, Text, View, TextInput, Alert, TouchableOpacity 
 import { useState, useEffect } from "react";
 import firestore from "@react-native-firebase/firestore";
 import auth from "@react-native-firebase/auth";
+import Feather from "react-native-vector-icons/Feather";
+import { Divider } from "@rneui/themed";
+import toast from "../utils/toast";
 
 function WorkoutItem({ exerciseToAdd, workout, sets }) {
   const [exerciseAdded, setExerciseAdded] = useState(false);
@@ -30,13 +33,14 @@ function WorkoutItem({ exerciseToAdd, workout, sets }) {
   }
 
   return (
-    <View style={styles.workout}>
+    <View style={[styles.workout, styles.shadow]}>
       <Text style={styles.workoutName}>{workout.data().name}</Text>
       <TouchableOpacity
         disabled={exerciseAdded}
-        style={[styles.addExerciseButton, { backgroundColor: workout.data().added || exerciseAdded ? "darkgrey" : "teal" }]}
+        style={[styles.addExerciseButton, { backgroundColor: workout.data().added || exerciseAdded ? "#c1c1c1" : "teal" }]}
         onPress={() => handleAddExercise(workout.id)}
       >
+        <Feather name={exerciseAdded ? "check" : "plus"} color="white" size={17} />
         <Text style={styles.addExerciseButtonText}>{exerciseAdded ? "Added" : "Add"}</Text>
       </TouchableOpacity>
     </View>
@@ -58,10 +62,26 @@ export default function AddExerciseScreen({ route, navigation }) {
       }
     }
     fetchWorkouts();
-  }, [workouts])
+  }, [workouts]);
+
+  function handlePlusSet() {
+    updateSets(sets => sets + 1);
+  }
+
+  function handleMinusSet() {
+    if (sets > 1) {
+      updateSets(sets => sets - 1);
+    } else {
+      toast("At least 1 set is required");
+    }
+  }
 
   return (
     <View style={styles.container}>
+      <View style={styles.titleContainer}>
+        <Text style={styles.titleText}>Add exercise</Text>
+      </View>
+      <Divider />
       <ScrollView>
         {workouts.length === 0 ?
           <>
@@ -71,9 +91,10 @@ export default function AddExerciseScreen({ route, navigation }) {
               style={styles.addWorkoutButton}
               onPress={() => {
                 navigation.navigate("HomeNavigator", { screen: "Workouts" });
-                navigation.navigate("AddWorkoutScreen", { exerciseToAdd: exercise })
+                navigation.navigate("AddWorkoutScreen", { exercise, action: "create", headerTitle: "Create workout" })
               }}
             >
+              <Feather name={"plus"} color="white" size={17} />
               <Text style={styles.addWorkoutButtonText}>Add a workout</Text>
             </TouchableOpacity>
           </>
@@ -81,19 +102,32 @@ export default function AddExerciseScreen({ route, navigation }) {
           <>
             <Text style={styles.addWorkoutPrompt}>{exercise.name}</Text>
             <Text style={styles.exerciseTarget}>{exercise.target}</Text>
-            <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", margin: 10, marginBottom: 20 }}>
+            <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", marginTop: 10 }}>
+              <Feather name="minus" size={22} color="lightblue" onPress={handleMinusSet} />
               <TextInput style={styles.exerciseSet} value={sets ? sets.toString() : ""} onChangeText={text => text ? updateSets(parseInt(text, 10)) : updateSets(null)} keyboardType="numeric" />
-              <Text style={styles.exerciseSetText}>sets</Text>
+              <Feather name="plus" size={22} color="lightblue" onPress={handlePlusSet} />
             </View>
-            <Text style={styles.addWorkoutSubPrompt}>Choose a workout to add this exercise.</Text>
+            <Text style={styles.exerciseSetText}>sets</Text>
+            <Text style={styles.addWorkoutSubPrompt}>Choose a workout to add this exercise</Text>
             {workouts.map(workout =>
               <WorkoutItem key={workout.id} workout={workout} exerciseToAdd={exercise} sets={sets} />
             )}
+            <Divider style={{ marginHorizontal: 100, marginTop: 15, marginBottom: 5 }} />
+            <Text style={styles.addWorkoutSubPrompt}>Or create a new workout with this exercise</Text>
+            <TouchableOpacity
+              style={[styles.addWorkoutButton, styles.shadow]}
+              onPress={() => {
+                navigation.navigate("HomeNavigator", { screen: "Workouts" });
+                navigation.navigate("AddWorkoutScreen", { exercise, action: "create", headerTitle: "Create workout" })
+              }}
+            >
+              <Feather name={"plus"} color="white" size={17} />
+              <Text style={styles.addWorkoutButtonText}>Create workout</Text>
+            </TouchableOpacity>
           </>
         }
-
-        <TouchableOpacity style={styles.cancleButton} onPress={() => navigation.goBack()}>
-          <Text style={styles.cancleButtonText}>Close</Text>
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <Text style={styles.closeButtonText}>Close</Text>
         </TouchableOpacity>
       </ScrollView>
     </View>
@@ -104,7 +138,16 @@ const styles = StyleSheet.create({
   container: {
     paddingHorizontal: 30,
     backgroundColor: "white",
-    flex: 1
+    flex: 1,
+  },
+  titleContainer: {
+
+  },
+  titleText: {
+    textAlign: "center",
+    fontSize: 18,
+    fontWeight: "500",
+    margin: 10
   },
   workout: {
     flexDirection: "row",
@@ -114,7 +157,8 @@ const styles = StyleSheet.create({
     margin: 10,
     backgroundColor: "rgb(250,250,250)",
     borderRadius: 10,
-
+  },
+  shadow: {
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
@@ -151,18 +195,22 @@ const styles = StyleSheet.create({
   },
   exerciseSet: {
     textAlign: "center",
-    width: "20%",
+    width: "17%",
     backgroundColor: "rgb(245, 245, 245)",
     fontSize: 25,
     padding: 10,
-    borderRadius: 10
+    borderRadius: 10,
+    marginHorizontal: 20,
+    marginVertical: 5
   },
   exerciseSetText: {
+    textAlign: "center",
     fontSize: 18,
-    margin: 5,
     fontWeight: "500"
   },
   addWorkoutButton: {
+    height: 45,
+    flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: "teal",
@@ -171,11 +219,13 @@ const styles = StyleSheet.create({
     borderRadius: 10
   },
   addWorkoutButtonText: {
+    marginLeft: 5,
     fontSize: 18,
     fontWeight: "600",
     color: "white"
   },
   addExerciseButton: {
+    flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
     padding: 10,
@@ -183,11 +233,14 @@ const styles = StyleSheet.create({
   },
   addExerciseButtonText: {
     fontSize: 18,
-    color: "white"
+    color: "white",
+    fontWeight: "500",
+    marginLeft: 3
   },
-  cancleButtonText: {
-    fontSize: 20,
-    color: "red",
+  closeButtonText: {
+    fontSize: 17,
+    color: "#aa3155",
+    fontWeight: "500",
     textAlign: "center",
     margin: 10,
     marginBottom: 30

@@ -4,9 +4,13 @@ import { Divider } from "@rneui/themed";
 import { useState } from "react";
 import { useEffect } from "react";
 import firestore from "@react-native-firebase/firestore";
+import Feather from "react-native-vector-icons/Feather";
+import YoutubePlayer from "react-native-youtube-iframe";
+import axios from "axios";
 
 export default function ExerciseModal({ route, navigation }) {
   const [exercise, setExercise] = useState([]);
+  const [videoId, setVideoId] = useState(null);
   const [loading, setLoading] = useState(true);
   const exerciseId = route.params.exerciseId;
 
@@ -15,9 +19,13 @@ export default function ExerciseModal({ route, navigation }) {
       try {
         const exercise = await firestore().collection("exercises").doc(exerciseId).get();
         setExercise(exercise.data());
+        setLoading(false);
+        const res = await axios.get(`https://www.googleapis.com/youtube/v3/search?key=AIzaSyB7YEQGU5t822OQfJAi-vq169iW1lIR2Pc&part=id&q=${exercise.data().name + " exercise"}`);
+        if (res.data.pageInfo.totalResults > 0) {
+          setVideoId(res.data.items[0].id.videoId);
+        }
       } catch (error) {
         Alert.alert(error.message);
-      } finally {
         setLoading(false);
       }
     }
@@ -26,10 +34,16 @@ export default function ExerciseModal({ route, navigation }) {
 
   function handleAddExercise() {
     // Check who called this screen and delegate the add exercise functionality accordingly
-    const parentScreen = navigation.getState().routes.find(route => route.name === "AddWorkoutScreen");
-    if (parentScreen) {
-      const action = parentScreen.params.action;
-      navigation.navigate("AddWorkoutScreen", { exercise, headerTitle: action === "edit" ? "Edit workout" : "Create workout", action })
+    const routes = navigation.getState().routes;
+
+    if (routes.find(route => route.name === "AddWorkoutScreen")) {
+      const parentScreen = routes.find(route => route.name === "AddWorkoutScreen");
+      const action = parentScreen.params.action; // action is either edit or create
+      navigation.navigate("AddWorkoutScreen", { exercise, headerTitle: action === "edit" ? "Edit workout" : "Create workout", action });
+    } else if (routes.find(route => route.name === "StartWorkoutScreen")) {
+      const parentScreen = routes.find(route => route.name === "StartWorkoutScreen");
+      const action = parentScreen.params.action; // action is either edit or start
+      navigation.navigate("StartWorkoutScreen", { exercise, headerTitle: action === "edit" ? "Edit completed workout" : "Start workout", action });
     } else {
       navigation.navigate("AddExerciseScreen", { exercise });
     };
@@ -41,6 +55,7 @@ export default function ExerciseModal({ route, navigation }) {
         <>
           <View style={styles.buttonsContainer}>
             <TouchableOpacity style={styles.addToWorkoutButton} onPress={handleAddExercise}>
+              <Feather name="plus" color="white" size={18} />
               <Text style={styles.addToWorkoutButtonText}>Add to Workout</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.closeButton} onPress={() => navigation.goBack()} >
@@ -76,9 +91,28 @@ export default function ExerciseModal({ route, navigation }) {
                 </View>
               </View>
             </View>
-            <View>
+
+            <View style={styles.PRContainer}>
+              <Text style={styles.exerciseKey}>Your PR</Text>
+              <View style={{ backgroundColor: "rgba(0,128,128,0.07)", padding: 7, borderRadius: 10 }}>
+                <Text style={styles.PRValue}>40 lbs x 12</Text>
+              </View>
+            </View>
+
+            <View style={{ marginBottom: 30 }}>
               <Divider style={{ padding: 10 }} />
               <Text style={styles.instructions}>Instructions</Text>
+              <View style={{ alignSelf: "center" }}>
+                {videoId ?
+                  <YoutubePlayer
+                    height={200}
+                    width={350}
+                    play={false}
+                    mute={true}
+                    videoId={videoId}
+                  /> : null
+                }
+              </View>
               {exercise?.instructions.map((instruction, index) => {
                 return <Text style={styles.instructionStep} key={index}>{(index + 1) + ". " + instruction}</Text>
               })}
@@ -92,7 +126,8 @@ export default function ExerciseModal({ route, navigation }) {
 
 const styles = StyleSheet.create({
   container: {
-    padding: 20,
+    paddingTop: 20,
+    paddingHorizontal: 20,
     alignItems: "center",
     flex: 1,
     backgroundColor: "white"
@@ -111,6 +146,15 @@ const styles = StyleSheet.create({
     width: 250,
     height: 250,
   },
+  PRContainer: {
+
+  },
+  PRValue: {
+    textAlign: "center",
+    color: "teal",
+    fontSize: 20,
+    fontWeight: "600"
+  },
   keyValueRow: {
     flexDirection: "row",
     justifyContent: "flex-start"
@@ -120,7 +164,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "300",
     color: "darkgrey",
-    marginTop: 20,
+    marginTop: 15,
     marginBottom: 5
   },
   exerciseValue: {
@@ -144,6 +188,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   addToWorkoutButton: {
+    flexDirection: "row",
+    alignItems: "center",
     backgroundColor: "teal",
     borderRadius: 10,
     padding: 10
@@ -151,9 +197,12 @@ const styles = StyleSheet.create({
   addToWorkoutButtonText: {
     fontSize: 17,
     color: "white",
+    fontWeight: "500",
+    marginLeft: 5
   },
   closeButtonText: {
     fontSize: 17,
-    color: "#aa3155"
+    color: "#aa3155",
+    fontWeight: "500"
   }
 })

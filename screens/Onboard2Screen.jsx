@@ -40,7 +40,7 @@ export default function Onboard2Screen({ navigation }) {
   return (
     <SafeAreaView style={styles.container}>
       <BackButton color="blue" handleOnPress={() => navigation.goBack()} />
-      <Text style={[appStyles.heading1, { marginTop: "15%" }]}>Choose your fitness level</Text>
+      <Text style={[appStyles.heading1, { marginTop: "5%" }]}>Choose your fitness level</Text>
       <Text style={[appStyles.heading2]}>Step 2 of 2</Text>
 
       <View style={styles.expContainer}>
@@ -59,9 +59,9 @@ export default function Onboard2Screen({ navigation }) {
             </View>);
         })}
       </View>
-
-      <PrimaryButton title="Create Account" handleOnPress={handleSubmitOnboardData} loading={loading} disabled={loading || selectedIndex < 0} />
-
+      <View style={{ marginBottom: 15 }}>
+        <PrimaryButton title="Create Account" handleOnPress={handleSubmitOnboardData} loading={loading} disabled={loading || selectedIndex < 0} />
+      </View>
     </SafeAreaView>
   )
 }
