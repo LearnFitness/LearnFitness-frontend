@@ -191,6 +191,10 @@ export default function DashboardScreen({ navigation }) {
   }
 
   function WorkoutStats() {
+    const today = new Date().toDateString();
+    const todaySessions = sessions.filter(session => new Date(session.data().date.seconds * 1000).toDateString() === today);
+    const totalDurationToday = todaySessions.reduce((total, session) => total + session.data().duration, 0);
+    const totalDurationTodayMinutes = Math.ceil(totalDurationToday / 60);
     return (
       <View style={styles.statsContainer}>
         <View style={styles.statText}>
@@ -202,8 +206,8 @@ export default function DashboardScreen({ navigation }) {
           <Text style={styles.subText}>{`DAYS SINCE\nLAST WORKOUT`}</Text>
         </View>
         <View style={styles.statText}>
-          <Text style={styles.statNumber}>10</Text>
-          <Text style={styles.subText}>{`PRs ACHIEVED\nTHIS WEEK`}</Text>
+          <Text style={styles.statNumber}>{totalDurationTodayMinutes}</Text>
+          <Text style={styles.subText}>MINUTES SPENT WORKING OUT TODAY</Text>
         </View>
       </View>
     )
