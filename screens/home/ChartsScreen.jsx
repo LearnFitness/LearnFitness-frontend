@@ -45,6 +45,7 @@ export default function ChartsScreen({ navigation }) {
   const [maxWorkoutTime, setMaxWorkoutTime] = useState(0);
   const [weeklyWorkouts, setWeeklyWorkouts] = useState([]);
   const [maxVolumePerExercise, setMaxVolumePerExercise] = useState({});
+  const [exerciseNames, setExerciseNames] = useState({});
 
   useEffect(() => {
     const unsubscribe = firestore()
@@ -66,7 +67,7 @@ export default function ChartsScreen({ navigation }) {
       });
     return () => unsubscribe();
   }, []);
-
+  
   useEffect(() => {
     const unsubscribe = firestore()
       .collection("users")
@@ -104,7 +105,7 @@ export default function ChartsScreen({ navigation }) {
         setCompletedWorkoutDates(dates);
         setTotalWorkouts(totalWorkouts);
         setMaxVolumePerExercise(maxVolumeData);
-
+  
         if (totalWorkouts > 0) {
           const firstSessionDate =
             Object.keys(dates).length > 0
@@ -114,13 +115,13 @@ export default function ChartsScreen({ navigation }) {
             (new Date() - firstSessionDate) / (1000 * 60 * 60 * 24)
           );
           const weeksBetween = Math.ceil(daysBetween / 7);
-
+  
           const avgDuration = totalDuration / totalWorkouts;
           setAvgWorkoutDuration(avgDuration / 60);
-
+  
           const caloriesBurned = (totalWorkouts * 400) / weeksBetween;
           setCaloriesBurnedPerWeek(caloriesBurned);
-
+  
           setWorkoutTimePerDay(workoutTimePerDayCopy);
         } else {
           setAvgWorkoutDuration(0);
@@ -129,33 +130,21 @@ export default function ChartsScreen({ navigation }) {
       });
     return () => unsubscribe();
   }, []);
-
+  
   useEffect(() => {
     const unsubscribe = firestore()
       .collection('exercises')
       .onSnapshot(snapshot => {
-        const exerciseNames = {};
+        const names = {};
         snapshot.forEach(doc => {
           const exerciseData = doc.data();
-          exerciseNames[doc.id] = exerciseData.name;
+          names[doc.id] = exerciseData.name;
         });
-
-        // Map the exercise IDs to their names and update the state
-        setMaxVolumePerExercise(prevMaxVolumes => {
-          const updatedMaxVolumes = {};
-          for (const exerciseId in prevMaxVolumes) {
-            updatedMaxVolumes[exerciseId] = {
-              ...prevMaxVolumes[exerciseId],
-              name: exerciseNames[exerciseId] || '', // Assign exercise name if found
-            };
-          }
-          return updatedMaxVolumes;
-        });
+        setExerciseNames(names);
       });
-
     return () => unsubscribe();
   }, []);
-
+  
   useEffect(() => {
     const weeklyData = [];
     const firstSessionDate =
@@ -182,11 +171,11 @@ export default function ChartsScreen({ navigation }) {
     }
     setWeeklyWorkouts(weeklyData);
   }, [completedWorkoutDates]);
-
+  
   const toggleHistory = () => {
     setHistory(!showHistory);
   };
-
+  
   const capitalizeFirstLetter = (string) => {
     return string.toLowerCase().split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
   };
@@ -304,15 +293,18 @@ export default function ChartsScreen({ navigation }) {
               </View>
               {/* PRs horizontally scrollable */}
               <ScrollView horizontal>
-                <View style={styles.prContainer}>
-                  {/* Display max volume with exercise name */}
-                  {Object.keys(maxVolumePerExercise).map((exerciseId, index, array) => (
+              <View style={styles.prContainer}>
+              {/* Display max volume with exercise name */}
+              {Object.keys(maxVolumePerExercise).map((exerciseId, index, array) => {
+                const exerciseName = exerciseNames[exerciseId]; // Fetch exercise name from exerciseNames
+                return (
                   <Text key={exerciseId} style={styles.prText}>
-                    <Text style={{ fontWeight: 'bold' }}>{maxVolumePerExercise[exerciseId].name ? capitalizeFirstLetter(maxVolumePerExercise[exerciseId].name) : ''}</Text> - {maxVolumePerExercise[exerciseId].reps} reps x {maxVolumePerExercise[exerciseId].lbs} lbs.
+                    <Text style={{ fontWeight: 'bold' }}>{exerciseName ? capitalizeFirstLetter(exerciseName) : ''}</Text> - {maxVolumePerExercise[exerciseId].reps} reps x {maxVolumePerExercise[exerciseId].lbs} lbs.
                     {index !== array.length - 1 && ' | '}
                   </Text>
-                ))}
-                </View>
+                );
+              })}
+            </View>
               </ScrollView>
             </View>
           </SafeAreaView>
