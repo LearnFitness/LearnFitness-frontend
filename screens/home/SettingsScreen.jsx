@@ -19,17 +19,17 @@ export default function SettingsScreen() {
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [vibrationEnabled, setVibrationEnabled] = useState(true);
 
-  const [editprofileData, setEditProfileData] = useState({
+  const [editProfileData, setEditProfileData] = useState({
     height: "",
     weight: "",
     gender: "",
     expLevel: "",
   });
 
-  const [selectedGender,  setSelectedGender] = useState(0);
+  const [selectedGender, setSelectedGender] = useState(0);
   const genders = ["Male", "Female", "Other"]
-  const [selectedLevel, setSelectedLevel] = useState(0);
-  const levels = ["Beginner", "Intermediate", "Expert"];
+  const [selectedExpLevel, setSelectedExpLevel] = useState(0);
+  const expLevels = ["Beginner", "Intermediate", "Advanced"];
 
   const updateUserProfile = async () => {
     try {
@@ -37,24 +37,24 @@ export default function SettingsScreen() {
 
       // Check if age is an integer
       const ageRegex = /^\d+$/;
-      if (!ageRegex.test(editprofileData.age)) {
+      if (!ageRegex.test(editProfileData.age)) {
         Alert.alert("Invalid Age", "Please enter a valid age.");
         return;
       }
 
       // Check if height is a float (optimal decimal point)
       const heightRegex = /^[0-9]+(\.[0-9]+)?$/;
-      if (!heightRegex.test(editprofileData.height)) {
+      if (!heightRegex.test(editProfileData.height)) {
         Alert.alert("Invalid Height", "Please enter a valid height.");
         return;
-      } else if (!editprofileData.height.includes('.')) {
+      } else if (!editProfileData.height.includes('.')) {
         // Convert height from integer to float with one decimal point
-        editprofileData.height = parseFloat(editprofileData.height).toFixed(1);
+        editProfileData.height = parseFloat(editProfileData.height).toFixed(1);
       }
 
       // Check if weight is an integer
       const weightRegex = /^\d+$/;
-      if (!weightRegex.test(editprofileData.weight)) {
+      if (!weightRegex.test(editProfileData.weight)) {
         Alert.alert("Invalid Weight", "Please enter a valid weight.");
         return;
       }
@@ -65,7 +65,11 @@ export default function SettingsScreen() {
       const snapshot = await userRef.get();
       if (!snapshot.empty) {
         const doc = snapshot.docs[0];
-        await doc.ref.update(editprofileData);
+        await doc.ref.update(editProfileData);
+
+        // Handle changing user exp level
+        handleEditExpLevel(editProfileData.expLevel);
+
         Alert.alert("Changes saved.");
       } else {
         Alert.alert("An error occured.");
@@ -101,7 +105,7 @@ export default function SettingsScreen() {
           expLevel: userData.expLevel,
         })
         setSelectedGender(genders.indexOf(userData.gender))
-        setSelectedLevel(levels.indexOf(userData.expLevel));
+        setSelectedExpLevel(expLevels.indexOf(userData.expLevel));
       } catch (error) {
         Alert.alert("An error occurred", error);
       } finally {
@@ -110,6 +114,18 @@ export default function SettingsScreen() {
     }
     fetchData();
   }, []);
+
+  async function handleEditExpLevel(newExpLevel) {
+    let newRecommendedWorkouts = [];
+    const recommendedWorkoutsSnapshot = await firestore().collection("premade_workouts").where("expLevel", "==", newExpLevel.toLowerCase()).get();
+    recommendedWorkoutsSnapshot.forEach(snapshot => {
+      newRecommendedWorkouts.push(snapshot.id);
+    })
+
+    await firestore().collection("users").doc(auth().currentUser.uid).update({
+      recommendedWorkouts: newRecommendedWorkouts
+    })
+  }
 
   async function handleEditPhoto(photoObject) {
     setPhotoObject(photoObject);
@@ -190,6 +206,7 @@ export default function SettingsScreen() {
                 <Text style={styles.button}>Edit Profile</Text>
               </View>
             </Pressable>
+
             {/* Notifications settings */}
             <Pressable onPress={toggleNotificationSettings}>
               <View style={styles.buttonRow}>
@@ -202,6 +219,7 @@ export default function SettingsScreen() {
                 <Text style={styles.button}>Notifications</Text>
               </View>
             </Pressable>
+
             {/* Logout button */}
             <Pressable onPress={handleLogout}>
               <View style={styles.buttonRow}>
@@ -274,10 +292,10 @@ export default function SettingsScreen() {
                 <Text style={styles.edittitle}>Name</Text>
                 <TextInput
                   onChangeText={(e) => {
-                    setEditProfileData({ ...editprofileData, name: e });
+                    setEditProfileData({ ...editProfileData, name: e });
                   }}
                   style={styles.inputComponent}
-                  value={editprofileData.name || ""}
+                  value={editProfileData.name || ""}
                 />
               </View>
               <Divider />
@@ -285,10 +303,10 @@ export default function SettingsScreen() {
                 <Text style={styles.edittitle}>Age</Text>
                 <TextInput
                   onChangeText={(e) => {
-                    setEditProfileData({ ...editprofileData, age: e });
+                    setEditProfileData({ ...editProfileData, age: e });
                   }}
                   style={styles.inputComponent}
-                  value={editprofileData.age || ""}
+                  value={editProfileData.age || ""}
                 />
               </View>
               <Divider />
@@ -305,10 +323,10 @@ export default function SettingsScreen() {
                 <Text style={styles.edittitle}>Height (ft.in)</Text>
                 <TextInput
                   onChangeText={(e) => {
-                    setEditProfileData({ ...editprofileData, height: e });
+                    setEditProfileData({ ...editProfileData, height: e });
                   }}
                   style={styles.inputComponent}
-                  value={editprofileData.height || ""}
+                  value={editProfileData.height || ""}
                 />
               </View>
               <Divider />
@@ -316,10 +334,10 @@ export default function SettingsScreen() {
                 <Text style={styles.edittitle}>Weight (lbs)</Text>
                 <TextInput
                   onChangeText={(e) => {
-                    setEditProfileData({ ...editprofileData, weight: e });
+                    setEditProfileData({ ...editProfileData, weight: e });
                   }}
                   style={styles.inputComponent}
-                  value={editprofileData.weight || ""}
+                  value={editProfileData.weight || ""}
                 />
               </View>
               <Divider />
@@ -331,7 +349,7 @@ export default function SettingsScreen() {
                   onPress={(value) => {
                     setSelectedGender(value);
                     setEditProfileData({
-                      ...editprofileData,
+                      ...editProfileData,
                       gender: genders[value],
                     });
                   }}
@@ -342,13 +360,13 @@ export default function SettingsScreen() {
               <View style={{ flexDirection: "col" }}>
                 <Text style={styles.edittitle}> Experience Level</Text>
                 <ButtonGroup
-                  buttons={levels}
-                  selectedIndex={selectedLevel}
+                  buttons={expLevels}
+                  selectedIndex={selectedExpLevel}
                   onPress={(value) => {
-                    setSelectedLevel(value);
+                    setSelectedExpLevel(value);
                     setEditProfileData({
-                      ...editprofileData,
-                      expLevel: levels[value],
+                      ...editProfileData,
+                      expLevel: expLevels[value],
                     });
                   }}
                   containerStyle={{ marginBottom: 20 }}
@@ -360,10 +378,10 @@ export default function SettingsScreen() {
                 title="Save Changes"
                 handleOnPress={() => updateUserProfile()}
                 disabled={
-                  editprofileData.expLevel === "" ||
-                  editprofileData.weight === "" ||
-                  editprofileData.height === "" ||
-                  editprofileData.gender === ""
+                  editProfileData.expLevel === "" ||
+                  editProfileData.weight === "" ||
+                  editProfileData.height === "" ||
+                  editProfileData.gender === ""
                 }
               />
             </View>

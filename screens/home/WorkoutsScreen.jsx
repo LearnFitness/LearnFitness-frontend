@@ -38,6 +38,7 @@ export default function WorkoutsScreen({ route, navigation }) {
     return () => unsubscribe();
   }, []);
 
+  // Get recommended workouts
   useEffect(() => {
     const unsubscribe = firestore()
       .collection('users')
