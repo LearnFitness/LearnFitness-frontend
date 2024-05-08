@@ -92,7 +92,8 @@ export const WorkoutModal = ({ workout, navigation, isWorkoutModalVisible, handl
         .add({
           name: workout.name,
           description: workout.description,
-          exercises: workout.exercises
+          exercises: workout.exercises,
+          imgUrl: workout.imgUrl
         });
       handleCloseModal();
       await handleRemoveRecommendation(toastShown = false);

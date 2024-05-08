@@ -12,6 +12,7 @@ import { AntDesign } from "@expo/vector-icons";
 export default function StartWorkoutScreen({ route, navigation }) {
   const { workout, exercise, action } = route.params;
   const sessionDate = new Date();
+  const [sessionImgUrl, setSessionImgUrl] = useState(workout ? workout.imgUrl : "")
   const [sessionId, setSessionId] = useState("");
   const [sessionName, setSessionName] = useState(workout ? workout.name : "");
   const [sessionDescription, setSessionDescription] = useState(workout ? workout.description : "");
@@ -133,7 +134,6 @@ export default function StartWorkoutScreen({ route, navigation }) {
       }
       return ex;
     });
-    console.log("Updated exercises:", updatedExercises[0].sets);
     setExercises(updatedExercises);
   };
 
@@ -147,7 +147,6 @@ export default function StartWorkoutScreen({ route, navigation }) {
       }
       return ex;
     });
-    console.log("Updated exercises:", updatedExercises[0].sets);
     setExercises(updatedExercises);
   };
 
@@ -199,7 +198,8 @@ export default function StartWorkoutScreen({ route, navigation }) {
           description: sessionDescription,
           exercises: filteredExercises,
           date: sessionDate,
-          duration: sessionDuration
+          duration: sessionDuration,
+          imgUrl: sessionImgUrl
         };
 
         if (action === "edit") {
@@ -404,8 +404,6 @@ export default function StartWorkoutScreen({ route, navigation }) {
       </View>
     );
   }
-
-
 }
 
 function padToTwoDigits(number) {

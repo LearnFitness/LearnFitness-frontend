@@ -102,7 +102,7 @@ export default function SessionModal({ route, navigation }) {
         :
         <>
           <Animated.Image
-            source={require("./../assets/workout_plans_images/leg1.jpg")}
+            source={{ uri: session.data.imgUrl }}
             style={[styles.sessionImage, imageAnimatedStyle]}
             resizeMode="cover"
           />
