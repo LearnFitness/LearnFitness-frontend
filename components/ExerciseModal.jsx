@@ -4,12 +4,13 @@ import { Divider } from "@rneui/themed";
 import { useState } from "react";
 import { useEffect } from "react";
 import firestore from "@react-native-firebase/firestore";
+import auth from "@react-native-firebase/auth";
 import Feather from "react-native-vector-icons/Feather";
 import YoutubePlayer from "react-native-youtube-iframe";
 import axios from "axios";
 
 export default function ExerciseModal({ route, navigation }) {
-  const [exercise, setExercise] = useState([]);
+  const [exercise, setExercise] = useState({});
   const [videoId, setVideoId] = useState(null);
   const [loading, setLoading] = useState(true);
   const exerciseId = route.params.exerciseId;
@@ -18,7 +19,8 @@ export default function ExerciseModal({ route, navigation }) {
     async function fetchExercise() {
       try {
         const exercise = await firestore().collection("exercises").doc(exerciseId).get();
-        setExercise(exercise.data());
+        const PR = await firestore().collection("users").doc(auth().currentUser.uid).collection("PRs").doc(exerciseId).get();
+        setExercise({ ...exercise.data(), PR: PR ? PR.data() : null });
         setLoading(false);
         const res = await axios.get(`https://www.googleapis.com/youtube/v3/search?key=AIzaSyB7YEQGU5t822OQfJAi-vq169iW1lIR2Pc&part=id&q=${exercise.data().name + " exercise"}`);
         if (res.data.pageInfo.totalResults > 0) {
@@ -95,7 +97,9 @@ export default function ExerciseModal({ route, navigation }) {
             <View style={styles.PRContainer}>
               <Text style={styles.exerciseKey}>Your PR</Text>
               <View style={{ backgroundColor: "rgba(0,128,128,0.07)", padding: 7, borderRadius: 10 }}>
-                <Text style={styles.PRValue}>40 lbs x 12</Text>
+                <Text style={styles.PRValue}>
+                  {exercise?.PR ? `${exercise.PR.lbs} lbs x ${exercise.PR.reps}` : "-"}
+                </Text>
               </View>
             </View>
 

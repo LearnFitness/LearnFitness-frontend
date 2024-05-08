@@ -191,7 +191,7 @@ export default function SettingsScreen() {
   };
 
   return (
-    <SafeAreaView>
+    <SafeAreaView style={{ flex: 1 }}>
       <View style={styles.container}>
         <FocusAwareStatusBar
           translucent

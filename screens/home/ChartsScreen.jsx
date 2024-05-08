@@ -28,6 +28,7 @@ import {
 } from "react-native-chart-kit";
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { FontAwesome6 } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 
 export default function ChartsScreen({ navigation }) {
   // export default function ProgressScreen({ navigation }) {
@@ -45,6 +46,17 @@ export default function ChartsScreen({ navigation }) {
   const [weeklyWorkouts, setWeeklyWorkouts] = useState([]);
   const [maxVolumePerExercise, setMaxVolumePerExercise] = useState({});
   const [exerciseNames, setExerciseNames] = useState({});
+
+  async function updateExercisePR(maxVolumeData) {
+    const PRsRef = await firestore().collection("users").doc(auth().currentUser.uid).collection("PRs");
+
+    Object.entries(maxVolumeData).forEach(async ([id, { reps, lbs }]) => {
+      await PRsRef.doc(id).set({
+        reps,
+        lbs
+      })
+    })
+  }
 
   useEffect(() => {
     const unsubscribe = firestore()
@@ -104,6 +116,8 @@ export default function ChartsScreen({ navigation }) {
         setCompletedWorkoutDates(dates);
         setTotalWorkouts(totalWorkouts);
         setMaxVolumePerExercise(maxVolumeData);
+
+        updateExercisePR(maxVolumeData);
 
         if (totalWorkouts > 0) {
           const firstSessionDate =
@@ -192,7 +206,7 @@ export default function ChartsScreen({ navigation }) {
           <ActivityIndicator size="large" color="#FFFFFF" style={styles.loading} />
         ) : (
           <SafeAreaView style={styles.contentContainer}>
-            <Text style={styles.sectionTitle}>Workout Intensity Over the Week</Text>
+            <Text style={styles.sectionTitle}><Ionicons name="bar-chart" size={24} color="white" />  Workout Intensity Over the Week</Text>
             <BarChart
               data={{
                 labels: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
@@ -205,7 +219,7 @@ export default function ChartsScreen({ navigation }) {
               style={styles.chartStyle}
             />
 
-            <Text style={styles.sectionTitle}>Total Workouts Per Week</Text>
+            <Text style={styles.sectionTitle}><Ionicons name="bar-chart" size={24} color="white" />  Total Workouts Per Week</Text>
             <BarChart
               data={{
                 labels: weeklyWorkouts.map(data => data.weekLabel),
