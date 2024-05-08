@@ -71,6 +71,7 @@ export default function SettingsScreen() {
         handleEditExpLevel(editProfileData.expLevel);
 
         Alert.alert("Changes saved.");
+        setShowEditProfileSettings(false);
       } else {
         Alert.alert("An error occured.");
       }
@@ -79,7 +80,6 @@ export default function SettingsScreen() {
       Alert.alert("An error occured.");
     } finally {
       setLoading(false);
-      setShowEditProfileSettings(false);
     }
   };
 

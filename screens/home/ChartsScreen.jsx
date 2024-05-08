@@ -10,7 +10,9 @@ import {
   ActivityIndicator,
   Dimensions,
   ScrollView,
+  StatusBar
 } from "react-native";
+import { useIsFocused } from '@react-navigation/native';
 import LinearBackground from "../../components/LinearBackground";
 import auth from "@react-native-firebase/auth";
 import { Feather } from "@expo/vector-icons";
@@ -180,15 +182,25 @@ export default function ChartsScreen({ navigation }) {
     return string.toLowerCase().split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
   };
 
+  function FocusAwareStatusBar(props) {
+    const isFocused = useIsFocused();
+    return isFocused ? <StatusBar {...props} /> : null;
+  }
+
   return (
     <LinearBackground>
+      <FocusAwareStatusBar
+        translucent
+        backgroundColor="transparent"
+        barStyle={"dark-content"}
+      />
       <ScrollView>
         {loading ? (
           <ActivityIndicator style={{ flex: 1 }} />
         ) : (
           <SafeAreaView>
             <View>
-              {/* <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', margin: 20, marginTop: 40 }}> 
+              {/* <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', margin: 20, marginTop: 40 }}>
               <Text style={{ color: 'white', fontSize: 24, fontWeight: 'bold', marginLeft: 10 }}>My Progress</Text>
                 <Pressable onPress={() => navigation.navigate('Settings')}>
                   <AvatarDisplay source={userData && userData.photoURL ? { uri: userData.photoURL } : null} size={60} editable={false} clickable={false} />
@@ -368,7 +380,7 @@ const styles = StyleSheet.create({
   },
   sectionTitleContainer: {
     borderTopWidth: 1,
-    borderTopColor: '#FFFFFF', 
+    borderTopColor: '#FFFFFF',
     paddingTop: 10,
     paddingBottom: 5,
     marginBottom: 10,
@@ -379,7 +391,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   prContainer: {
-    flexDirection: 'row', 
+    flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 10,
   },

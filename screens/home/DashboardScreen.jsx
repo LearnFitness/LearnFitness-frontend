@@ -8,6 +8,8 @@ import auth from "@react-native-firebase/auth";
 import firestore from "@react-native-firebase/firestore";
 import News from "../../components/News";
 
+const statusBarHeight = Platform.OS === 'android' ? StatusBar.currentHeight + 10 : 0;
+
 const DAYS_OF_WEEK = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 const currentDayOfWeek = DAYS_OF_WEEK[new Date().getDay()];
 const MOTIVATIONAL_QUOTES = [
@@ -90,7 +92,7 @@ export default function DashboardScreen({ navigation }) {
       ) : null}
 
       <LinearBackground>
-        <ScrollView>
+        <ScrollView style={{ marginTop: statusBarHeight }}>
           <View style={styles.container}>
             <View style={styles.greetingContainer}>
               <UserGreeting />

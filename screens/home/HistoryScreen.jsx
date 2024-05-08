@@ -8,8 +8,10 @@ import {
   ActivityIndicator,
   Image,
   SectionList,
-
+  Alert,
+  StatusBar
 } from "react-native";
+import { useIsFocused } from '@react-navigation/native';
 import { Calendar } from "react-native-calendars";
 import firestore from "@react-native-firebase/firestore";
 import auth from "@react-native-firebase/auth";
@@ -25,7 +27,7 @@ import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 const HistoryScreen = ({ navigation }) => {
   const [loading, setLoading] = useState(true);
   const [sessions, setSessions] = useState([]);
-  const [showCalendar, setShowCalendar] = useState(false);
+  const [showCalendar, setShowCalendar] = useState(true);
   const [markedDates, setMarkedDates] = useState({});
   const sectionListRef = useRef(null);
   const opacity = useSharedValue(0);
@@ -35,9 +37,22 @@ const HistoryScreen = ({ navigation }) => {
   const [selectedDate, setSelectedDate] = useState("");
 
   const onDayPress = (day) => {
-    scrollToDate(day.dateString);
-    setSelectedDate(day.dateString);
-  }
+    const selectedDateString = day.dateString;
+    const hasWorkouts = markedDates[selectedDateString] && markedDates[selectedDateString].marked;
+
+    if (hasWorkouts) {
+      scrollToDate(selectedDateString);
+      setSelectedDate(selectedDateString);
+    } else {
+      // Display alert if no workouts are found for the selected date
+      Alert.alert(
+        "No workouts!",
+        "There are no completed workouts for this date.",
+        [{ onPress: () => console.log("OK") }],
+        { cancelable: true }
+      );
+    }
+  };
 
   useEffect(() => {
     if (markedDates[selectedDate]) {
@@ -208,8 +223,18 @@ const HistoryScreen = ({ navigation }) => {
     }
   };
 
+  function FocusAwareStatusBar(props) {
+    const isFocused = useIsFocused();
+    return isFocused ? <StatusBar {...props} /> : null;
+  }
+
   return (
     <LinearBackground>
+      <FocusAwareStatusBar
+        translucent
+        backgroundColor="transparent"
+        barStyle={"dark-content"}
+      />
       {loading ? (
         <ActivityIndicator style={{ flex: 1 }} />
       ) : (

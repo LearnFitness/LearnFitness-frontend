@@ -1,7 +1,7 @@
 import firestore from "@react-native-firebase/firestore";
 import auth from "@react-native-firebase/auth";
 import React, { useEffect, useState, useCallback } from "react";
-import { View, Text, StyleSheet, ScrollView, Image, Pressable, Alert, ActivityIndicator, Modal, TouchableOpacity } from "react-native";
+import { View, Text, StyleSheet, ScrollView, Image, Pressable, Alert, ActivityIndicator, Modal, TouchableOpacity, Platform, StatusBar } from "react-native";
 import LinearBackground from "../../components/LinearBackground";
 import { getBackendData } from "./../../utils/backendAPI";
 import { WorkoutModal } from "../../components/WorkoutModal";
@@ -99,12 +99,14 @@ export default function WorkoutsScreen({ route, navigation }) {
     );
   }, []);
 
+  const statusBarHeight = Platform.OS === 'android' ? StatusBar.currentHeight + 10 : 0;
+
   return (
     <LinearBackground containerStyle={styles.container}>
       {loading ? <ActivityIndicator style={{ flex: 1 }} />
         : (
           <>
-            <ScrollView contentContainerStyle={{ paddingBottom: 80 }}>
+            <ScrollView style={{ marginTop: statusBarHeight }} contentContainerStyle={{ paddingBottom: 90 }}>
               <Text style={styles.title}>Your Workouts</Text>
               <View style={styles.workoutsContainer}>
                 {workouts.length === 0 ?
@@ -155,7 +157,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: "bold",
     color: "white",
-    marginTop: 50,
+    marginTop: 10,
     marginBottom: 10,
   },
   workoutsContainer: {

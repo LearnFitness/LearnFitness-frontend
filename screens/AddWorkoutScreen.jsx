@@ -7,7 +7,7 @@ import auth from "@react-native-firebase/auth";
 import Ionicon from "react-native-vector-icons/Ionicons";
 import toast from "../utils/toast";
 import { useHeaderHeight } from "@react-navigation/elements";
-import storage from "@react-native-firebase/storage";
+//import storage from "@react-native-firebase/storage";
 
 export default function AddWorkoutScreen({ route, navigation }) {
   const { workout, exercise, image, action } = route.params ? route.params : {};
