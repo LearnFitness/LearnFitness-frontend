@@ -145,7 +145,7 @@ const HistoryScreen = ({ navigation }) => {
       }}
     >
       <Image
-        source={require("./../../assets/workout_plans_images/leg1.jpg")}
+        source={{ uri: item.imgUrl }}
         style={styles.workoutImage}
       />
       <View style={styles.completedWorkoutDetails}>

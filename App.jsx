@@ -17,6 +17,7 @@ import ExerciseModal from "./components/ExerciseModal";
 import ExercisesSearchModal from "./components/ExercisesSearchModal";
 import StartWorkoutScreen from "./screens/StartWorkoutScreen";
 import SessionModal from "./screens/SessionModal";
+import WorkoutImagePicker from "./components/WorkoutImagePicker";
 
 const Stack = createNativeStackNavigator();
 
@@ -81,6 +82,7 @@ export default function App() {
                 <Stack.Screen name="ExercisesSearchModal" component={ExercisesSearchModal} />
                 <Stack.Screen name="ExerciseModal" component={ExerciseModal} />
                 <Stack.Screen name="SessionModal" component={SessionModal} />
+                <Stack.Screen name="WorkoutImagePicker" component={WorkoutImagePicker} />
               </Stack.Group>
             </>
             :

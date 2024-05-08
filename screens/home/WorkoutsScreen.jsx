@@ -1,6 +1,6 @@
 import firestore from "@react-native-firebase/firestore";
 import auth from "@react-native-firebase/auth";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { View, Text, StyleSheet, ScrollView, Image, Pressable, Alert, ActivityIndicator, Modal, TouchableOpacity } from "react-native";
 import LinearBackground from "../../components/LinearBackground";
 import { getBackendData } from "./../../utils/backendAPI";
@@ -73,7 +73,7 @@ export default function WorkoutsScreen({ route, navigation }) {
   };
 
 
-  const WorkoutItem = ({ workout }) => {
+  const WorkoutItem = useCallback(({ workout }) => {
     const handleQuickView = () => {
       setSelectedWorkout(workout);
       setWorkoutModalVisible(true);
@@ -90,14 +90,14 @@ export default function WorkoutsScreen({ route, navigation }) {
 
     return (
       <TouchableOpacity activeOpacity={0.7} style={styles.workoutItemContainer} onPress={handleQuickView}>
-        <Image source={require("./../../assets/workout_plans_images/leg1.jpg")} style={styles.workoutImage} />
+        <Image source={{uri: workout.imgUrl}} style={styles.workoutImage} />
         <View style={styles.workoutDetailsContainer}>
           <Text style={styles.workoutName}>{workout.name}</Text>
           <Text style={styles.workoutDescription}>{generateBriefDescription()}</Text>
         </View>
       </TouchableOpacity>
     );
-  };
+  }, []);
 
   return (
     <LinearBackground containerStyle={styles.container}>

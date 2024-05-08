@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { View, ScrollView, Text, StyleSheet, Alert, TextInput, TouchableOpacity, Platform } from "react-native";
+import { View, ScrollView, Text, StyleSheet, Alert, TextInput, TouchableOpacity, Platform, Image } from "react-native";
 import LinearBackground from "../components/LinearBackground";
 import FontAwesome from "react-native-vector-icons/FontAwesome6";
 import firestore from "@react-native-firebase/firestore";
@@ -7,15 +7,23 @@ import auth from "@react-native-firebase/auth";
 import Ionicon from "react-native-vector-icons/Ionicons";
 import toast from "../utils/toast";
 import { useHeaderHeight } from "@react-navigation/elements";
+import storage from "@react-native-firebase/storage";
 
 export default function AddWorkoutScreen({ route, navigation }) {
-  const { workout, exercise, action } = route.params ? route.params : {};
+  const { workout, exercise, image, action } = route.params ? route.params : {};
+  const [workoutImage, setWorkoutImage] = useState(null);
   const [workoutId, setWorkoutId] = useState("");
   const [workoutName, setWorkoutName] = useState("");
   const [workoutDescription, setWorkoutDescription] = useState("");
   const [exercises, setExercises] = useState([]);
   const scrollYRef = useRef(0);  // Using useRef to hold the current scroll position
   const headerHeight = useHeaderHeight();
+
+  // const geturl = async () => {
+  //   const url = await storage().ref("/workoutImages/back.png").getDownloadURL();
+  //   console.log(url);
+  // }
+  // geturl();
 
   const handleScroll = (event) => {
     const newY = event.nativeEvent.contentOffset.y;
@@ -47,8 +55,12 @@ export default function AddWorkoutScreen({ route, navigation }) {
       setWorkoutName(workout.name);
       setWorkoutDescription(workout.description);
       setExercises(workout.exercises);
+      setWorkoutImage({ data: { url: workout.imgUrl } })
     }
-  }, [exercise, workout]);
+    if (image) {
+      setWorkoutImage(image);
+    }
+  }, [exercise, workout, image]);
 
   function handleGoBack() {
     if (!workoutName && exercises.length === 0) {
@@ -122,7 +134,8 @@ export default function AddWorkoutScreen({ route, navigation }) {
       const newWorkout = {
         name: workoutName,
         description: workoutDescription,
-        exercises: exercises
+        exercises: exercises,
+        imgUrl: workoutImage.data.url
       };
 
       if (action === "edit") {
@@ -144,6 +157,13 @@ export default function AddWorkoutScreen({ route, navigation }) {
     <LinearBackground containerStyle={{ paddingHorizontal: "5%" }} safeAreaView={false}>
       <ScrollView onScroll={handleScroll} scrollEventThrottle={15} style={{ paddingTop: Platform.OS === 'ios' ? headerHeight : 0 }}
       >
+        <TouchableOpacity onPress={() => navigation.navigate("WorkoutImagePicker")}>
+          <Image
+            source={workoutImage ? { uri: workoutImage.data.url } : require("./../assets/workout_plans_images/leg1.jpg")}
+            style={{ alignSelf: "center", width: 150, height: 150, margin: 15, borderRadius: 5 }}
+          />
+        </TouchableOpacity>
+
         <TextInput
           style={styles.workoutName}
           placeholder="Workout name"
@@ -239,7 +259,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontSize: 28,
     fontWeight: "600",
-    marginTop: 20
+    marginTop: 10
   },
   workoutDescription: {
     color: "grey",

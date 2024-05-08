@@ -167,7 +167,7 @@ export default function DashboardScreen({ navigation }) {
               const sessionDate = new Date(sessionData.date.seconds * 1000);
               return (
                 <TouchableOpacity activeOpacity={0.6} key={index} style={styles.completedWorkout} onPress={() => handleViewSession(session)}>
-                  <Image source={require("./../../assets/workout_plans_images/leg1.jpg")} style={styles.workoutImage} />
+                  <Image source={{ uri: sessionData.imgUrl }} style={styles.workoutImage} />
                   <View style={styles.completedWorkoutDetails}>
                     <Text style={styles.workoutName}>{sessionData.name}</Text>
                     <Text style={styles.workoutDate}>{sessionDate.toDateString()} at {sessionDate.toLocaleTimeString()}</Text>
