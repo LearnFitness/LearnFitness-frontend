@@ -1,5 +1,7 @@
 # LearnFitness mobile app
 
+[YouTube link to app demo](https://youtu.be/lCQBNHP2-MQ)
+
 Welcome to the repository of our LearnFitness mobile app, a cutting-edge solution designed to cater to fitness enthusiasts and individuals looking to enhance their physical well-being through structured and engaging workout routines.
 
 ## Contribution and workflow
